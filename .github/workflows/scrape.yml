@@ -7,7 +7,7 @@ on:
     # the hour (0 * * * *): GitHub's scheduled-workflow queue spikes hardest
     # exactly at :00 because so many repos worldwide schedule there too,
     # which was causing runs to be delayed or dropped entirely.
-    - cron: '30 * * * *'
+    - cron: '40 * * * *'
   workflow_dispatch: {}   # allows manually triggering a run from the Actions tab
 
 permissions:
