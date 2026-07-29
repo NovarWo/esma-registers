@@ -65,6 +65,19 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 .topnav__links a:hover { background: rgba(35,48,218,.08); }
 .topnav__links a.active { background: var(--color-primary); color: #fff; }
 
+/* NL/EN language toggle, top right of the nav */
+.lang-toggle {
+  display: inline-flex; align-items: center; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
+}
+.lang-toggle__btn {
+  font-family: inherit; font-size: .75rem; font-weight: 700; letter-spacing: .02em; cursor: pointer;
+  border: none; background: none; color: var(--text-muted); border-radius: var(--radius-pill);
+  padding: 5px 11px; transition: background .15s ease, color .15s ease;
+}
+.lang-toggle__btn:hover { color: var(--text); }
+.lang-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
+
 /* Page header */
 .page-header { margin-bottom: 28px; }
 .page-header h1 { font-size: 1.75rem; font-weight: 700; }
@@ -173,17 +186,37 @@ table.data thead tr.col-filter-row th.col-filter-cell {
 .col-filter-dropdown__check { width: 14px; height: 14px; margin-left: auto; flex: none; visibility: hidden; }
 .col-filter-dropdown__option.is-selected .col-filter-dropdown__check { visibility: visible; }
 
+/* Search box pinned to the top of a dropdown popover (Land / Toezichthouder
+   have too many options to scan by eye — typing "nede" narrows to Nederland). */
+.col-filter-dropdown__search {
+  display: block; width: 100%; box-sizing: border-box; margin-bottom: 6px;
+  font-family: inherit; font-size: .8125rem; color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius-pill);
+  padding: 6px 12px; background: var(--surface-2);
+}
+.col-filter-dropdown__search:focus {
+  outline: none; border-color: var(--color-primary); background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(35,48,218,.12);
+}
+
 /* Icons shown inside dropdown option rows (and the button once selected) */
 .dropdown-icon--flag { font-size: 1.05em; line-height: 1; }
-.dropdown-icon--authority {
-  display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px;
-  border-radius: var(--radius-sm); background: var(--color-primary-lighter); color: var(--color-primary); flex: none;
-}
-.dropdown-icon--authority svg { width: 12px; height: 12px; }
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .status-dot--active { background: var(--color-success); }
 .status-dot--withdrawn { background: var(--grey-400); }
 .status-dot--unknown { background: var(--grey-300); }
+
+/* Authority "logo": a monogram badge (bracketed code from ESMA's data, e.g.
+   FMA/BaFin/AFM, or an acronym built from the full name) in the same
+   light-blue circular treatment used elsewhere on the site — used both in
+   the Toezichthouder filter list and in the register table's own column. */
+.authority-badge {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px;
+  padding: 0 4px; border-radius: var(--radius-sm); background: var(--color-primary-lighter); color: var(--color-primary);
+  font-size: .6875rem; font-weight: 700; letter-spacing: .01em; line-height: 1; flex: none;
+}
+.authority-badge--small { font-size: .625rem; }
+.authority-badge--tiny { font-size: .5625rem; }
 
 /* Chip-popover column filter (used where a column can have multiple values
    selected at once, OR-combined — e.g. CASP Diensten). A native <select>

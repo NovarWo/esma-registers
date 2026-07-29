@@ -9,6 +9,13 @@ const { window } = dom;
 global.window = window;
 global.document = window.document;
 
+// i18n.js MUST load before app.js — app.js calls t()/getLang() while building
+// CASP_SERVICES and REGISTERS at parse time.
+const i18nJs = fs.readFileSync(new URL("../assets/js/i18n.js", import.meta.url), "utf-8");
+const i18nScriptEl = window.document.createElement("script");
+i18nScriptEl.textContent = i18nJs;
+window.document.body.appendChild(i18nScriptEl);
+
 const appJs = fs.readFileSync(new URL("../assets/js/app.js", import.meta.url), "utf-8");
 const scriptEl = window.document.createElement("script");
 scriptEl.textContent = appJs;
@@ -17,16 +24,27 @@ window.document.body.appendChild(scriptEl);
 // const/let declarations in a classic <script> don't attach to `window` - bridge
 // them explicitly so this harness (running as a separate ES module) can reach them.
 const bridge = window.document.createElement("script");
-bridge.textContent = "window.__b = { REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES, extractServiceCode, countryName, parseEsmaDate };";
+bridge.textContent = "window.__b = { REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES, extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityAcronym, authorityBadgeHtml, shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml };";
 window.document.body.appendChild(bridge);
 
-const { REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES, extractServiceCode, countryName, parseEsmaDate } = window.__b;
+const {
+  REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES,
+  extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityAcronym,
+  authorityBadgeHtml, shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml,
+} = window.__b;
 
 let failures = 0;
 function check(label, cond) {
   console.log(`[${cond ? "OK  " : "FAIL"}] ${label}`);
   if (!cond) failures++;
 }
+
+// --- i18n ---
+check("Default language is Dutch (no localStorage value set)", getLang() === "nl");
+check("t() resolves a nested NL string", t("columns.name") === "Naam");
+check("t() falls back to the raw key when a path doesn't exist", t("nonexistent.path") === "nonexistent.path");
+check("t() resolves a templated (function-valued) string with args", t("table.count", 3, 10) === "3 van 10 records");
+check("CASP_SERVICES labels are sourced from the i18n dictionary", CASP_SERVICES[0].label === t("services.a.label") && CASP_SERVICES[0].label === "Bewaring");
 
 // --- pure helpers ---
 check("cleanServiceLabel strips letter prefix", cleanServiceLabel("a. providing custody and administration of crypto-assets on behalf of clients") === "Providing custody and administration of crypto-assets on behalf of clients");
@@ -37,6 +55,33 @@ check("CASP_SERVICES has all 10 canonical MiCAR services (a-j)", CASP_SERVICES.l
 check("extractServiceCode reads the leading letter", extractServiceCode("a. providing custody and administration of crypto-assets on behalf of clients") === "a");
 check("extractServiceCode falls back to keyword match when no letter prefix", extractServiceCode("exchange of crypto-assets for funds") === "c");
 check("extractServiceCode returns null for unrecognisable text", extractServiceCode("something completely unrelated") === null);
+
+// --- authority monogram badges ("logos") ---
+check("authorityAcronym uses the bracketed code when ESMA's data has one", authorityAcronym("Netherlands Authority for the Financial Markets (AFM)") === "AFM");
+check("authorityAcronym derives initials when there's no bracketed code", authorityAcronym("Banco de Portugal") === "BP");
+check("authorityAcronym skips stopwords like 'of'/'the' when deriving initials", authorityAcronym("Central Bank of Iceland") === "CBI");
+check("authorityBadgeHtml renders a .authority-badge span with the acronym text", authorityBadgeHtml("Netherlands Authority for the Financial Markets (AFM)").includes(">AFM<"));
+
+// --- reusable dropdown filter component (used by both register tables and changelog.html) ---
+{
+  const syntheticOptions = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "Nederland", "Duitsland"];
+  let picked;
+  const dd = buildDropdownFilter({
+    label: "Test", options: syntheticOptions, getValue: (v) => v, getLabel: (v) => v,
+    onChange: (v) => { picked = v; },
+  });
+  window.document.body.appendChild(dd.el);
+  check("Dropdown search box appears once there are more than 6 options", dd.el.querySelector(".col-filter-dropdown__search") !== null);
+  const searchInput = dd.el.querySelector(".col-filter-dropdown__search");
+  searchInput.value = "neder";
+  searchInput.dispatchEvent(new window.Event("input"));
+  const visibleNonAllRows = [...dd.el.querySelectorAll(".col-filter-dropdown__option")].filter((r) => r.textContent.trim() !== "Alle" && r.style.display !== "none");
+  check("Typing 'neder' narrows the option list to just Nederland", visibleNonAllRows.length === 1 && visibleNonAllRows[0].textContent.includes("Nederland"));
+  const nlRow = [...dd.el.querySelectorAll(".col-filter-dropdown__option")].find((r) => r.textContent.includes("Nederland"));
+  nlRow.dispatchEvent(new window.Event("click", { bubbles: true }));
+  check("Selecting the filtered option calls onChange with the right value", picked === "Nederland");
+  dd.el.remove();
+}
 
 // --- render each register with real fixture data ---
 for (const key of Object.keys(REGISTERS)) {
@@ -92,14 +137,18 @@ for (const key of Object.keys(REGISTERS)) {
 
   // Per-column filters generalise beyond CASPs too: non_compliant's
   // "authority" column shows the shortened name (via shortAuthority) as the
-  // select option label, not the raw long ESMA competent-authority string.
+  // dropdown option label, not the raw long ESMA competent-authority string,
+  // and each row carries its own monogram "logo" badge (not a generic icon).
   if (key === "non_compliant" && data.records.length) {
-    const authoritySelect = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authority"] .col-filter-select');
-    check(`${key}: authority column has a select filter`, authoritySelect !== null);
-    if (authoritySelect) {
-      const optionTexts = [...authoritySelect.options].map((o) => o.textContent);
-      check(`${key}: authority select shows the short "AFM" label, not the full raw name`,
-        optionTexts.includes("AFM") && !optionTexts.some((t) => t.includes("Netherlands Authority for the Financial Markets")));
+    const authorityDropdown = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authority"] .col-filter-dropdown');
+    check(`${key}: authority column has a dropdown filter`, authorityDropdown !== null);
+    if (authorityDropdown) {
+      const optionRows = authorityDropdown.querySelectorAll(".col-filter-dropdown__option");
+      const optionTexts = [...optionRows].map((o) => o.textContent.trim());
+      check(`${key}: authority dropdown shows the short "AFM" label, not the full raw name`,
+        optionTexts.some((txt) => txt.includes("AFM")) && !optionTexts.some((txt) => txt.includes("Netherlands Authority for the Financial Markets")));
+      const afmRow = [...optionRows].find((o) => o.textContent.includes("AFM"));
+      check(`${key}: authority dropdown rows carry the monogram badge (not a generic icon)`, afmRow.querySelector(".authority-badge") !== null && afmRow.querySelector(".authority-badge").textContent === "AFM");
     }
   }
 }
@@ -136,10 +185,19 @@ check("Every CASPs column has a filter cell (7 columns)", filterCells.length ===
 
 const cellFor = (key) => caspsRoot.querySelector(`tr.col-filter-row th.col-filter-cell[data-key="${key}"]`);
 check("Naam column gets a free-text filter input", cellFor("name").querySelector(".col-filter-input") !== null);
-check("Land column gets a select filter", cellFor("country").querySelector(".col-filter-select") !== null);
-check("Toezichthouder column gets a select filter", cellFor("authority").querySelector(".col-filter-select") !== null);
-check("Status column gets a select filter", cellFor("status").querySelector(".col-filter-select") !== null);
-check("Diensten column gets a chip-popover filter, not a select", cellFor("services").querySelector(".col-filter-chips") !== null);
+check("Land column gets a dropdown filter", cellFor("country").querySelector(".col-filter-dropdown") !== null);
+check("Toezichthouder column gets a dropdown filter", cellFor("authority").querySelector(".col-filter-dropdown") !== null);
+check("Status column gets a dropdown filter", cellFor("status").querySelector(".col-filter-dropdown") !== null);
+check("Diensten column gets a chip-popover filter, not a dropdown", cellFor("services").querySelector(".col-filter-chips") !== null);
+
+// Dropdown option rows carry the branded icon matching their column: a flag
+// for Land, and a colour-coded dot for Status.
+const countryOptionRows = cellFor("country").querySelectorAll(".col-filter-dropdown__option");
+const atRow = [...countryOptionRows].find((o) => o.textContent.includes("(AT)"));
+check("Land dropdown row for Oostenrijk (AT) shows a flag icon", atRow && atRow.querySelector(".dropdown-icon--flag") !== null);
+const statusOptionRows = cellFor("status").querySelectorAll(".col-filter-dropdown__option");
+const activeStatusRow = [...statusOptionRows].find((o) => o.textContent.trim() === "Actief");
+check("Status dropdown row for 'Actief' shows a green status dot", activeStatusRow && activeStatusRow.querySelector(".status-dot--active") !== null);
 
 // Text filter on "Naam": narrows to the matching CASP only.
 const nameInput = cellFor("name").querySelector(".col-filter-input");
@@ -151,15 +209,24 @@ nameInput.value = "";
 nameInput.dispatchEvent(new window.Event("input"));
 check("Clearing the Naam filter restores all 6 CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
 
-// Select filter on "Land": all sample CASPs happen to be NL-free (AT/CY/CZ/DE),
+// Dropdown filter on "Land": all sample CASPs happen to be NL-free (AT/CY/CZ/DE),
 // so filtering on "AT" should narrow to the 3 Austrian entries.
-const countrySelect = cellFor("country").querySelector(".col-filter-select");
-countrySelect.value = "AT";
-countrySelect.dispatchEvent(new window.Event("change"));
-check("Select filter on Land='AT' narrows to the 3 Austrian CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 3);
-countrySelect.value = "";
-countrySelect.dispatchEvent(new window.Event("change"));
-check("Clearing the Land filter restores all 6 CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+const countryDropdown = cellFor("country").querySelector(".col-filter-dropdown");
+const countryBtn = countryDropdown.querySelector(".col-filter-dropdown__btn");
+const countryList = countryDropdown.querySelector(".col-filter-dropdown__list");
+check("Land dropdown is closed by default", !countryList.classList.contains("open"));
+countryBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Clicking the Land filter button opens its dropdown", countryList.classList.contains("open"));
+const countryRows = countryList.querySelectorAll(".col-filter-dropdown__option");
+const atOptionRow = [...countryRows].find((o) => o.textContent.includes("(AT)"));
+atOptionRow.dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Selecting 'Oostenrijk (AT)' narrows to the 3 Austrian CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 3);
+check("Dropdown closes itself after picking an option", !countryList.classList.contains("open"));
+check("Filter button shows the selected flag + country once chosen", countryBtn.classList.contains("has-selection") && countryBtn.querySelector(".dropdown-icon--flag") !== null);
+countryBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+const allRow = [...countryList.querySelectorAll(".col-filter-dropdown__option")].find((o) => o.textContent.trim() === "Alle");
+allRow.dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Picking 'Alle' clears the Land filter (all 6 CASPs shown again)", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
 
 // Chip-popover filter on "Diensten": fixed canonical option set (10 services),
 // not derived from the data (which is what caused the earlier combinatorial-
@@ -195,6 +262,27 @@ check("After OR of 2 codes: 3 CASPs match (Trade Republic, Bitpanda, Bybit)", ca
 popover.querySelector(".chip-popover__clear").dispatchEvent(new window.Event("click", { bubbles: true }));
 check("'Alles wissen' resets the Diensten filter (all 6 CASPs shown again)", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
 check("Filter button count badge is hidden again after reset", chipsBtn.querySelector(".col-filter-chips__count").hidden === true);
+
+// --- "Reset filters" toolbar button clears every active filter at once ---
+const searchInputEl = caspsRoot.querySelector('input[type="search"]');
+searchInputEl.value = "bit";
+searchInputEl.dispatchEvent(new window.Event("input"));
+nameInput.value = "bitpanda";
+nameInput.dispatchEvent(new window.Event("input"));
+countryBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+[...countryList.querySelectorAll(".col-filter-dropdown__option")].find((o) => o.textContent.includes("(AT)")).dispatchEvent(new window.Event("click", { bubbles: true }));
+chipsBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+[...popover.querySelectorAll(".chip-popover__btn")].find((b) => b.textContent.includes("Bewaring")).dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Sanity: combined text+dropdown+chip filters narrow to just Bitpanda", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 1);
+
+const resetBtn = caspsRoot.querySelector(".btn--reset");
+check("Reset filters button renders in the toolbar", resetBtn !== null);
+resetBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Reset filters button restores all 6 CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+check("Reset filters clears the global search box", searchInputEl.value === "");
+check("Reset filters clears the Naam text filter", nameInput.value === "");
+check("Reset filters clears the Land dropdown back to 'Alle'", !countryBtn.classList.contains("has-selection"));
+check("Reset filters clears the Diensten chip selection", chipsBtn.querySelector(".col-filter-chips__count").hidden === true);
 
 console.log(failures === 0 ? "\nALL SITE TESTS PASSED" : `\n${failures} SITE TEST(S) FAILED`);
 process.exit(failures ? 1 : 0);

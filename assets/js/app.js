@@ -1,25 +1,19 @@
 /* ESMA MiCAR Register Tracker — shared front-end logic.
  * No build step, no framework: plain fetch() over the data/*.json files that
- * scraper/fetch_esma.py maintains, rendered with vanilla DOM APIs.
+ * scraper/fetch_esma.py maintains, rendered with vanilla DOM APIs. UI text
+ * comes from assets/js/i18n.js's t() helper, which MUST be loaded first.
  */
 
-const COUNTRY_NAMES = {
-  AT: "Oostenrijk", BE: "België", BG: "Bulgarije", CY: "Cyprus", CZ: "Tsjechië",
-  DE: "Duitsland", DK: "Denemarken", EE: "Estland", EL: "Griekenland", GR: "Griekenland",
-  ES: "Spanje", FI: "Finland", FR: "Frankrijk", HR: "Kroatië", HU: "Hongarije",
-  IE: "Ierland", IS: "IJsland", IT: "Italië", LI: "Liechtenstein", LT: "Litouwen",
-  LU: "Luxemburg", LV: "Letland", MT: "Malta", NL: "Nederland", NO: "Noorwegen",
-  PL: "Polen", PT: "Portugal", RO: "Roemenië", SE: "Zweden", SI: "Slovenië",
-  SK: "Slowakije", GB: "Verenigd Koninkrijk", CH: "Zwitserland",
-};
-
-// EL ("Griekenland" in older EU documents) has no matching flag - alias to GR.
+// EL ("Griekenland"/"Greece" in older EU documents) has no matching flag emoji
+// code point - alias to GR. This is a flag-rendering detail, not a language
+// string, so it stays here rather than in the i18n dictionary.
 const FLAG_ALIAS = { EL: "GR" };
 
 function countryName(code) {
   if (!code) return "—";
   const c = code.trim().toUpperCase();
-  return COUNTRY_NAMES[c] ? `${COUNTRY_NAMES[c]} (${c})` : c;
+  const name = t(`countries.${c}`);
+  return name === `countries.${c}` ? c : `${name} (${c})`;
 }
 
 function flagEmoji(code) {
@@ -46,10 +40,39 @@ function shortAuthority(name) {
   return m ? m[1].trim() : name.trim();
 }
 
+// A distinct "logo" per authority isn't practical (there's no real artwork to
+// draw from, and reproducing official government/regulator emblems would be
+// a copyright/trademark minefield) — instead every authority gets its own
+// monogram badge in the same light-blue circular style used elsewhere on the
+// site: the bracketed code if ESMA's data already has one (FMA, BaFin, AFM,
+// CySEC…), otherwise an acronym built from the significant words of the full
+// name (e.g. "Banco de Portugal" → "BdP", "Central Bank of Iceland" → "CBI").
+const AUTHORITY_ACRONYM_STOPWORDS = new Set([
+  "de", "van", "of", "and", "the", "la", "le", "les", "der", "den", "het",
+  "per", "e", "y", "und", "für", "fur", "och", "og", "voor", "for",
+]);
+
+function authorityAcronym(name) {
+  if (!name) return "?";
+  const trimmed = name.trim();
+  const short = shortAuthority(trimmed);
+  if (short !== trimmed) return short; // already has an explicit bracketed code
+  const words = trimmed.split(/\s+/).filter((w) => !AUTHORITY_ACRONYM_STOPWORDS.has(w.toLowerCase()));
+  const initials = words.slice(0, 4).map((w) => w[0]).join("").toUpperCase();
+  return initials || trimmed.slice(0, 3).toUpperCase();
+}
+
+function authorityBadgeHtml(name) {
+  const code = authorityAcronym(name);
+  const sizeClass = code.length > 5 ? " authority-badge--tiny" : code.length > 3 ? " authority-badge--small" : "";
+  return `<span class="authority-badge${sizeClass}" aria-hidden="true">${escapeHtml(code)}</span>`;
+}
+
 function authorityCell(name) {
   if (!name) return "—";
   const short = shortAuthority(name);
-  return short === name.trim() ? escapeHtml(name) : `<span title="${escapeHtml(name)}">${escapeHtml(short)}</span>`;
+  const label = short === name.trim() ? escapeHtml(name) : `<span title="${escapeHtml(name)}">${escapeHtml(short)}</span>`;
+  return `<span class="flag-cell">${authorityBadgeHtml(name)} ${label}</span>`;
 }
 
 function shortDomain(url) {
@@ -68,21 +91,14 @@ function websiteCell(url) {
 
 // --------------------------------------------------------------------------
 // Small icon helpers for the per-column filter dropdown's option rows — a
-// flag for country values, a light-blue "authority" glyph (matching the
-// service-icon look) for competent-authority values, and a colour-coded dot
-// for status values, so the filter itself carries the same visual language
-// as the table cells it filters.
+// flag for country values, the authority monogram badge for competent-
+// authority values, and a colour-coded dot for status values, so the filter
+// itself carries the same visual language as the table cells it filters.
 // --------------------------------------------------------------------------
 
 function countryFlagIconHtml(code) {
   const flag = flagEmoji(code);
   return flag ? `<span class="dropdown-icon dropdown-icon--flag">${flag}</span>` : "";
-}
-
-function authorityIconHtml() {
-  // svgIcon() is defined further down the file but hoisted (function
-  // declaration), so it's safe to call from here.
-  return `<span class="dropdown-icon dropdown-icon--authority">${svgIcon('<path d="m3 10 9-6 9 6"/><path d="M5 10v9M10 10v9M14 10v9M19 10v9"/><path d="M3 19h18"/>')}</span>`;
 }
 
 function statusIconHtml(value) {
@@ -104,24 +120,49 @@ function parseEsmaDate(s) {
 }
 
 function formatTimestamp(iso) {
-  if (!iso) return "onbekend";
+  if (!iso) return t("misc.unknownValue");
   const d = new Date(iso);
   if (isNaN(d)) return iso;
-  return d.toLocaleString("nl-NL", {
+  const locale = getLang() === "en" ? "en-GB" : "nl-NL";
+  return d.toLocaleString(locale, {
     day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
 }
 
 async function fetchJSON(path) {
   const res = await fetch(path, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Kon ${path} niet laden (${res.status})`);
+  if (!res.ok) throw new Error(t("misc.fetchError", path, res.status));
   return res.json();
 }
 
 function statusBadge(status) {
-  if (status === "active") return `<span class="badge badge--success">Actief</span>`;
-  if (status === "withdrawn") return `<span class="badge badge--neutral">Ingetrokken</span>`;
-  return `<span class="badge badge--neutral">Onbekend</span>`;
+  if (status === "active") return `<span class="badge badge--success">${escapeHtml(t("status.active"))}</span>`;
+  if (status === "withdrawn") return `<span class="badge badge--neutral">${escapeHtml(t("status.withdrawn"))}</span>`;
+  return `<span class="badge badge--neutral">${escapeHtml(t("status.unknown"))}</span>`;
+}
+
+function statusLabel(status) {
+  return status === "active" ? t("status.active") : status === "withdrawn" ? t("status.withdrawn") : "—";
+}
+
+// Shared by index.html's "recent changes" list and changelog.html's full list.
+function changelogTypeLabel(type) {
+  return type === "added" ? t("badges.added") : type === "removed" ? t("badges.removed") : t("badges.changed");
+}
+
+function changelogBadgeHtml(type) {
+  const cls = type === "added" ? "badge--success" : type === "removed" ? "badge--neutral" : "badge--warning";
+  return `<span class="badge ${cls}">${escapeHtml(changelogTypeLabel(type))}</span>`;
+}
+
+function changelogItemHtml(c) {
+  const registerLabel = REGISTERS[c.register]?.shortLabel || c.register;
+  return `
+    ${changelogBadgeHtml(c.type)}
+    <span>${escapeHtml(c.name || `(${t("misc.unknownValue")})`)}</span>
+    <span class="register-tag">${escapeHtml(registerLabel)}</span>
+    <time>${formatTimestamp(c.timestamp)}</time>
+  `;
 }
 
 function el(tag, attrs = {}, html) {
@@ -129,6 +170,106 @@ function el(tag, attrs = {}, html) {
   for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
   if (html !== undefined) node.innerHTML = html;
   return node;
+}
+
+// --------------------------------------------------------------------------
+// Shared popover/dropdown plumbing — used by per-column filters on the
+// register pages AND by changelog.html's Register/Type filters, so there's
+// one place that knows how to open/close/search a dropdown list.
+// --------------------------------------------------------------------------
+
+let popoverCloseWired = false;
+function closeAllPopovers(except) {
+  document.querySelectorAll(".col-filter-dropdown__list.open, .chip-popover.open").forEach((p) => {
+    if (p !== except) p.classList.remove("open");
+  });
+}
+function wireGlobalPopoverClose() {
+  if (popoverCloseWired) return;
+  popoverCloseWired = true;
+  document.addEventListener("click", () => closeAllPopovers());
+}
+
+// A single-select dropdown (button + popover list), styled to match the
+// site rather than a native <select> — which can only show plain text, so it
+// can't carry a flag / authority badge / status colour next to each option.
+// Reused for register-table column filters and for changelog.html's filters.
+function buildDropdownFilter({ label, options, getValue, getLabel, optionIcon, onChange, searchable = true }) {
+  wireGlobalPopoverClose();
+  let current = null;
+  const wrap = el("div", { class: "col-filter-dropdown" });
+  const btn = el("button", { type: "button", class: "col-filter-dropdown__btn" },
+    `<span class="col-filter-dropdown__current"></span><svg class="col-filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`);
+  const currentLabel = btn.querySelector(".col-filter-dropdown__current");
+  const list = el("div", { class: "col-filter-dropdown__list" });
+
+  let searchInput = null;
+  if (searchable && options.length > 6) {
+    searchInput = el("input", { type: "text", class: "col-filter-dropdown__search", placeholder: t("filters.dropdownSearchPlaceholder") });
+    searchInput.addEventListener("click", (e) => e.stopPropagation());
+    list.appendChild(searchInput);
+  }
+
+  const optionRows = [];
+  function addOptionRow(value, displayLabel, iconHtml, isAll) {
+    const row = el("div", { class: "col-filter-dropdown__option" },
+      `${iconHtml || ""}<span>${escapeHtml(displayLabel)}</span><svg class="col-filter-dropdown__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`);
+    row.dataset.searchText = displayLabel.toLowerCase();
+    row.addEventListener("click", (e) => {
+      e.stopPropagation();
+      current = value;
+      updateSelected();
+      list.classList.remove("open");
+      onChange(value);
+    });
+    optionRows.push({ row, value, isAll: !!isAll });
+    list.appendChild(row);
+  }
+  addOptionRow(null, t("filters.all"), "", true);
+  for (const opt of options) {
+    addOptionRow(getValue(opt), getLabel(opt), optionIcon ? optionIcon(opt) : "");
+  }
+
+  function updateSelected() {
+    for (const { row, value } of optionRows) row.classList.toggle("is-selected", value === current);
+    if (current === null) {
+      currentLabel.innerHTML = escapeHtml(t("filters.allOfLabel", label));
+    } else {
+      const match = options.find((o) => getValue(o) === current);
+      const iconHtml = optionIcon && match ? optionIcon(match) : "";
+      currentLabel.innerHTML = `${iconHtml}<span>${escapeHtml(match ? getLabel(match) : current)}</span>`;
+    }
+    btn.classList.toggle("has-selection", current !== null);
+  }
+  updateSelected();
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const term = searchInput.value.trim().toLowerCase();
+      for (const { row, isAll } of optionRows) {
+        if (isAll) continue;
+        row.style.display = !term || row.dataset.searchText.includes(term) ? "" : "none";
+      }
+    });
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !list.classList.contains("open");
+    closeAllPopovers();
+    if (willOpen) {
+      list.classList.add("open");
+      if (searchInput) {
+        searchInput.value = "";
+        for (const { row, isAll } of optionRows) if (!isAll) row.style.display = "";
+        searchInput.focus();
+      }
+    }
+  });
+
+  wrap.appendChild(btn);
+  wrap.appendChild(list);
+  return { el: wrap, btn, list, reset: () => { current = null; updateSelected(); } };
 }
 
 // --------------------------------------------------------------------------
@@ -145,24 +286,33 @@ function svgIcon(path) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 }
 
-const CASP_SERVICES = [
-  { code: "a", label: "Bewaring", full: "Bewaring en administratie van crypto-activa namens cliënten", icon: svgIcon('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>') },
-  { code: "b", label: "Handelsplatform", full: "Exploiteren van een handelsplatform voor crypto-activa", icon: svgIcon('<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>') },
-  { code: "c", label: "Wisselen — fiat", full: "Wisselen van crypto-activa voor geld", icon: svgIcon('<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>') },
-  { code: "d", label: "Wisselen — crypto", full: "Wisselen van crypto-activa voor andere crypto-activa", icon: svgIcon('<path d="m17 3 4 4-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/>') },
-  { code: "e", label: "Orderuitvoering", full: "Uitvoeren van orders voor crypto-activa namens cliënten", icon: svgIcon('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5"/>') },
-  { code: "f", label: "Plaatsing", full: "Plaatsen van crypto-activa", icon: svgIcon('<path d="m3 11 18-8-8 18-2-8-8-2Z"/>') },
-  { code: "g", label: "Orderdoorgifte", full: "Ontvangen en doorgeven van orders voor crypto-activa namens cliënten", icon: svgIcon('<circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="m8.1 10.9 7.8-3.8M8.1 13.1l7.8 3.8"/>') },
-  { code: "h", label: "Advies", full: "Advies verlenen over crypto-activa", icon: svgIcon('<path d="M21 11.5a8.4 8.4 0 0 1-4.7 7.6 8.4 8.4 0 0 1-3.8.9h-.5A8.5 8.5 0 0 1 3 11.5 8.5 8.5 0 0 1 11.5 3h.5a8.48 8.48 0 0 1 8 8v.5z"/><path d="M11.5 8v4l2.5 1.5"/>') },
-  { code: "i", label: "Vermogensbeheer", full: "Portefeuillebeheer van crypto-activa", icon: svgIcon('<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>') },
-  { code: "j", label: "Overdracht", full: "Overdrachtsdiensten voor crypto-activa namens cliënten", icon: svgIcon('<path d="M4 12h16"/><path d="m14 6 6 6-6 6"/>') },
-];
+const CASP_SERVICE_ICON_PATHS = {
+  a: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  b: '<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>',
+  c: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+  d: '<path d="m17 3 4 4-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/>',
+  e: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5"/>',
+  f: '<path d="m3 11 18-8-8 18-2-8-8-2Z"/>',
+  g: '<circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="m8.1 10.9 7.8-3.8M8.1 13.1l7.8 3.8"/>',
+  h: '<path d="M21 11.5a8.4 8.4 0 0 1-4.7 7.6 8.4 8.4 0 0 1-3.8.9h-.5A8.5 8.5 0 0 1 3 11.5 8.5 8.5 0 0 1 11.5 3h.5a8.48 8.48 0 0 1 8 8v.5z"/><path d="M11.5 8v4l2.5 1.5"/>',
+  i: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  j: '<path d="M4 12h16"/><path d="m14 6 6 6-6 6"/>',
+};
+
+const CASP_SERVICES = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"].map((code) => ({
+  code,
+  label: t(`services.${code}.label`),
+  full: t(`services.${code}.full`),
+  icon: svgIcon(CASP_SERVICE_ICON_PATHS[code]),
+}));
 const CASP_SERVICE_BY_CODE = Object.fromEntries(CASP_SERVICES.map((s) => [s.code, s]));
 
 // Most ESMA rows lead each service with its letter code ("a. providing
 // custody..."), but some (e.g. real-world entries like "Stratos Europe Ltd")
 // omit the letter entirely. Fall back to matching on the official English
-// MiCAR service wording so those still resolve to a canonical service.
+// MiCAR service wording so those still resolve to a canonical service. This
+// matching is against ESMA's own (English) source text, so it is NOT
+// language-dependent — it stays fixed regardless of the site's UI language.
 const CASP_SERVICE_KEYWORDS = [
   { code: "a", re: /custody/i },
   { code: "b", re: /trading platform/i },
@@ -228,7 +378,7 @@ function caspServiceDetailItems(r) {
     const info = known.get(svc.code);
     const countries = [...info.countries];
     const comments = [...info.comments].filter(Boolean);
-    return `${svc.icon}<strong>${escapeHtml(svc.label)}</strong> — <span class="detail-service-desc">${escapeHtml(svc.full)}</span>${countries.length ? `<br>Landen: ${countries.join(", ")}` : ""}${comments.length ? `<br><em>${escapeHtml(comments.join(" · "))}</em>` : ""}`;
+    return `${svc.icon}<strong>${escapeHtml(svc.label)}</strong> — <span class="detail-service-desc">${escapeHtml(svc.full)}</span>${countries.length ? `<br>${escapeHtml(t("detail.countriesLabel", countries.join(", ")))}` : ""}${comments.length ? `<br><em>${escapeHtml(comments.join(" · "))}</em>` : ""}`;
   });
   const extra = unknown.map((u) => `${escapeHtml(u.label)}${u.countries?.length ? ` — ${u.countries.join(", ")}` : ""}`);
   return [...items, ...extra];
@@ -240,23 +390,23 @@ function caspServiceDetailItems(r) {
 
 const REGISTERS = {
   casps: {
-    label: "Crypto-asset service providers",
-    shortLabel: "CASPs",
+    label: t("registers.casps.label"),
+    shortLabel: t("registers.casps.shortLabel"),
     file: "casps",
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
-      { key: "name", label: "Naam", value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
-      { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
+      { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
+      { key: "lei", label: t("columns.lei"), value: (r) => r.lei || "—" },
       {
-        key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
         filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
-        key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
+        key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
       },
       {
-        key: "services", label: "Diensten",
+        key: "services", label: t("columns.services"),
         value: caspServiceSummary,
         render: (r) => renderServiceIcons(expandCaspServiceEntries(r.services).known),
         sortValue: (r) => { const { known, unknown } = expandCaspServiceEntries(r.services); return known.size + unknown.length; },
@@ -268,171 +418,171 @@ const REGISTERS = {
           },
         },
       },
-      { key: "website", label: "Website", value: (r) => r.website || "—", render: (r) => websiteCell(r.website) },
+      { key: "website", label: t("columns.website"), value: (r) => r.website || "—", render: (r) => websiteCell(r.website) },
       {
-        key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
+        key: "status", label: t("columns.status"), value: (r) => statusLabel(r.status), render: (r) => statusBadge(r.status),
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: statusLabel, optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
-      ["Bevoegde autoriteit", r.competent_authority],
-      ["Lidstaat", countryName(r.home_member_state)],
-      ["LEI", r.lei],
-      ["Land hoofdkantoor", countryName(r.head_office_country)],
-      ["Adres", r.address],
-      ["Website", linkify(r.website)],
-      ["Website platform", linkify(r.platform_website)],
-      ["Datum autorisatie", r.authorisation_date],
-      ["Datum intrekking", r.withdrawal_date || "—"],
-    ], "Diensten", caspServiceDetailItems(r)),
+      [t("detail.competentAuthority"), r.competent_authority],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei],
+      [t("detail.headOfficeCountry"), countryName(r.head_office_country)],
+      [t("detail.address"), r.address],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.websitePlatform"), linkify(r.platform_website)],
+      [t("detail.authorisationDate"), r.authorisation_date],
+      [t("detail.withdrawalDate"), r.withdrawal_date || "—"],
+    ], t("detail.servicesTitle"), caspServiceDetailItems(r)),
   },
 
   art: {
-    label: "Uitgevers van asset-referenced tokens (ART)",
-    shortLabel: "ART-uitgevers",
+    label: t("registers.art.label"),
+    shortLabel: t("registers.art.shortLabel"),
     file: "art",
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
-      { key: "name", label: "Naam", value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
-      { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
+      { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
+      { key: "lei", label: t("columns.lei"), value: (r) => r.lei || "—" },
       {
-        key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
         filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
-        key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
+        key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
       },
-      { key: "credit_institution", label: "Kredietinstelling", value: (r) => r.credit_institution || "—" },
+      { key: "credit_institution", label: t("columns.creditInstitution"), value: (r) => r.credit_institution || "—" },
       {
-        key: "whitepapers", label: "Whitepapers",
+        key: "whitepapers", label: t("columns.whitepapersCount"),
         value: (r) => `${(r.whitepapers || []).length}`, sortValue: (r) => (r.whitepapers || []).length,
       },
       {
-        key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
+        key: "status", label: t("columns.status"), value: (r) => statusLabel(r.status), render: (r) => statusBadge(r.status),
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: statusLabel, optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
-      ["Bevoegde autoriteit", r.competent_authority],
-      ["Lidstaat", countryName(r.home_member_state)],
-      ["LEI", r.lei],
-      ["Adres", r.address],
-      ["Website", linkify(r.website)],
-      ["Kredietinstelling", r.credit_institution || "—"],
-      ["Datum autorisatie", r.authorisation_date],
-      ["Datum intrekking", r.withdrawal_date || "—"],
-    ], "Whitepapers", (r.whitepapers || []).map((w) =>
-      `${linkify(w.url)}${w.start_date ? ` — start aanbieding: ${w.start_date}` : ""}${w.offer_countries?.length ? `<br>Landen: ${w.offer_countries.join(", ")}` : ""}`
+      [t("detail.competentAuthority"), r.competent_authority],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei],
+      [t("detail.address"), r.address],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.creditInstitution"), r.credit_institution || "—"],
+      [t("detail.authorisationDate"), r.authorisation_date],
+      [t("detail.withdrawalDate"), r.withdrawal_date || "—"],
+    ], t("detail.whitepapersTitle"), (r.whitepapers || []).map((w) =>
+      `${linkify(w.url)}${w.start_date ? escapeHtml(t("detail.offerStart", w.start_date)) : ""}${w.offer_countries?.length ? `<br>${escapeHtml(t("detail.countriesLabel", w.offer_countries.join(", ")))}` : ""}`
     )),
   },
 
   emt: {
-    label: "Uitgevers van e-money tokens (EMT)",
-    shortLabel: "EMT-uitgevers",
+    label: t("registers.emt.label"),
+    shortLabel: t("registers.emt.shortLabel"),
     file: "emt",
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
-      { key: "name", label: "Naam", value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
-      { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
+      { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
+      { key: "lei", label: t("columns.lei"), value: (r) => r.lei || "—" },
       {
-        key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
         filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
-        key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
+        key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
       },
       {
-        key: "institution_type", label: "Type instelling", value: (r) => r.institution_type || "—",
+        key: "institution_type", label: t("columns.institutionType"), value: (r) => r.institution_type || "—",
         filter: { type: "select", valueFn: (r) => r.institution_type },
       },
       {
-        key: "whitepapers", label: "Whitepapers",
+        key: "whitepapers", label: t("columns.whitepapersCount"),
         value: (r) => `${(r.whitepapers || []).length}`, sortValue: (r) => (r.whitepapers || []).length,
       },
       {
-        key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
+        key: "status", label: t("columns.status"), value: (r) => statusLabel(r.status), render: (r) => statusBadge(r.status),
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: statusLabel, optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
-      ["Bevoegde autoriteit", r.competent_authority],
-      ["Lidstaat", countryName(r.home_member_state)],
-      ["LEI", r.lei],
-      ["Adres", r.address],
-      ["Website", linkify(r.website)],
-      ["Type instelling", r.institution_type || "—"],
-      ["Vrijstelling art. 48(4)", r.exemption_48_4 || "—"],
-      ["Vrijstelling art. 48(5)", r.exemption_48_5 || "—"],
-      ["Datum autorisatie", r.authorisation_date],
-      ["Datum intrekking", r.withdrawal_date || "—"],
-    ], "Whitepapers", (r.whitepapers || []).map((w) =>
-      `${linkify(w.url)}${w.start_date ? ` — start aanbieding: ${w.start_date}` : ""}${w.comments ? `<br><em>${escapeHtml(w.comments)}</em>` : ""}`
+      [t("detail.competentAuthority"), r.competent_authority],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei],
+      [t("detail.address"), r.address],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.institutionType"), r.institution_type || "—"],
+      [t("detail.exemption484"), r.exemption_48_4 || "—"],
+      [t("detail.exemption485"), r.exemption_48_5 || "—"],
+      [t("detail.authorisationDate"), r.authorisation_date],
+      [t("detail.withdrawalDate"), r.withdrawal_date || "—"],
+    ], t("detail.whitepapersTitle"), (r.whitepapers || []).map((w) =>
+      `${linkify(w.url)}${w.start_date ? escapeHtml(t("detail.offerStart", w.start_date)) : ""}${w.comments ? `<br><em>${escapeHtml(w.comments)}</em>` : ""}`
     )),
   },
 
   whitepapers: {
-    label: "Whitepapers (overige crypto-assets)",
-    shortLabel: "Whitepapers",
+    label: t("registers.whitepapers.label"),
+    shortLabel: t("registers.whitepapers.shortLabel"),
     file: "whitepapers",
     searchFields: (r) => [r.name, r.lei, r.competent_authority],
     columns: [
-      { key: "name", label: "Naam issuer/aanbieder", value: (r) => r.name || "—", ellipsis: true },
-      { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
+      { key: "name", label: t("columns.nameIssuer"), value: (r) => r.name || "—", ellipsis: true },
+      { key: "lei", label: t("columns.lei"), value: (r) => r.lei || "—" },
       {
-        key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
         filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
-        key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
+        key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
       },
       {
-        key: "casp", label: "Betrokken CASP",
+        key: "casp", label: t("columns.involvedCasp"),
         value: (r) => (r.whitepapers || []).find((w) => w.casp_name)?.casp_name || "—", ellipsis: true,
       },
       {
-        key: "whitepapers", label: "Whitepapers",
+        key: "whitepapers", label: t("columns.whitepapersCount"),
         value: (r) => `${(r.whitepapers || []).length}`, sortValue: (r) => (r.whitepapers || []).length,
       },
     ],
     detail: (r) => detailArticle(r, [
-      ["Bevoegde autoriteit", r.competent_authority],
-      ["Lidstaat", countryName(r.home_member_state)],
-      ["LEI", r.lei],
-    ], "Whitepapers", (r.whitepapers || []).map((w) =>
-      `${linkify(w.url)}${w.casp_name ? ` — via CASP: ${w.casp_name}` : ""}${w.offer_countries?.length ? `<br>Landen: ${w.offer_countries.join(", ")}` : ""}${w.comments ? `<br><em>${escapeHtml(w.comments)}</em>` : ""}`
+      [t("detail.competentAuthority"), r.competent_authority],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei],
+    ], t("detail.whitepapersTitle"), (r.whitepapers || []).map((w) =>
+      `${linkify(w.url)}${w.casp_name ? escapeHtml(t("detail.viaCasp", w.casp_name)) : ""}${w.offer_countries?.length ? `<br>${escapeHtml(t("detail.countriesLabel", w.offer_countries.join(", ")))}` : ""}${w.comments ? `<br><em>${escapeHtml(w.comments)}</em>` : ""}`
     )),
   },
 
   non_compliant: {
-    label: "Non-compliant entiteiten",
-    shortLabel: "Non-compliant",
+    label: t("registers.non_compliant.label"),
+    shortLabel: t("registers.non_compliant.shortLabel"),
     file: "non_compliant",
     searchFields: (r) => [r.name, r.lei, r.website, r.competent_authority],
     columns: [
-      { key: "name", label: "Naam", value: (r) => r.name || "—", ellipsis: true },
+      { key: "name", label: t("columns.name"), value: (r) => r.name || "—", ellipsis: true },
       {
-        key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
         filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
-        key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
+        key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
       },
-      { key: "reason", label: "Reden", value: (r) => r.reason || "—", ellipsis: true, maxWidth: 280 },
-      { key: "decision_date", label: "Besluitdatum", value: (r) => r.decision_date || "—", sortValue: (r) => parseEsmaDate(r.decision_date) },
+      { key: "reason", label: t("columns.reason"), value: (r) => r.reason || "—", ellipsis: true, maxWidth: 280 },
+      { key: "decision_date", label: t("columns.decisionDate"), value: (r) => r.decision_date || "—", sortValue: (r) => parseEsmaDate(r.decision_date) },
     ],
     detail: (r) => detailArticle(r, [
-      ["Bevoegde autoriteit", r.competent_authority],
-      ["Lidstaat", countryName(r.home_member_state)],
-      ["LEI", r.lei || "—"],
-      ["Website", linkify(r.website)],
-      ["Artikel 17-inbreuk (ESMA)", r.article_17_infringement || "—"],
-      ["Reden", r.reason || "—"],
-      ["Besluitdatum", r.decision_date || "—"],
-      ["Opmerkingen", r.comments || "—"],
+      [t("detail.competentAuthority"), r.competent_authority],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei || "—"],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.article17"), r.article_17_infringement || "—"],
+      [t("detail.reason"), r.reason || "—"],
+      [t("detail.decisionDate"), r.decision_date || "—"],
+      [t("detail.comments"), r.comments || "—"],
     ]),
   },
 };
@@ -473,18 +623,17 @@ function renderRegisterTable(root, config, records) {
   let sortDir = 1;
   const activeFilters = {};
   let searchTerm = "";
-  const openPopovers = [];
   const filterResetters = [];
 
   const toolbar = el("div", { class: "toolbar" });
-  const searchInput = el("input", { type: "search", placeholder: "Zoek op naam, LEI, website…" });
+  const searchInput = el("input", { type: "search", placeholder: t("filters.searchPlaceholder") });
   toolbar.appendChild(searchInput);
 
-  const resetBtn = el("button", { class: "btn btn--reset", type: "button" }, "Reset filters");
+  const resetBtn = el("button", { class: "btn btn--reset", type: "button" }, escapeHtml(t("buttons.resetFilters")));
   toolbar.appendChild(resetBtn);
 
   const countLabel = el("span", { class: "toolbar__count" });
-  const exportBtn = el("button", { class: "btn", type: "button" }, "Exporteer CSV");
+  const exportBtn = el("button", { class: "btn", type: "button" }, escapeHtml(t("buttons.exportCsv")));
   toolbar.appendChild(exportBtn);
   toolbar.appendChild(countLabel);
   root.appendChild(toolbar);
@@ -514,70 +663,27 @@ function renderRegisterTable(root, config, records) {
     const fc = col.filter || { type: "text" };
 
     if (fc.type === "select") {
-      // A native <select> can only show plain text per option, so it can't
-      // carry the flag / authority icon / status-colour that the rest of the
-      // site uses to identify these values at a glance. This is a small
-      // custom dropdown (button + popover list) instead, styled to match.
       activeFilters[col.key] = null;
       const options = [...new Set(records.map((r) => fc.valueFn(r)).filter(Boolean))].sort();
-      const wrap = el("div", { class: "col-filter-dropdown" });
-      const btn = el("button", { type: "button", class: "col-filter-dropdown__btn" },
-        `<span class="col-filter-dropdown__current"></span><svg class="col-filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`);
-      const currentLabel = btn.querySelector(".col-filter-dropdown__current");
-      const list = el("div", { class: "col-filter-dropdown__list" });
-
-      const optionRows = [];
-      function addOptionRow(value, label, iconHtml) {
-        const row = el("div", { class: "col-filter-dropdown__option" },
-          `${iconHtml || ""}<span>${escapeHtml(label)}</span><svg class="col-filter-dropdown__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`);
-        row.addEventListener("click", (e) => {
-          e.stopPropagation();
-          activeFilters[col.key] = value;
-          updateSelected();
-          list.classList.remove("open");
-          applyAndRender();
-        });
-        optionRows.push({ row, value });
-        list.appendChild(row);
-      }
-      addOptionRow(null, "Alle", "");
-      for (const opt of options) {
-        addOptionRow(opt, fc.formatFn ? fc.formatFn(opt) : opt, fc.optionIcon ? fc.optionIcon(opt) : "");
-      }
-
-      function updateSelected() {
-        const active = activeFilters[col.key];
-        for (const { row, value } of optionRows) row.classList.toggle("is-selected", value === active);
-        if (active === null) {
-          currentLabel.innerHTML = `${escapeHtml(col.label)}: alle`;
-        } else {
-          const iconHtml = fc.optionIcon ? fc.optionIcon(active) : "";
-          const label = fc.formatFn ? fc.formatFn(active) : active;
-          currentLabel.innerHTML = `${iconHtml}<span>${escapeHtml(label)}</span>`;
-        }
-        btn.classList.toggle("has-selection", active !== null);
-      }
-      updateSelected();
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const willOpen = !list.classList.contains("open");
-        for (const p of openPopovers) p.classList.remove("open");
-        if (willOpen) list.classList.add("open");
+      const dropdown = buildDropdownFilter({
+        label: col.label,
+        options,
+        getValue: (o) => o,
+        getLabel: (o) => (fc.formatFn ? fc.formatFn(o) : o),
+        optionIcon: fc.optionIcon,
+        onChange: (value) => { activeFilters[col.key] = value; applyAndRender(); },
       });
-      wrap.appendChild(btn);
-      wrap.appendChild(list);
-      cell.appendChild(wrap);
-      openPopovers.push(list);
-      filterResetters.push(() => { activeFilters[col.key] = null; updateSelected(); });
+      cell.appendChild(dropdown.el);
+      filterResetters.push(() => { activeFilters[col.key] = null; dropdown.reset(); });
     } else if (fc.type === "chips") {
       activeFilters[col.key] = [];
+      wireGlobalPopoverClose();
       const wrap = el("div", { class: "col-filter-chips" });
       const btn = el("button", { type: "button", class: "col-filter-chips__btn" },
         `<span>${escapeHtml(col.label)}</span><span class="col-filter-chips__count" hidden></span>`);
       const countBadge = btn.querySelector(".col-filter-chips__count");
       const popover = el("div", { class: "chip-popover" });
-      const clearBtn = el("button", { type: "button", class: "chip-popover__clear" }, "Alles wissen");
+      const clearBtn = el("button", { type: "button", class: "chip-popover__clear" }, escapeHtml(t("filters.clearAll")));
       clearBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         activeFilters[col.key] = [];
@@ -610,16 +716,15 @@ function renderRegisterTable(root, config, records) {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const willOpen = !popover.classList.contains("open");
-        for (const p of openPopovers) p.classList.remove("open");
+        closeAllPopovers();
         if (willOpen) popover.classList.add("open");
       });
       wrap.appendChild(btn);
       wrap.appendChild(popover);
       cell.appendChild(wrap);
-      openPopovers.push(popover);
       filterResetters.push(() => { activeFilters[col.key] = []; updateChipVisual(); });
     } else {
-      const input = el("input", { type: "text", class: "col-filter-input", placeholder: "Filter…" });
+      const input = el("input", { type: "text", class: "col-filter-input", placeholder: t("filters.textPlaceholder") });
       input.addEventListener("click", (e) => e.stopPropagation());
       input.addEventListener("input", () => {
         activeFilters[col.key] = input.value.trim().toLowerCase();
@@ -631,7 +736,6 @@ function renderRegisterTable(root, config, records) {
     filterRow.appendChild(cell);
   }
   thead.appendChild(filterRow);
-  document.addEventListener("click", () => { for (const p of openPopovers) p.classList.remove("open"); });
 
   resetBtn.addEventListener("click", () => {
     searchTerm = "";
@@ -692,7 +796,7 @@ function renderRegisterTable(root, config, records) {
     tbody.innerHTML = "";
     if (!filtered.length) {
       const tr = el("tr", { class: "empty-row" });
-      tr.appendChild(el("td", { colspan: config.columns.length }, "Geen records gevonden voor deze zoekopdracht/filters."));
+      tr.appendChild(el("td", { colspan: config.columns.length }, escapeHtml(t("table.empty"))));
       tbody.appendChild(tr);
     } else {
       for (const r of filtered) {
@@ -714,7 +818,7 @@ function renderRegisterTable(root, config, records) {
         tbody.appendChild(tr);
       }
     }
-    countLabel.textContent = `${filtered.length} van ${records.length} records`;
+    countLabel.textContent = t("table.count", filtered.length, records.length);
   }
 
   exportBtn.addEventListener("click", () => exportCsv(config, filtered));
@@ -750,7 +854,7 @@ function ensureOverlay() {
   if (overlay) return overlay;
   overlay = el("div", { class: "overlay", id: "detail-overlay" });
   const panel = el("div", { class: "detail" });
-  panel.appendChild(el("button", { class: "detail__close", type: "button", "aria-label": "Sluiten" }, "&times;"));
+  panel.appendChild(el("button", { class: "detail__close", type: "button", "aria-label": t("buttons.close") }, "&times;"));
   panel.appendChild(el("h2", { id: "detail-title" }));
   panel.appendChild(el("div", { class: "detail__meta", id: "detail-meta" }));
   panel.appendChild(el("div", { id: "detail-body" }));
@@ -764,7 +868,7 @@ function ensureOverlay() {
 
 function openDetail(config, record) {
   const overlay = ensureOverlay();
-  overlay.querySelector("#detail-title").textContent = record.commercial_name || record.name || "Details";
+  overlay.querySelector("#detail-title").textContent = record.commercial_name || record.name || t("detail.titleFallback");
   overlay.querySelector("#detail-meta").textContent = config.label;
   overlay.querySelector("#detail-body").innerHTML = config.detail(record);
   overlay.classList.add("open");
