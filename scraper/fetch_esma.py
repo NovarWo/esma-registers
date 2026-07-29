@@ -20,6 +20,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -313,6 +314,116 @@ def load_previous(register: str) -> dict[str, dict]:
     return {rec["id"]: rec for rec in data.get("records", [])}
 
 
+# Dutch short labels for the 10 MiCAR CASP services (Art. 3(1)(16), letters
+# a-j) - mirrors assets/js/i18n.js's `services.<code>.label` (nl). Kept as a
+# small duplicate here rather than shared with the front-end, since this
+# script has no JS runtime available; if the i18n labels change, update both.
+SERVICE_LABELS_NL = {
+    "a": "Bewaring",
+    "b": "Handelsplatform",
+    "c": "Wisselen — fiat",
+    "d": "Wisselen — crypto",
+    "e": "Orderuitvoering",
+    "f": "Plaatsing",
+    "g": "Orderdoorgifte",
+    "h": "Advies",
+    "i": "Vermogensbeheer",
+    "j": "Overdracht",
+}
+
+# Mirrors extractServiceCode() in assets/js/app.js: ESMA rows normally lead
+# each service with its MiCAR letter code ("a. providing custody..."), but
+# some real-world rows omit the letter - fall back to matching the official
+# English service wording so those still resolve to a canonical service.
+_SERVICE_CODE_RE = re.compile(r"^\s*([a-j])\s*[.)]", re.I)
+_SERVICE_KEYWORDS = [
+    ("a", re.compile(r"custody", re.I)),
+    ("b", re.compile(r"trading platform", re.I)),
+    ("c", re.compile(r"exchange of crypto-assets? for funds", re.I)),
+    ("d", re.compile(r"exchange of crypto-assets? for other crypto", re.I)),
+    ("e", re.compile(r"execution of orders", re.I)),
+    ("f", re.compile(r"placing of crypto-assets", re.I)),
+    ("g", re.compile(r"reception and transmission", re.I)),
+    ("h", re.compile(r"advice on crypto-assets", re.I)),
+    ("i", re.compile(r"portfolio management", re.I)),
+    ("j", re.compile(r"transfer services", re.I)),
+]
+
+
+def extract_service_code(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    m = _SERVICE_CODE_RE.match(raw)
+    if m:
+        return m.group(1).lower()
+    for code, pattern in _SERVICE_KEYWORDS:
+        if pattern.search(raw):
+            return code
+    return None
+
+
+def _index_services_by_code(services: list[dict] | None) -> dict[str, set[str]]:
+    """code -> set of countries offered, merging pipe-joined/duplicate rows."""
+    idx: dict[str, set[str]] = {}
+    for s in services or []:
+        for part in (s.get("service") or "").split("|"):
+            code = extract_service_code(part.strip())
+            if code:
+                idx.setdefault(code, set()).update(s.get("countries") or [])
+    return idx
+
+
+def describe_service_changes(old_services: list[dict] | None, new_services: list[dict] | None) -> list[str]:
+    """Human-readable (Dutch) lines describing what changed in a CASP's
+    services: a new service type added, a service dropped, or - for a
+    service offered in both snapshots - countries added/removed."""
+    old_idx = _index_services_by_code(old_services)
+    new_idx = _index_services_by_code(new_services)
+    lines = []
+    for code in sorted(new_idx.keys() - old_idx.keys()):
+        lines.append(f"{SERVICE_LABELS_NL.get(code, code)} toegevoegd aan dienstverlening")
+    for code in sorted(old_idx.keys() - new_idx.keys()):
+        lines.append(f"{SERVICE_LABELS_NL.get(code, code)} niet langer aangeboden")
+    for code in sorted(old_idx.keys() & new_idx.keys()):
+        label = SERVICE_LABELS_NL.get(code, code)
+        added = sorted(new_idx[code] - old_idx[code])
+        removed = sorted(old_idx[code] - new_idx[code])
+        if added:
+            lines.append(f"{label} nu ook aangeboden in: {', '.join(added)}")
+        if removed:
+            lines.append(f"{label} niet langer aangeboden in: {', '.join(removed)}")
+    return lines
+
+
+def _fmt_value(v) -> str:
+    if v is None or v == "":
+        return "onbekend"
+    return str(v)
+
+
+def describe_record_change(old: dict, new: dict) -> list[str]:
+    """Human-readable (Dutch) lines describing what changed between two
+    snapshots of the same record - services get the detailed treatment above,
+    every other field falls back to a generic "field: oud -> nieuw" line (or
+    just "field gewijzigd" for list/dict-valued fields we don't want to dump
+    raw into a Slack message, e.g. a register's "whitepapers" list)."""
+    lines: list[str] = []
+    if old.get("services") != new.get("services"):
+        lines.extend(describe_service_changes(old.get("services"), new.get("services")))
+    for key, new_val in new.items():
+        if key in ("id", "services"):
+            continue
+        old_val = old.get(key)
+        if old_val == new_val:
+            continue
+        label = key.replace("_", " ")
+        if isinstance(old_val, (list, dict)) or isinstance(new_val, (list, dict)):
+            lines.append(f"{label} gewijzigd")
+        else:
+            lines.append(f"{label}: {_fmt_value(old_val)} → {_fmt_value(new_val)}")
+    return lines
+
+
 def diff_records(register: str, previous: dict[str, dict], current: list[dict]) -> list[dict]:
     changes = []
     current_ids = set()
@@ -322,7 +433,11 @@ def diff_records(register: str, previous: dict[str, dict], current: list[dict]) 
         if old is None:
             changes.append({"type": "added", "register": register, "id": rec["id"], "name": rec.get("name")})
         elif old != rec:
-            changes.append({"type": "changed", "register": register, "id": rec["id"], "name": rec.get("name")})
+            entry = {"type": "changed", "register": register, "id": rec["id"], "name": rec.get("name")}
+            detail = describe_record_change(old, rec)
+            if detail:
+                entry["detail"] = detail
+            changes.append(entry)
     for old_id, old_rec in previous.items():
         if old_id not in current_ids:
             changes.append({"type": "removed", "register": register, "id": old_id, "name": old_rec.get("name")})
@@ -405,10 +520,18 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
     if github_output:
         TYPE_LABELS_NL = {"added": "toegevoegd", "changed": "gewijzigd", "removed": "verwijderd"}
         MAX_SUMMARY_LINES = 20
-        detail_lines = [
-            f"{c['register']}: {c.get('name') or c['id']} ({TYPE_LABELS_NL.get(c['type'], c['type'])})"
-            for c in all_changes
-        ]
+        detail_lines = []
+        for c in all_changes:
+            header = f"{c['register']}: {c.get('name') or c['id']}"
+            # "changed" records with a field-level description (see
+            # describe_record_change) get one line per changed aspect, e.g.
+            # "casps: BTC Direct B.V. -> Bewaring toegevoegd aan dienstverlening"
+            # - added/removed records, or a changed record where nothing
+            # specific could be described, fall back to the plain type label.
+            if c["type"] == "changed" and c.get("detail"):
+                detail_lines.extend(f"{header} -> {d}" for d in c["detail"])
+            else:
+                detail_lines.append(f"{header} ({TYPE_LABELS_NL.get(c['type'], c['type'])})")
         summary_lines = detail_lines[:MAX_SUMMARY_LINES]
         if len(detail_lines) > MAX_SUMMARY_LINES:
             summary_lines.append(f"... en {len(detail_lines) - MAX_SUMMARY_LINES} andere wijziging(en)")
