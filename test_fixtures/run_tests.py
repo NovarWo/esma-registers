@@ -76,7 +76,8 @@ ncasp = load("non_compliant")
 art = load("art")
 
 bitpanda = find(casps, "Bitpanda GmbH")
-check("Bitpanda GmbH grouped to 3 services", len(bitpanda["services"]) == 3)
+check("Bitpanda GmbH: pipe-joined single-row services split into 3 items", len(bitpanda["services"]) == 3)
+check("Bitpanda GmbH: each split service is a clean single label (no stray '|')", all("|" not in s["service"] for s in bitpanda["services"]))
 check("Bitpanda GmbH status active (no end date)", bitpanda["status"] == "active")
 
 trade_republic = find(casps, "Trade Republic Bank GmbH")
@@ -85,7 +86,7 @@ check("Trade Republic Bank grouped to 4 services", len(trade_republic["services"
 stratos = find(casps, "Stratos Europe Ltd")
 check("Stratos Europe Ltd status withdrawn (has end date)", stratos["status"] == "withdrawn")
 
-check("CASPs: 6 unique entities from 13 sample rows", len(casps) == 6)
+check("CASPs: 6 unique entities from 11 sample rows", len(casps) == 6)
 
 allunity = find(emt, "AllUnity GmbH")
 check("AllUnity GmbH grouped to 3 whitepapers", len(allunity["whitepapers"]) == 3)
