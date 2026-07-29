@@ -2,8 +2,7 @@ name: ESMA MiCAR register scrape
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # ~07:00 Europe/Amsterdam
-    - cron: '0 17 * * *'  # ~19:00 Europe/Amsterdam
+    - cron: '0 * * * *'   # elk uur, op het hele uur (UTC)
   workflow_dispatch: {}
 
 permissions:
