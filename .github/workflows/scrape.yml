@@ -3,7 +3,7 @@ name: ESMA MiCAR register scrape
 on:
   schedule:
     # ESMA republishes the interim register weekly, so exact minute precision
-    # doesn't matter much — this runs every hour at :30. Deliberately NOT on
+    # doesn't matter much — this runs every hour at :50. Deliberately NOT on
     # the hour (0 * * * *): GitHub's scheduled-workflow queue spikes hardest
     # exactly at :00 because so many repos worldwide schedule there too,
     # which was causing runs to be delayed or dropped entirely.
@@ -36,13 +36,23 @@ jobs:
         run: python scraper/fetch_esma.py
 
       - name: Commit data changes (if any)
+        id: commit
         run: |
           git config user.name "esma-micar-tracker-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/
           if git diff --cached --quiet; then
             echo "No changes to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
+            # Short per-file summary of what changed, used by the Slack
+            # notification step below (e.g. "data/casps.json | 2 ++--").
+            {
+              echo "summary<<EOF"
+              git diff --cached --stat -- data/ | sed '$d'
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
             git commit -m "chore(data): update ESMA MiCAR register snapshot ($(date -u +'%Y-%m-%d %H:%M UTC'))"
             # main may have moved (e.g. someone manually uploaded a file via the
             # GitHub web UI) between checkout and this push, so rebase onto the
@@ -53,3 +63,31 @@ jobs:
               sleep 5
             done
           fi
+
+      - name: Notify Slack on new data
+        # Only fires when the step above actually committed something — i.e.
+        # ESMA's register changed, not just "the scraper ran". Requires a
+        # SLACK_WEBHOOK_URL repository secret: a Slack Workflow Builder
+        # "From a webhook" trigger URL, with a single text variable named
+        # "message" feeding a "Send a message" step. See README.md for the
+        # one-time setup. Never fails the workflow if the webhook isn't
+        # configured yet or Slack is briefly unreachable.
+        if: steps.commit.outputs.changed == 'true'
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CHANGE_SUMMARY: ${{ steps.commit.outputs.summary }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL secret not set — skipping Slack notification."
+            exit 0
+          fi
+          # Slack Workflow Builder webhooks expect a JSON body matching the
+          # workflow's own input variable names — not the classic Incoming
+          # Webhook {"text": "..."} shape. This assumes a single variable
+          # called "message"; rename the key below if yours differs.
+          PAYLOAD=$(jq -n \
+            --arg summary "$CHANGE_SUMMARY" \
+            --arg url "https://novarwo.github.io/esma-registers/changelog.html" \
+            '{message: ("📋 *ESMA MiCAR register bijgewerkt*\nEr zijn nieuwe wijzigingen gevonden:\n```" + $summary + "```\n<" + $url + "|Bekijk de wijzigingsgeschiedenis>")}')
+          curl -sf -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
