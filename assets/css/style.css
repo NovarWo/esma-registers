@@ -206,29 +206,6 @@ table.data thead tr.col-filter-row th.col-filter-cell {
 .status-dot--withdrawn { background: var(--grey-400); }
 .status-dot--unknown { background: var(--grey-300); }
 
-/* Authority logo: the authority's own real logo (scraped from its official
-   website, assets/img/authorities/), shown in a small white chip so both
-   light- and dark-background source logos read consistently — used both in
-   the Toezichthouder filter list and in the register table's own column. */
-.authority-logo {
-  display: inline-flex; align-items: center; justify-content: center; height: 22px; max-width: 60px;
-  padding: 2px 5px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
-  flex: none; overflow: hidden;
-}
-.authority-logo img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; }
-
-/* Fallback when an authority has no resolved real logo (or its image 404s):
-   a monogram badge (bracketed code from ESMA's data, e.g. FMA/BaFin/AFM, or
-   an acronym built from the full name) in the same light-blue circular
-   treatment used elsewhere on the site. */
-.authority-badge {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px;
-  padding: 0 4px; border-radius: var(--radius-sm); background: var(--color-primary-lighter); color: var(--color-primary);
-  font-size: .6875rem; font-weight: 700; letter-spacing: .01em; line-height: 1; flex: none;
-}
-.authority-badge--small { font-size: .625rem; }
-.authority-badge--tiny { font-size: .5625rem; }
-
 /* Chip-popover column filter (used where a column can have multiple values
    selected at once, OR-combined — e.g. CASP Diensten). A native <select>
    can't express "any of these N", and there are too many options (10 MiCAR
