@@ -19,6 +19,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -391,6 +392,22 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
         json.dump(changelog, f, ensure_ascii=False, indent=2)
 
     print(f"[info] done - {len(all_changes)} total change(s) across all registers")
+
+    # Every run rewrites each register's `generated_at` to "now", so a git
+    # diff on data/ is never empty even when ESMA's actual content didn't
+    # change - that's just freshness bookkeeping, not "new data". Expose the
+    # real, record-level change count (and a short per-register breakdown)
+    # as a GitHub Actions step output, so the workflow can gate its Slack
+    # notification on genuinely new results instead of every successful run.
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if github_output:
+        change_counts = {r: len([c for c in all_changes if c["register"] == r]) for r in SOURCES}
+        summary_lines = [f"{r}: {n} wijziging(en)" for r, n in change_counts.items() if n]
+        with open(github_output, "a", encoding="utf-8") as f:
+            f.write(f"real_changes={len(all_changes)}\n")
+            f.write("change_summary<<EOF\n")
+            f.write("\n".join(summary_lines) + "\n")
+            f.write("EOF\n")
 
     if len(errors) == len(SOURCES):
         return 1  # every single register failed - a real failure, not "no change"
