@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wijzigingen — ESMA MiCAR Register Tracker</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav__inner">
+    <span class="topnav__brand">
+      <svg viewBox="0 0 40 48" xmlns="http://www.w3.org/2000/svg"><path d="M33.2853 7.85441L35.4567 0H29.1595L27.8568 4.8861C26.6987 4.46114 25.4683 4.1789 24.2399 3.9661L25.3237 0H19.0264L18.0131 3.82144C12.5852 4.52864 7.59069 7.28865 4.26255 11.6051C-2.68702 20.4503 -0.950287 33.1875 8.0977 39.9805L5.92629 47.8323H12.1538L13.4565 42.9501C14.6146 43.3744 15.8456 43.6573 17.0734 43.8701L15.987 47.8323H22.2112L23.2969 44.0115C28.7255 43.3063 33.7233 40.5469 37.0494 36.2304C44.07 27.3139 42.3326 14.648 33.2853 7.85441ZM20.6915 28.6589C19.718 28.659 18.7662 28.3769 17.9567 27.8482C17.1472 27.3195 16.5162 26.568 16.1435 25.6887C15.7709 24.8094 15.6733 23.8418 15.8632 22.9083C16.053 21.9748 16.5217 21.1173 17.2101 20.4443C17.8985 19.7712 18.7755 19.3128 19.7303 19.1271C20.6852 18.9414 21.6749 19.0366 22.5743 19.4008C23.4738 19.765 24.2425 20.3818 24.7834 21.1732C25.3243 21.9645 25.613 22.895 25.613 23.8467C25.613 26.536 23.4416 28.6589 20.6915 28.6589Z" fill="#2330da"></path></svg>
+      ESMA MiCAR Register Tracker
+    </span>
+    <div class="topnav__links">
+      <a href="index.html" data-nav="dashboard">Dashboard</a>
+      <a href="register.html?type=casps" data-nav="casps">CASPs</a>
+      <a href="register.html?type=art" data-nav="art">ART</a>
+      <a href="register.html?type=emt" data-nav="emt">EMT</a>
+      <a href="register.html?type=whitepapers" data-nav="whitepapers">Whitepapers</a>
+      <a href="register.html?type=non_compliant" data-nav="non_compliant">Non-compliant</a>
+      <a href="changelog.html" data-nav="changelog">Wijzigingen</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <h1>Wijzigingsgeschiedenis</h1>
+    <p>Elke scrape (± 07:00 en ± 19:00) vergelijkt met de vorige stand. Alleen echte wijzigingen verschijnen hier — ESMA zelf ververst het register maar wekelijks, dus lege runs zijn normaal.</p>
+  </div>
+
+  <div class="toolbar">
+    <select id="filter-register">
+      <option value="">Register: alle</option>
+    </select>
+    <select id="filter-type">
+      <option value="">Type: alle</option>
+      <option value="added">Nieuw</option>
+      <option value="changed">Gewijzigd</option>
+      <option value="removed">Verwijderd</option>
+    </select>
+    <span class="toolbar__count" id="changelog-count"></span>
+  </div>
+
+  <div id="changelog-list" class="changelog-list"></div>
+
+  <footer class="site-footer">
+    <span id="footer-checked">Laatst gecontroleerd: laden…</span>
+    <span>Bron: <a href="https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica" target="_blank" rel="noopener">ESMA Interim MiCA Register</a></span>
+  </footer>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+highlightNav("changelog");
+const MAX_SHOWN = 500;
+
+(async function init() {
+  const listEl = document.getElementById("changelog-list");
+  const countEl = document.getElementById("changelog-count");
+  const registerSelect = document.getElementById("filter-register");
+  const typeSelect = document.getElementById("filter-type");
+  const footerChecked = document.getElementById("footer-checked");
+
+  let meta = {};
+  try { meta = await fetchJSON("data/meta.json"); } catch (e) { /* ignore */ }
+  footerChecked.textContent = meta.last_checked
+    ? `Laatst gecontroleerd: ${formatTimestamp(meta.last_checked)}`
+    : "Nog geen scrape uitgevoerd.";
+
+  let changelog = [];
+  try { changelog = await fetchJSON("data/history/changelog.json"); } catch (e) { /* none yet */ }
+  changelog = changelog.slice().reverse(); // newest first
+
+  for (const key of Object.keys(REGISTERS)) {
+    registerSelect.appendChild(el("option", { value: key }, REGISTERS[key].shortLabel));
+  }
+
+  function render() {
+    const registerFilter = registerSelect.value;
+    const typeFilter = typeSelect.value;
+    const filtered = changelog.filter((c) =>
+      (!registerFilter || c.register === registerFilter) &&
+      (!typeFilter || c.type === typeFilter)
+    );
+    const shown = filtered.slice(0, MAX_SHOWN);
+    countEl.textContent = filtered.length > MAX_SHOWN
+      ? `Toont laatste ${MAX_SHOWN} van ${filtered.length} wijzigingen`
+      : `${filtered.length} wijziging(en)`;
+
+    listEl.innerHTML = "";
+    if (!shown.length) {
+      listEl.innerHTML = `<p class="filter-note">Geen wijzigingen gevonden voor deze filters.</p>`;
+      return;
+    }
+    for (const c of shown) {
+      const badgeClass = c.type === "added" ? "badge--success" : c.type === "removed" ? "badge--neutral" : "badge--warning";
+      const label = c.type === "added" ? "Nieuw" : c.type === "removed" ? "Verwijderd" : "Gewijzigd";
+      const registerLabel = REGISTERS[c.register]?.shortLabel || c.register;
+      listEl.appendChild(el("div", { class: "changelog-item" }, `
+        <span class="badge ${badgeClass}">${label}</span>
+        <span>${escapeHtml(c.name || "(onbekend)")}</span>
+        <span class="register-tag">${escapeHtml(registerLabel)}</span>
+        <time>${formatTimestamp(c.timestamp)}</time>
+      `));
+    }
+  }
+
+  registerSelect.addEventListener("change", render);
+  typeSelect.addEventListener("change", render);
+  render();
+})();
+</script>
+</body>
+</html>

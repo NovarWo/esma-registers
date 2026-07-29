@@ -4,7 +4,7 @@ Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers (whitepapers, ART-
 EMT-uitgevers, CASPs, non-compliant entiteiten), automatisch bijgewerkt via GitHub Actions.
 
 Zie `ESMA_MiCAR_Register_Tracker_Ontwerp.md` voor het volledige ontwerp (datamodel, site-architectuur, UI).
-Dit onderdeel van de repo bevat de **scraper** — de site zelf volgt in een volgende stap.
+Deze repo bevat zowel de **scraper** als de **site** (statisch, voor GitHub Pages).
 
 ## Wat de scraper doet
 
@@ -32,6 +32,23 @@ zomer-/wintertijd) en via handmatige trigger (`workflow_dispatch`, te vinden ond
 is dus vaker dan de bron zelf verandert — dat is bewust, om een update zo snel mogelijk
 op te pikken zodra hij verschijnt.
 
+## De site
+
+Volledig statisch (geen build-stap, geen backend) — vanilla HTML/CSS/JS die `data/*.json`
+rechtstreeks met `fetch()` uitleest:
+
+- `index.html` — dashboard met aantallen per register en de meest recente wijzigingen.
+- `register.html?type=casps|art|emt|whitepapers|non_compliant` — doorzoekbare/filterbare/
+  sorteerbare tabel per register, met een detailpaneel per record en CSV-export van de
+  huidige selectie.
+- `changelog.html` — volledige wijzigingsgeschiedenis, filterbaar op register en type
+  (nieuw/gewijzigd/verwijderd).
+- `assets/js/app.js` — alle rendering/filter/sort/zoek-logica; `assets/css/style.css` —
+  styling.
+
+Werkt direct via GitHub Pages zodra Pages op de repo-root (branch `main`) is ingesteld
+(**Settings → Pages → Source: Deploy from a branch → `main` / `/ (root)`**).
+
 ## Lokaal draaien
 
 ```bash
@@ -50,7 +67,8 @@ Dit vult (of werkt bij) de `data/`-map in de repo-root.
    "Read and write permissions" (nodig zodat de workflow naar `data/` kan pushen).
 3. Draai de workflow eenmalig handmatig (Actions-tab → "ESMA MiCAR register scrape" →
    "Run workflow") om de eerste snapshot te vullen.
-4. (Volgende stap) Site + GitHub Pages inrichten die `data/*.json` uitleest.
+4. Onder **Settings → Pages**: source op "Deploy from a branch", branch `main`, map `/ (root)`.
+   De site (`index.html` e.v.) verschijnt dan op de Pages-URL van de repo.
 
 ## Verificatie
 
@@ -59,6 +77,12 @@ De parsing/groepering/diff-logica is getest tegen echte fragmenten van alle 5 ES
 diensten per CASP, meerdere whitepapers per EMT-/ART-uitgever, deduplicatie van een
 letterlijk dubbele rij in het non-compliant register, en correcte detectie van
 toegevoegde/gewijzigde/verwijderde records tussen twee runs. Alle checks slagen.
+
+De front-end (`assets/js/app.js`) is los daarvan getest met een jsdom-harnas tegen dezelfde
+echte ESMA-fragmenten: per register is gecontroleerd dat de tabel rendert, zoeken de
+resultaten terecht versmalt, kolomsortering (op/neer) niet crasht, en het detailpaneel
+correct opent — voor alle 5 registers, inclusief het lege ART-register. Alle checks slagen.
+
 `test_fixtures/` is alleen voor lokale verificatie en hoeft niet mee de deploy in —
 `data/` staat momenteel op lege placeholders totdat de workflow voor het eerst draait.
 
