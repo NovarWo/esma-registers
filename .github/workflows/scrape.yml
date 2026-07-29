@@ -2,8 +2,10 @@ name: ESMA MiCAR register scrape
 
 on:
   schedule:
-    - cron: '0 * * * *'   # elk uur, op het hele uur (UTC)
-  workflow_dispatch: {}
+    # ESMA republishes the interim register weekly, so exact minute precision
+    # doesn't matter much — this just runs every hour, on the hour (UTC).
+    - cron: '0 * * * *'
+  workflow_dispatch: {}   # allows manually triggering a run from the Actions tab
 
 permissions:
   contents: write
@@ -39,5 +41,12 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "chore(data): update ESMA MiCAR register snapshot ($(date -u +'%Y-%m-%d %H:%M UTC'))"
-            git push
+            # main may have moved (e.g. someone manually uploaded a file via the
+            # GitHub web UI) between checkout and this push, so rebase onto the
+            # latest remote commit first. Retry a few times in case of a race.
+            for i in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              echo "Push attempt $i failed, retrying..."
+              sleep 5
+            done
           fi
