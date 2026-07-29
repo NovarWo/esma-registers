@@ -66,6 +66,30 @@ function websiteCell(url) {
   return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(domain || clean)}</a>`;
 }
 
+// --------------------------------------------------------------------------
+// Small icon helpers for the per-column filter dropdown's option rows — a
+// flag for country values, a light-blue "authority" glyph (matching the
+// service-icon look) for competent-authority values, and a colour-coded dot
+// for status values, so the filter itself carries the same visual language
+// as the table cells it filters.
+// --------------------------------------------------------------------------
+
+function countryFlagIconHtml(code) {
+  const flag = flagEmoji(code);
+  return flag ? `<span class="dropdown-icon dropdown-icon--flag">${flag}</span>` : "";
+}
+
+function authorityIconHtml() {
+  // svgIcon() is defined further down the file but hoisted (function
+  // declaration), so it's safe to call from here.
+  return `<span class="dropdown-icon dropdown-icon--authority">${svgIcon('<path d="m3 10 9-6 9 6"/><path d="M5 10v9M10 10v9M14 10v9M19 10v9"/><path d="M3 19h18"/>')}</span>`;
+}
+
+function statusIconHtml(value) {
+  const cls = value === "active" ? "status-dot--active" : value === "withdrawn" ? "status-dot--withdrawn" : "status-dot--unknown";
+  return `<span class="status-dot ${cls}"></span>`;
+}
+
 function cleanServiceLabel(s) {
   if (!s) return "";
   return s.replace(/^\s*[a-j]\s*[.)]\s*/i, "").trim().replace(/^./, (c) => c.toUpperCase());
@@ -225,11 +249,11 @@ const REGISTERS = {
       { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
       {
         key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
-        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName },
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
         key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
       },
       {
         key: "services", label: "Diensten",
@@ -247,7 +271,7 @@ const REGISTERS = {
       { key: "website", label: "Website", value: (r) => r.website || "—", render: (r) => websiteCell(r.website) },
       {
         key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v) },
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
@@ -273,11 +297,11 @@ const REGISTERS = {
       { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
       {
         key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
-        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName },
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
         key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
       },
       { key: "credit_institution", label: "Kredietinstelling", value: (r) => r.credit_institution || "—" },
       {
@@ -286,7 +310,7 @@ const REGISTERS = {
       },
       {
         key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v) },
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
@@ -313,11 +337,11 @@ const REGISTERS = {
       { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
       {
         key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
-        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName },
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
         key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
       },
       {
         key: "institution_type", label: "Type instelling", value: (r) => r.institution_type || "—",
@@ -329,7 +353,7 @@ const REGISTERS = {
       },
       {
         key: "status", label: "Status", value: (r) => (r.status === "active" ? "Actief" : r.status === "withdrawn" ? "Ingetrokken" : "—"), render: (r) => statusBadge(r.status),
-        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v) },
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: (v) => (v === "active" ? "Actief" : v === "withdrawn" ? "Ingetrokken" : v), optionIcon: statusIconHtml },
       },
     ],
     detail: (r) => detailArticle(r, [
@@ -358,11 +382,11 @@ const REGISTERS = {
       { key: "lei", label: "LEI", value: (r) => r.lei || "—" },
       {
         key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
-        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName },
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
         key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
       },
       {
         key: "casp", label: "Betrokken CASP",
@@ -391,11 +415,11 @@ const REGISTERS = {
       { key: "name", label: "Naam", value: (r) => r.name || "—", ellipsis: true },
       {
         key: "country", label: "Land", value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
-        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName },
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
       },
       {
         key: "authority", label: "Toezichthouder", value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityIconHtml },
       },
       { key: "reason", label: "Reden", value: (r) => r.reason || "—", ellipsis: true, maxWidth: 280 },
       { key: "decision_date", label: "Besluitdatum", value: (r) => r.decision_date || "—", sortValue: (r) => parseEsmaDate(r.decision_date) },
@@ -450,10 +474,14 @@ function renderRegisterTable(root, config, records) {
   const activeFilters = {};
   let searchTerm = "";
   const openPopovers = [];
+  const filterResetters = [];
 
   const toolbar = el("div", { class: "toolbar" });
   const searchInput = el("input", { type: "search", placeholder: "Zoek op naam, LEI, website…" });
   toolbar.appendChild(searchInput);
+
+  const resetBtn = el("button", { class: "btn btn--reset", type: "button" }, "Reset filters");
+  toolbar.appendChild(resetBtn);
 
   const countLabel = el("span", { class: "toolbar__count" });
   const exportBtn = el("button", { class: "btn", type: "button" }, "Exporteer CSV");
@@ -486,18 +514,62 @@ function renderRegisterTable(root, config, records) {
     const fc = col.filter || { type: "text" };
 
     if (fc.type === "select") {
+      // A native <select> can only show plain text per option, so it can't
+      // carry the flag / authority icon / status-colour that the rest of the
+      // site uses to identify these values at a glance. This is a small
+      // custom dropdown (button + popover list) instead, styled to match.
+      activeFilters[col.key] = null;
       const options = [...new Set(records.map((r) => fc.valueFn(r)).filter(Boolean))].sort();
-      const select = el("select", { class: "col-filter-select" });
-      select.appendChild(el("option", { value: "" }, "Alle"));
-      for (const opt of options) {
-        select.appendChild(el("option", { value: opt }, fc.formatFn ? escapeHtml(fc.formatFn(opt)) : escapeHtml(opt)));
+      const wrap = el("div", { class: "col-filter-dropdown" });
+      const btn = el("button", { type: "button", class: "col-filter-dropdown__btn" },
+        `<span class="col-filter-dropdown__current"></span><svg class="col-filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`);
+      const currentLabel = btn.querySelector(".col-filter-dropdown__current");
+      const list = el("div", { class: "col-filter-dropdown__list" });
+
+      const optionRows = [];
+      function addOptionRow(value, label, iconHtml) {
+        const row = el("div", { class: "col-filter-dropdown__option" },
+          `${iconHtml || ""}<span>${escapeHtml(label)}</span><svg class="col-filter-dropdown__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`);
+        row.addEventListener("click", (e) => {
+          e.stopPropagation();
+          activeFilters[col.key] = value;
+          updateSelected();
+          list.classList.remove("open");
+          applyAndRender();
+        });
+        optionRows.push({ row, value });
+        list.appendChild(row);
       }
-      select.addEventListener("click", (e) => e.stopPropagation());
-      select.addEventListener("change", () => {
-        activeFilters[col.key] = select.value || null;
-        applyAndRender();
+      addOptionRow(null, "Alle", "");
+      for (const opt of options) {
+        addOptionRow(opt, fc.formatFn ? fc.formatFn(opt) : opt, fc.optionIcon ? fc.optionIcon(opt) : "");
+      }
+
+      function updateSelected() {
+        const active = activeFilters[col.key];
+        for (const { row, value } of optionRows) row.classList.toggle("is-selected", value === active);
+        if (active === null) {
+          currentLabel.innerHTML = `${escapeHtml(col.label)}: alle`;
+        } else {
+          const iconHtml = fc.optionIcon ? fc.optionIcon(active) : "";
+          const label = fc.formatFn ? fc.formatFn(active) : active;
+          currentLabel.innerHTML = `${iconHtml}<span>${escapeHtml(label)}</span>`;
+        }
+        btn.classList.toggle("has-selection", active !== null);
+      }
+      updateSelected();
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const willOpen = !list.classList.contains("open");
+        for (const p of openPopovers) p.classList.remove("open");
+        if (willOpen) list.classList.add("open");
       });
-      cell.appendChild(select);
+      wrap.appendChild(btn);
+      wrap.appendChild(list);
+      cell.appendChild(wrap);
+      openPopovers.push(list);
+      filterResetters.push(() => { activeFilters[col.key] = null; updateSelected(); });
     } else if (fc.type === "chips") {
       activeFilters[col.key] = [];
       const wrap = el("div", { class: "col-filter-chips" });
@@ -545,6 +617,7 @@ function renderRegisterTable(root, config, records) {
       wrap.appendChild(popover);
       cell.appendChild(wrap);
       openPopovers.push(popover);
+      filterResetters.push(() => { activeFilters[col.key] = []; updateChipVisual(); });
     } else {
       const input = el("input", { type: "text", class: "col-filter-input", placeholder: "Filter…" });
       input.addEventListener("click", (e) => e.stopPropagation());
@@ -553,11 +626,19 @@ function renderRegisterTable(root, config, records) {
         applyAndRender();
       });
       cell.appendChild(input);
+      filterResetters.push(() => { input.value = ""; activeFilters[col.key] = ""; });
     }
     filterRow.appendChild(cell);
   }
   thead.appendChild(filterRow);
   document.addEventListener("click", () => { for (const p of openPopovers) p.classList.remove("open"); });
+
+  resetBtn.addEventListener("click", () => {
+    searchTerm = "";
+    searchInput.value = "";
+    for (const reset of filterResetters) reset();
+    applyAndRender();
+  });
 
   const tbody = el("tbody");
   table.appendChild(thead);
