@@ -111,37 +111,75 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 .btn--primary { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
 .btn--primary:hover { background: #1a24b0; }
 
-/* Select-type filters — custom chevron + pill shape, brand-styled focus/hover */
-.filter-select { position: relative; display: inline-flex; }
-.filter-select select {
-  font-family: inherit; font-size: .875rem; font-weight: 600; color: var(--text);
-  border: 1px solid var(--border); border-radius: var(--radius-pill);
-  padding: 10px 34px 10px 16px; background: var(--surface-2);
-  appearance: none; -webkit-appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23627185' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center; background-size: 13px;
-  transition: border-color .15s ease, background-color .15s ease;
+/* Per-column filter row, rendered as a second <tr> inside the table header.
+   Every column gets a compact control here: a text input by default, or a
+   select / chip-popover for columns that declare one — styled to match the
+   rest of the site (pill shapes, brand-blue focus/active states) rather than
+   plain browser form controls. */
+table.data thead tr.col-filter-row th.col-filter-cell {
+  background: var(--surface); padding: 8px 10px 10px; cursor: default;
+  position: relative; vertical-align: top;
 }
-.filter-select select:hover { background-color: var(--surface); border-color: var(--color-primary-light); }
-.filter-select select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(35,48,218,.12); }
 
-/* Chip-style multi-select filters (fixed option set, OR-combined) */
-.chip-filter {
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-2xl);
-  padding: 14px 20px; margin-bottom: 16px;
+.col-filter-input,
+.col-filter-select {
+  width: 100%; box-sizing: border-box; font-family: inherit; font-size: .8125rem; font-weight: 500;
+  color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  padding: 7px 14px; background: var(--surface-2);
+  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
 }
-.chip-filter__label { font-size: .8125rem; font-weight: 600; color: var(--text-muted); margin-right: 4px; white-space: nowrap; }
-.chip-filter__btn {
-  display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
-  font-size: .8125rem; font-weight: 600; color: var(--text-muted); cursor: pointer;
-  background: var(--surface-2); border: 1px solid transparent; border-radius: var(--radius-pill);
-  padding: 7px 14px 7px 10px; transition: background .15s ease, color .15s ease, border-color .15s ease;
+.col-filter-input::placeholder { color: var(--grey-400); }
+.col-filter-input:hover, .col-filter-select:hover { border-color: var(--color-primary-light); }
+.col-filter-input:focus, .col-filter-select:focus {
+  outline: none; border-color: var(--color-primary); background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(35,48,218,.12);
 }
-.chip-filter__btn svg { width: 15px; height: 15px; flex: none; }
-.chip-filter__btn:hover { border-color: var(--color-primary-light); color: var(--text); }
-.chip-filter__btn.is-active { background: var(--color-primary); color: #fff; }
-.chip-filter__btn.is-active svg { color: #fff; }
+.col-filter-select {
+  appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23627185' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 12px;
+}
+
+/* Chip-popover column filter (used where a column can have multiple values
+   selected at once, OR-combined — e.g. CASP Diensten). A native <select>
+   can't express "any of these N", and there are too many options (10 MiCAR
+   services) to lay out flat inside a table header cell, hence the popover. */
+.col-filter-chips { position: relative; }
+.col-filter-chips__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
+  font-family: inherit; font-size: .8125rem; font-weight: 600; color: var(--text-muted); cursor: pointer;
+  border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface-2);
+  padding: 7px 12px; transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.col-filter-chips__btn:hover { border-color: var(--color-primary-light); color: var(--text); }
+.col-filter-chips__btn.has-selection { background: var(--color-primary-lighter); border-color: var(--color-primary-light); color: var(--color-primary); }
+.col-filter-chips__count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px;
+  padding: 0 5px; border-radius: var(--radius-pill); background: var(--color-primary); color: #fff;
+  font-size: .6875rem; font-weight: 700; line-height: 1;
+}
+
+.chip-popover {
+  display: none; flex-wrap: wrap; gap: 6px; position: absolute; top: calc(100% + 6px); left: 0; z-index: 30;
+  width: max-content; max-width: 280px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-medium); padding: 10px;
+}
+.chip-popover.open { display: flex; }
+.chip-popover__clear {
+  flex-basis: 100%; text-align: left; font-family: inherit; font-size: .75rem; font-weight: 600;
+  color: var(--color-primary); background: none; border: none; cursor: pointer; padding: 0 0 6px; margin: 0;
+}
+.chip-popover__clear:hover { text-decoration: underline; }
+.chip-popover__btn {
+  display: inline-flex; align-items: center; gap: 6px; font-family: inherit; font-size: .8125rem; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; background: var(--surface-2); border: 1px solid transparent;
+  border-radius: var(--radius-pill); padding: 6px 12px 6px 8px; white-space: nowrap;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.chip-popover__btn svg { width: 14px; height: 14px; flex: none; }
+.chip-popover__btn:hover { border-color: var(--color-primary-light); color: var(--text); }
+.chip-popover__btn.is-active { background: var(--color-primary); color: #fff; }
+.chip-popover__btn.is-active svg { color: #fff; }
 
 /* Table */
 .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-2xl); }
