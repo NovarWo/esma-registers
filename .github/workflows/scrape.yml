@@ -3,8 +3,11 @@ name: ESMA MiCAR register scrape
 on:
   schedule:
     # ESMA republishes the interim register weekly, so exact minute precision
-    # doesn't matter much — this just runs every hour, on the hour (UTC).
-    - cron: '0 * * * *'
+    # doesn't matter much — this runs every hour at :30. Deliberately NOT on
+    # the hour (0 * * * *): GitHub's scheduled-workflow queue spikes hardest
+    # exactly at :00 because so many repos worldwide schedule there too,
+    # which was causing runs to be delayed or dropped entirely.
+    - cron: '30 * * * *'
   workflow_dispatch: {}   # allows manually triggering a run from the Actions tab
 
 permissions:
