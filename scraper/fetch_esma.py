@@ -396,13 +396,22 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
     # Every run rewrites each register's `generated_at` to "now", so a git
     # diff on data/ is never empty even when ESMA's actual content didn't
     # change - that's just freshness bookkeeping, not "new data". Expose the
-    # real, record-level change count (and a short per-register breakdown)
-    # as a GitHub Actions step output, so the workflow can gate its Slack
-    # notification on genuinely new results instead of every successful run.
+    # real, record-level change count (and a human-readable per-entity
+    # breakdown: which party, which register, added/changed/removed) as a
+    # GitHub Actions step output, so the workflow can both gate its Slack
+    # notification on genuinely new results instead of every successful run,
+    # and say *what* changed rather than just how many.
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
-        change_counts = {r: len([c for c in all_changes if c["register"] == r]) for r in SOURCES}
-        summary_lines = [f"{r}: {n} wijziging(en)" for r, n in change_counts.items() if n]
+        TYPE_LABELS_NL = {"added": "toegevoegd", "changed": "gewijzigd", "removed": "verwijderd"}
+        MAX_SUMMARY_LINES = 20
+        detail_lines = [
+            f"{c['register']}: {c.get('name') or c['id']} ({TYPE_LABELS_NL.get(c['type'], c['type'])})"
+            for c in all_changes
+        ]
+        summary_lines = detail_lines[:MAX_SUMMARY_LINES]
+        if len(detail_lines) > MAX_SUMMARY_LINES:
+            summary_lines.append(f"... en {len(detail_lines) - MAX_SUMMARY_LINES} andere wijziging(en)")
         with open(github_output, "a", encoding="utf-8") as f:
             f.write(f"real_changes={len(all_changes)}\n")
             f.write("change_summary<<EOF\n")
