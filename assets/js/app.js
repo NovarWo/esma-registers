@@ -40,13 +40,11 @@ function shortAuthority(name) {
   return m ? m[1].trim() : name.trim();
 }
 
-// A distinct "logo" per authority isn't practical (there's no real artwork to
-// draw from, and reproducing official government/regulator emblems would be
-// a copyright/trademark minefield) — instead every authority gets its own
-// monogram badge in the same light-blue circular style used elsewhere on the
-// site: the bracketed code if ESMA's data already has one (FMA, BaFin, AFM,
-// CySEC…), otherwise an acronym built from the significant words of the full
-// name (e.g. "Banco de Portugal" → "BdP", "Central Bank of Iceland" → "CBI").
+// Fallback for authorities without a resolved real logo (see AUTHORITY_LOGO_MAP
+// below): a monogram badge in the same light-blue circular style used
+// elsewhere on the site — the bracketed code if ESMA's data already has one
+// (FMA, BaFin, AFM, CySEC…), otherwise an acronym built from the significant
+// words of the full name (e.g. "Banco de Portugal" → "BdP").
 const AUTHORITY_ACRONYM_STOPWORDS = new Set([
   "de", "van", "of", "and", "the", "la", "le", "les", "der", "den", "het",
   "per", "e", "y", "und", "für", "fur", "och", "og", "voor", "for",
@@ -62,10 +60,78 @@ function authorityAcronym(name) {
   return initials || trimmed.slice(0, 3).toUpperCase();
 }
 
-function authorityBadgeHtml(name) {
+function authorityMonogramHtml(name) {
   const code = authorityAcronym(name);
   const sizeClass = code.length > 5 ? " authority-badge--tiny" : code.length > 3 ? " authority-badge--small" : "";
   return `<span class="authority-badge${sizeClass}" aria-hidden="true">${escapeHtml(code)}</span>`;
+}
+
+// Real logos, scraped from each authority's own official website and saved
+// under assets/img/authorities/. Keyed by a normalized form of ESMA's raw
+// "competent authority" string so both the canonical spelling and the known
+// typo/format variants in the source data (e.g. the two "De Nederlan(d)sche
+// Bank (DNB)" spellings, or "Bank of Lithuania" with/without "(LSC)") resolve
+// to the same asset. Authorities that are genuinely distinct despite similar
+// names — France's AMF vs ACPR, Croatia's HANFA vs Croatian National Bank,
+// the Dutch AFM vs the Austrian FMA — each keep their own entry and logo.
+// Anything not listed here (or whose image 404s at runtime) falls back to
+// the monogram badge above via authorityBadgeHtml()'s onerror handler.
+function normalizeAuthorityKey(name) {
+  return (name || "")
+    .normalize("NFD").replace(new RegExp("[\\u0300-\\u036f]", "g"), "") // strip accents
+    .toLowerCase()
+    .replace(/[^a-z0-9()]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const AUTHORITY_LOGO_MAP = {
+  "austrian financial market authority (fma)": "fma-at",
+  "national bank of belgium (nbb)": "nbb-be",
+  "financial supervision commission (fsc)": "fsc-bg",
+  "cyprus securities and exchange commission (cysec)": "cysec-cy",
+  "czech national bank (cnb)": "cnb-cz",
+  "federal financial supervisory authority (bafin)": "bafin-de",
+  "estonian financial supervision authority (efsa)": "efsa-ee",
+  "comision nacional del mercado de valores (cnmv)": "cnmv-es",
+  "autorite des marches financiers (amf)": "amf-fr",
+  "autorite de controle prudentiel et de resolution (acpr)": "acpr-fr",
+  "croatian financial services supervisory agency (hanfa)": "hanfa-hr",
+  "croatian national bank": "hnb-hr",
+  "central bank of ireland (cbi)": "cbi-ie",
+  "finanstilsynet": "finanstilsynet-dk",
+  "finanssivalvonta (fin fsa)": "finfsa-fi",
+  "central bank of iceland": "sedlabanki-is",
+  "bank of lithuania (lsc)": "lb-lt",
+  "bank of lithuania": "lb-lt",
+  "commission de surveillance du secteur financier (cssf)": "cssf-lu",
+  "latvijas banka": "latvijasbanka-lv",
+  "malta financial services authority": "mfsa-mt",
+  "de nederlandsche bank (dnb)": "dnb-nl",
+  "de nederlansche bank (dnb)": "dnb-nl", // known ESMA typo — same authority as above
+  "polish financial supervision authority (knf)": "knf-pl",
+  "commissione nazionale per le societa e la borsa (consob)": "consob-it",
+  "netherlands authority for the financial markets (afm)": "afm-nl",
+  "national bank of slovakia (nbs)": "nbs-sk",
+};
+
+function authorityLogoPath(name) {
+  const slug = AUTHORITY_LOGO_MAP[normalizeAuthorityKey(name)];
+  return slug ? `assets/img/authorities/${slug}.png` : null;
+}
+
+// Exposed on window (plain <script>, no module scope) so the <img onerror>
+// below can reach it: if a logo asset fails to load (e.g. missing upload),
+// swap that one cell over to the monogram-badge fallback in place.
+function handleAuthorityLogoError(img) {
+  const span = img.closest(".authority-logo");
+  if (span) span.outerHTML = authorityMonogramHtml(img.dataset.authority || "");
+}
+
+function authorityBadgeHtml(name) {
+  const logo = authorityLogoPath(name);
+  if (!logo) return authorityMonogramHtml(name);
+  return `<span class="authority-logo" aria-hidden="true"><img src="${escapeHtml(logo)}" alt="" loading="lazy" data-authority="${escapeHtml(name || "")}" onerror="handleAuthorityLogoError(this)"></span>`;
 }
 
 function authorityCell(name) {
