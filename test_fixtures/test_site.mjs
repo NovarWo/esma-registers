@@ -89,11 +89,25 @@ for (const key of Object.keys(REGISTERS)) {
     const overlay = document.getElementById("detail-overlay");
     check(`${key}: detail overlay opens and has content`, overlay && overlay.classList.contains("open") && overlay.querySelector("#detail-body").innerHTML.length > 20);
   }
+
+  // Per-column filters generalise beyond CASPs too: non_compliant's
+  // "authority" column shows the shortened name (via shortAuthority) as the
+  // select option label, not the raw long ESMA competent-authority string.
+  if (key === "non_compliant" && data.records.length) {
+    const authoritySelect = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authority"] .col-filter-select');
+    check(`${key}: authority column has a select filter`, authoritySelect !== null);
+    if (authoritySelect) {
+      const optionTexts = [...authoritySelect.options].map((o) => o.textContent);
+      check(`${key}: authority select shows the short "AFM" label, not the full raw name`,
+        optionTexts.includes("AFM") && !optionTexts.some((t) => t.includes("Netherlands Authority for the Financial Markets")));
+    }
+  }
 }
 
 // --------------------------------------------------------------------------
 // CASPs-specific regression checks: the pipe-joined-services-in-one-row bug,
-// the icon rendering, and the new chip filter's fixed option set + OR logic.
+// icons-only-for-offered-services, and the per-column filter row (text,
+// select, and the OR-logic chip popover for Diensten).
 // --------------------------------------------------------------------------
 const caspsData = JSON.parse(fs.readFileSync("/tmp/site_test_data/data/casps.json", "utf-8"));
 const caspsRoot = window.document.createElement("div");
@@ -105,6 +119,7 @@ const dienstenCell = bpRow.children[4]; // name, lei, country, authority, servic
 check("Bitpanda's Diensten cell renders as icons, not a text blob", dienstenCell.querySelector(".service-icons") !== null);
 const activeIcons = dienstenCell.querySelectorAll(".service-icon.is-active");
 check(`Bitpanda has exactly 3 active service icons (a, c, d)`, activeIcons.length === 3);
+check("Bitpanda's Diensten cell shows ONLY offered services (no dimmed icons for the other 7)", dienstenCell.querySelectorAll(".service-icon").length === 3);
 check("Bitpanda's Diensten cell has no stray pipe characters", !dienstenCell.textContent.includes("|"));
 
 // Stratos Europe Ltd (commercial name "Tradu") is a real-world row whose
@@ -115,12 +130,48 @@ check("Stratos/Tradu row found in the table", stratosRow !== undefined);
 const stratosActive = stratosRow.children[4].querySelectorAll(".service-icon.is-active");
 check("Stratos (no letter-prefixed services) still resolves via keyword fallback", stratosActive.length > 0);
 
-// Chip filter: fixed canonical option set (10 services + "Alle"), not derived
-// from the data (which is what caused the combinatorial-explosion dropdown bug).
-const chipFilter = caspsRoot.querySelector(".chip-filter");
-check("Chip filter renders", chipFilter !== null);
-const chipButtons = chipFilter.querySelectorAll(".chip-filter__btn");
-check("Chip filter has exactly 11 buttons (Alle + 10 canonical services)", chipButtons.length === 11);
+// --- Per-column filter row: every column gets its own filter control -----
+const filterCells = caspsRoot.querySelectorAll("tr.col-filter-row th.col-filter-cell");
+check("Every CASPs column has a filter cell (7 columns)", filterCells.length === REGISTERS.casps.columns.length);
+
+const cellFor = (key) => caspsRoot.querySelector(`tr.col-filter-row th.col-filter-cell[data-key="${key}"]`);
+check("Naam column gets a free-text filter input", cellFor("name").querySelector(".col-filter-input") !== null);
+check("Land column gets a select filter", cellFor("country").querySelector(".col-filter-select") !== null);
+check("Toezichthouder column gets a select filter", cellFor("authority").querySelector(".col-filter-select") !== null);
+check("Status column gets a select filter", cellFor("status").querySelector(".col-filter-select") !== null);
+check("Diensten column gets a chip-popover filter, not a select", cellFor("services").querySelector(".col-filter-chips") !== null);
+
+// Text filter on "Naam": narrows to the matching CASP only.
+const nameInput = cellFor("name").querySelector(".col-filter-input");
+nameInput.value = "bitpanda";
+nameInput.dispatchEvent(new window.Event("input"));
+check("Text filter on Naam narrows to exactly Bitpanda", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 1
+  && caspsRoot.querySelector("tbody tr").textContent.includes("Bitpanda"));
+nameInput.value = "";
+nameInput.dispatchEvent(new window.Event("input"));
+check("Clearing the Naam filter restores all 6 CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+
+// Select filter on "Land": all sample CASPs happen to be NL-free (AT/CY/CZ/DE),
+// so filtering on "AT" should narrow to the 3 Austrian entries.
+const countrySelect = cellFor("country").querySelector(".col-filter-select");
+countrySelect.value = "AT";
+countrySelect.dispatchEvent(new window.Event("change"));
+check("Select filter on Land='AT' narrows to the 3 Austrian CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 3);
+countrySelect.value = "";
+countrySelect.dispatchEvent(new window.Event("change"));
+check("Clearing the Land filter restores all 6 CASPs", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+
+// Chip-popover filter on "Diensten": fixed canonical option set (10 services),
+// not derived from the data (which is what caused the earlier combinatorial-
+// explosion dropdown bug), combined with OR logic.
+const chipsWrap = cellFor("services").querySelector(".col-filter-chips");
+const chipsBtn = chipsWrap.querySelector(".col-filter-chips__btn");
+const popover = chipsWrap.querySelector(".chip-popover");
+check("Diensten popover is closed by default", !popover.classList.contains("open"));
+chipsBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
+check("Clicking the Diensten filter button opens the popover", popover.classList.contains("open"));
+const chipButtons = popover.querySelectorAll(".chip-popover__btn");
+check("Diensten popover has exactly 10 chips (the canonical MiCAR services)", chipButtons.length === 10);
 
 // OR logic: selecting two services should show CASPs offering EITHER one, not
 // only CASPs offering both. Per the fixture: only Trade Republic Bank offers
@@ -133,14 +184,17 @@ executionBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
 check("After selecting 'Orderuitvoering' only: Trade Republic (has 'e') is shown", countRowsWithName(caspsRoot, "Trade Republic") === 1);
 check("After selecting 'Orderuitvoering' only: Bitpanda (no 'e') is hidden", countRowsWithName(caspsRoot, "Bitpanda") === 0);
 check("After selecting 'Orderuitvoering' only: exactly 1 CASP matches", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 1);
+check("Filter button shows a '1' count badge while a service is selected", chipsBtn.querySelector(".col-filter-chips__count").textContent === "1");
 exchangeBtn.dispatchEvent(new window.Event("click", { bubbles: true }));
 check("After adding 'Wisselen — fiat' (OR): Bitpanda (has 'c') now shown too", countRowsWithName(caspsRoot, "Bitpanda") === 1);
 check("OR filter still shows Trade Republic (has 'e', not 'c')", countRowsWithName(caspsRoot, "Trade Republic") === 1);
 check("OR filter still hides Cryptonow (has neither 'e' nor 'c')", countRowsWithName(caspsRoot, "Cryptonow") === 0);
 check("After OR of 2 codes: 3 CASPs match (Trade Republic, Bitpanda, Bybit)", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 3);
-// Reset via "Alle"
-chipFilter.querySelector(".chip-filter__btn").dispatchEvent(new window.Event("click", { bubbles: true }));
-check("Clicking 'Alle' resets the filter (all 6 CASPs shown again)", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+
+// Reset via the popover's "Alles wissen" link.
+popover.querySelector(".chip-popover__clear").dispatchEvent(new window.Event("click", { bubbles: true }));
+check("'Alles wissen' resets the Diensten filter (all 6 CASPs shown again)", caspsRoot.querySelectorAll("tbody tr:not(.empty-row)").length === 6);
+check("Filter button count badge is hidden again after reset", chipsBtn.querySelector(".col-filter-chips__count").hidden === true);
 
 console.log(failures === 0 ? "\nALL SITE TESTS PASSED" : `\n${failures} SITE TEST(S) FAILED`);
 process.exit(failures ? 1 : 0);
