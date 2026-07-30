@@ -40,39 +40,14 @@ function shortAuthority(name) {
   return m ? m[1].trim() : name.trim();
 }
 
-// A distinct "logo" per authority isn't practical (there's no real artwork to
-// draw from, and reproducing official government/regulator emblems would be
-// a copyright/trademark minefield) — instead every authority gets its own
-// monogram badge in the same light-blue circular style used elsewhere on the
-// site: the bracketed code if ESMA's data already has one (FMA, BaFin, AFM,
-// CySEC…), otherwise an acronym built from the significant words of the full
-// name (e.g. "Banco de Portugal" → "BdP", "Central Bank of Iceland" → "CBI").
-const AUTHORITY_ACRONYM_STOPWORDS = new Set([
-  "de", "van", "of", "and", "the", "la", "le", "les", "der", "den", "het",
-  "per", "e", "y", "und", "für", "fur", "och", "og", "voor", "for",
-]);
-
-function authorityAcronym(name) {
-  if (!name) return "?";
-  const trimmed = name.trim();
-  const short = shortAuthority(trimmed);
-  if (short !== trimmed) return short; // already has an explicit bracketed code
-  const words = trimmed.split(/\s+/).filter((w) => !AUTHORITY_ACRONYM_STOPWORDS.has(w.toLowerCase()));
-  const initials = words.slice(0, 4).map((w) => w[0]).join("").toUpperCase();
-  return initials || trimmed.slice(0, 3).toUpperCase();
-}
-
-function authorityBadgeHtml(name) {
-  const code = authorityAcronym(name);
-  const sizeClass = code.length > 5 ? " authority-badge--tiny" : code.length > 3 ? " authority-badge--small" : "";
-  return `<span class="authority-badge${sizeClass}" aria-hidden="true">${escapeHtml(code)}</span>`;
-}
-
+// No icon/logo next to the authority name (decided against both the real
+// scraped logos and the monogram badge that preceded them) — just the short
+// code (bracketed abbreviation from ESMA's data, e.g. FMA/BaFin/AFM) with the
+// full official name available on hover.
 function authorityCell(name) {
   if (!name) return "—";
   const short = shortAuthority(name);
-  const label = short === name.trim() ? escapeHtml(name) : `<span title="${escapeHtml(name)}">${escapeHtml(short)}</span>`;
-  return `<span class="flag-cell">${authorityBadgeHtml(name)} ${label}</span>`;
+  return short === name.trim() ? escapeHtml(name) : `<span title="${escapeHtml(name)}">${escapeHtml(short)}</span>`;
 }
 
 function shortDomain(url) {
@@ -384,11 +359,76 @@ function caspServiceDetailItems(r) {
   return [...items, ...extra];
 }
 
+// AFM's crypto register only tracks 3 broad authorisation types (no
+// per-country nuance like ESMA's authority/country columns) - straightforward
+// code -> translated label lookup, same pattern as statusLabel()/countryName().
+function authorisationTypeLabel(code) {
+  if (!code) return "—";
+  return t(`afmAuthType.${code}`) || code;
+}
+
 // --------------------------------------------------------------------------
 // Register configuration — one entry per data/<key>.json file.
 // --------------------------------------------------------------------------
 
 const REGISTERS = {
+  afm_casps: {
+    label: t("registers.afm_casps.label"),
+    shortLabel: t("registers.afm_casps.shortLabel"),
+    file: "afm_casps",
+    // AFM's own register (rather than ESMA's EU-wide mirror) - shown first
+    // since it's the register that matters most for a Dutch-licensed CASP
+    // and updates ahead of ESMA's consolidated register.
+    sourceLinkText: t("footer.sourceLinkTextAfm"),
+    sourceUrl: "https://www.afm.nl/en/sector/registers/vergunningenregisters/cryptopartijen",
+    subtitleFn: (count, generated) => t("registerPage.subtitleAfm", count, generated),
+    searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.authorisation_number],
+    columns: [
+      { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
+      { key: "authorisation_number", label: t("columns.authorisationNumber"), value: (r) => r.authorisation_number || "—" },
+      {
+        key: "authorisation_type", label: t("columns.authorisationType"), value: (r) => authorisationTypeLabel(r.authorisation_type),
+        filter: { type: "select", valueFn: (r) => r.authorisation_type, formatFn: authorisationTypeLabel },
+      },
+      {
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
+      },
+      {
+        key: "services", label: t("columns.services"),
+        value: caspServiceSummary,
+        render: (r) => renderServiceIcons(expandCaspServiceEntries(r.services).known),
+        sortValue: (r) => { const { known, unknown } = expandCaspServiceEntries(r.services); return known.size + unknown.length; },
+        filter: {
+          type: "chips", options: CASP_SERVICES,
+          matchFn: (r, selectedCodes) => {
+            const { known } = expandCaspServiceEntries(r.services);
+            return selectedCodes.some((code) => known.has(code));
+          },
+        },
+      },
+      { key: "website", label: t("columns.website"), value: (r) => r.website || "—", render: (r) => websiteCell(r.website) },
+      {
+        key: "status", label: t("columns.status"), value: (r) => statusLabel(r.status), render: (r) => statusBadge(r.status),
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: statusLabel, optionIcon: statusIconHtml },
+      },
+    ],
+    detail: (r) => detailArticle(r, [
+      [t("detail.authorisationNumber"), r.authorisation_number || "—"],
+      [t("detail.authorisationType"), authorisationTypeLabel(r.authorisation_type)],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei || "—"],
+      [t("detail.address"), r.address],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.websitePlatform"), linkify(r.platform_website)],
+      [t("detail.authorisationDate"), r.authorisation_date || "—"],
+      [t("detail.withdrawalDate"), r.withdrawal_date || "—"],
+      [t("detail.suspensionPeriods"), r.suspension_periods || "—"],
+      [t("detail.euPassport"), r.eu_passport_raw || "—"],
+      [t("detail.equivalentServices"), r.equivalent_services || "—"],
+    ], t("detail.servicesTitle"), caspServiceDetailItems(r)),
+  },
+
   casps: {
     label: t("registers.casps.label"),
     shortLabel: t("registers.casps.shortLabel"),
@@ -403,7 +443,7 @@ const REGISTERS = {
       },
       {
         key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
       },
       {
         key: "services", label: t("columns.services"),
@@ -451,7 +491,7 @@ const REGISTERS = {
       },
       {
         key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
       },
       { key: "credit_institution", label: t("columns.creditInstitution"), value: (r) => r.credit_institution || "—" },
       {
@@ -491,7 +531,7 @@ const REGISTERS = {
       },
       {
         key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
       },
       {
         key: "institution_type", label: t("columns.institutionType"), value: (r) => r.institution_type || "—",
@@ -536,7 +576,7 @@ const REGISTERS = {
       },
       {
         key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
       },
       {
         key: "casp", label: t("columns.involvedCasp"),
@@ -569,7 +609,7 @@ const REGISTERS = {
       },
       {
         key: "authority", label: t("columns.authority"), value: (r) => r.competent_authority || "—", render: (r) => authorityCell(r.competent_authority),
-        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority, optionIcon: authorityBadgeHtml },
+        filter: { type: "select", valueFn: (r) => r.competent_authority, formatFn: shortAuthority },
       },
       { key: "reason", label: t("columns.reason"), value: (r) => r.reason || "—", ellipsis: true, maxWidth: 280 },
       { key: "decision_date", label: t("columns.decisionDate"), value: (r) => r.decision_date || "—", sortValue: (r) => parseEsmaDate(r.decision_date) },
@@ -664,7 +704,12 @@ function renderRegisterTable(root, config, records) {
 
     if (fc.type === "select") {
       activeFilters[col.key] = null;
-      const options = [...new Set(records.map((r) => fc.valueFn(r)).filter(Boolean))].sort();
+      // Sort by what's actually shown in the dropdown (the formatted label,
+      // e.g. the short "AFM"/"BaFin" authority code), not the raw underlying
+      // value — otherwise the on-screen order wouldn't be alphabetical.
+      const label = (v) => (fc.formatFn ? fc.formatFn(v) : v);
+      const options = [...new Set(records.map((r) => fc.valueFn(r)).filter(Boolean))]
+        .sort((a, b) => label(a).localeCompare(label(b)));
       const dropdown = buildDropdownFilter({
         label: col.label,
         options,

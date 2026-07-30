@@ -24,13 +24,13 @@ window.document.body.appendChild(scriptEl);
 // const/let declarations in a classic <script> don't attach to `window` - bridge
 // them explicitly so this harness (running as a separate ES module) can reach them.
 const bridge = window.document.createElement("script");
-bridge.textContent = "window.__b = { REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES, extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityAcronym, authorityBadgeHtml, shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml };";
+bridge.textContent = "window.__b = { REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES, extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityCell, shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml, authorisationTypeLabel };";
 window.document.body.appendChild(bridge);
 
 const {
   REGISTERS, renderRegisterTable, openDetail, cleanServiceLabel, expandCaspServiceEntries, CASP_SERVICES,
-  extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityAcronym,
-  authorityBadgeHtml, shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml,
+  extractServiceCode, countryName, parseEsmaDate, t, getLang, setLang, buildDropdownFilter, authorityCell,
+  shortAuthority, statusLabel, changelogTypeLabel, changelogItemHtml, authorisationTypeLabel,
 } = window.__b;
 
 let failures = 0;
@@ -56,11 +56,16 @@ check("extractServiceCode reads the leading letter", extractServiceCode("a. prov
 check("extractServiceCode falls back to keyword match when no letter prefix", extractServiceCode("exchange of crypto-assets for funds") === "c");
 check("extractServiceCode returns null for unrecognisable text", extractServiceCode("something completely unrelated") === null);
 
-// --- authority monogram badges ("logos") ---
-check("authorityAcronym uses the bracketed code when ESMA's data has one", authorityAcronym("Netherlands Authority for the Financial Markets (AFM)") === "AFM");
-check("authorityAcronym derives initials when there's no bracketed code", authorityAcronym("Banco de Portugal") === "BP");
-check("authorityAcronym skips stopwords like 'of'/'the' when deriving initials", authorityAcronym("Central Bank of Iceland") === "CBI");
-check("authorityBadgeHtml renders a .authority-badge span with the acronym text", authorityBadgeHtml("Netherlands Authority for the Financial Markets (AFM)").includes(">AFM<"));
+// --- authority cell: plain text only, no logo/monogram icon ---
+check("shortAuthority extracts the bracketed code when ESMA's data has one", shortAuthority("Netherlands Authority for the Financial Markets (AFM)") === "AFM");
+check("shortAuthority falls back to the full name when there's no bracketed code", shortAuthority("Banco de Portugal") === "Banco de Portugal");
+check("authorityCell renders just the short code as plain text, no icon/badge/logo markup",
+  authorityCell("Netherlands Authority for the Financial Markets (AFM)").includes(">AFM<") &&
+  !authorityCell("Netherlands Authority for the Financial Markets (AFM)").includes("authority-badge") &&
+  !authorityCell("Netherlands Authority for the Financial Markets (AFM)").includes("authority-logo") &&
+  !authorityCell("Netherlands Authority for the Financial Markets (AFM)").includes("<img"));
+check("authorityCell renders the full name as plain text when there's no bracketed code",
+  authorityCell("Banco de Portugal") === "Banco de Portugal");
 
 // --- reusable dropdown filter component (used by both register tables and changelog.html) ---
 {
@@ -138,7 +143,9 @@ for (const key of Object.keys(REGISTERS)) {
   // Per-column filters generalise beyond CASPs too: non_compliant's
   // "authority" column shows the shortened name (via shortAuthority) as the
   // dropdown option label, not the raw long ESMA competent-authority string,
-  // and each row carries its own monogram "logo" badge (not a generic icon).
+  // each row is plain text (no icon/logo), and the options are sorted
+  // alphabetically by that displayed short code — not by the underlying raw
+  // ESMA string, which would put them in a different order.
   if (key === "non_compliant" && data.records.length) {
     const authorityDropdown = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authority"] .col-filter-dropdown');
     check(`${key}: authority column has a dropdown filter`, authorityDropdown !== null);
@@ -148,8 +155,36 @@ for (const key of Object.keys(REGISTERS)) {
       check(`${key}: authority dropdown shows the short "AFM" label, not the full raw name`,
         optionTexts.some((txt) => txt.includes("AFM")) && !optionTexts.some((txt) => txt.includes("Netherlands Authority for the Financial Markets")));
       const afmRow = [...optionRows].find((o) => o.textContent.includes("AFM"));
-      check(`${key}: authority dropdown rows carry the monogram badge (not a generic icon)`, afmRow.querySelector(".authority-badge") !== null && afmRow.querySelector(".authority-badge").textContent === "AFM");
+      check(`${key}: authority dropdown row for AFM has no icon/logo markup, just the text label`,
+        afmRow.querySelector(".authority-logo") === null && afmRow.querySelector(".authority-badge") === null && afmRow.querySelector("img") === null);
+      // Fixture has AFM (NL), CONSOB (IT) and NBS (SK) — alphabetically by
+      // short code that's AFM, CONSOB, NBS, which differs from sorting the
+      // raw long names (CONSOB, NBS, AFM), so this actually exercises the fix.
+      const realOptionTexts = optionTexts.filter((txt) => txt !== t("filters.all"));
+      check(`${key}: authority dropdown is sorted alphabetically by the displayed short code (AFM, CONSOB, NBS)`,
+        JSON.stringify(realOptionTexts) === JSON.stringify(["AFM", "CONSOB", "NBS"]));
     }
+  }
+
+  // AFM writes services as "(x) description" (parens, not ESMA's "x. desc"),
+  // and has no per-service country breakdown - normalize_afm() rewrites each
+  // line to the same "x. desc" shape ESMA's CASPS register uses so the
+  // existing CASP_SERVICES icon rendering "just works" with zero JS changes.
+  // Confirm that actually holds for real AFM-shaped fixture data.
+  if (key === "afm_casps" && data.records.length) {
+    const btcDirect = data.records.find((r) => (r.name || "").includes("BTC Direct"));
+    check(`${key}: BTC Direct fixture row is present`, !!btcDirect);
+    if (btcDirect) {
+      const { known } = expandCaspServiceEntries(btcDirect.services);
+      check(`${key}: BTC Direct's AFM services ("(c)...", "(d)...", "(j)...") resolve to codes c/d/j via the CASP_SERVICES machinery`,
+        known.has("c") && known.has("d") && known.has("j") && !known.has("a"));
+    }
+    check(`${key}: authorisationTypeLabel translates AFM's 3 authorisation types`,
+      authorisationTypeLabel("authorisation") === "Vergunning (art. 63)" &&
+      authorisationTypeLabel("notification") === "Notificatie (art. 60)" &&
+      authorisationTypeLabel("cross_border") === "Cross-border (art. 65)");
+    const authTypeDropdown = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authorisation_type"] .col-filter-dropdown');
+    check(`${key}: authorisation type column has a dropdown filter`, authTypeDropdown !== null);
   }
 }
 

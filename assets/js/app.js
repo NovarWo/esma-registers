@@ -359,11 +359,76 @@ function caspServiceDetailItems(r) {
   return [...items, ...extra];
 }
 
+// AFM's crypto register only tracks 3 broad authorisation types (no
+// per-country nuance like ESMA's authority/country columns) - straightforward
+// code -> translated label lookup, same pattern as statusLabel()/countryName().
+function authorisationTypeLabel(code) {
+  if (!code) return "—";
+  return t(`afmAuthType.${code}`) || code;
+}
+
 // --------------------------------------------------------------------------
 // Register configuration — one entry per data/<key>.json file.
 // --------------------------------------------------------------------------
 
 const REGISTERS = {
+  afm_casps: {
+    label: t("registers.afm_casps.label"),
+    shortLabel: t("registers.afm_casps.shortLabel"),
+    file: "afm_casps",
+    // AFM's own register (rather than ESMA's EU-wide mirror) - shown first
+    // since it's the register that matters most for a Dutch-licensed CASP
+    // and updates ahead of ESMA's consolidated register.
+    sourceLinkText: t("footer.sourceLinkTextAfm"),
+    sourceUrl: "https://www.afm.nl/en/sector/registers/vergunningenregisters/cryptopartijen",
+    subtitleFn: (count, generated) => t("registerPage.subtitleAfm", count, generated),
+    searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.authorisation_number],
+    columns: [
+      { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
+      { key: "authorisation_number", label: t("columns.authorisationNumber"), value: (r) => r.authorisation_number || "—" },
+      {
+        key: "authorisation_type", label: t("columns.authorisationType"), value: (r) => authorisationTypeLabel(r.authorisation_type),
+        filter: { type: "select", valueFn: (r) => r.authorisation_type, formatFn: authorisationTypeLabel },
+      },
+      {
+        key: "country", label: t("columns.country"), value: (r) => countryName(r.home_member_state), render: (r) => countryCell(r.home_member_state),
+        filter: { type: "select", valueFn: (r) => r.home_member_state, formatFn: countryName, optionIcon: countryFlagIconHtml },
+      },
+      {
+        key: "services", label: t("columns.services"),
+        value: caspServiceSummary,
+        render: (r) => renderServiceIcons(expandCaspServiceEntries(r.services).known),
+        sortValue: (r) => { const { known, unknown } = expandCaspServiceEntries(r.services); return known.size + unknown.length; },
+        filter: {
+          type: "chips", options: CASP_SERVICES,
+          matchFn: (r, selectedCodes) => {
+            const { known } = expandCaspServiceEntries(r.services);
+            return selectedCodes.some((code) => known.has(code));
+          },
+        },
+      },
+      { key: "website", label: t("columns.website"), value: (r) => r.website || "—", render: (r) => websiteCell(r.website) },
+      {
+        key: "status", label: t("columns.status"), value: (r) => statusLabel(r.status), render: (r) => statusBadge(r.status),
+        filter: { type: "select", valueFn: (r) => r.status, formatFn: statusLabel, optionIcon: statusIconHtml },
+      },
+    ],
+    detail: (r) => detailArticle(r, [
+      [t("detail.authorisationNumber"), r.authorisation_number || "—"],
+      [t("detail.authorisationType"), authorisationTypeLabel(r.authorisation_type)],
+      [t("detail.homeMemberState"), countryName(r.home_member_state)],
+      [t("detail.lei"), r.lei || "—"],
+      [t("detail.address"), r.address],
+      [t("detail.website"), linkify(r.website)],
+      [t("detail.websitePlatform"), linkify(r.platform_website)],
+      [t("detail.authorisationDate"), r.authorisation_date || "—"],
+      [t("detail.withdrawalDate"), r.withdrawal_date || "—"],
+      [t("detail.suspensionPeriods"), r.suspension_periods || "—"],
+      [t("detail.euPassport"), r.eu_passport_raw || "—"],
+      [t("detail.equivalentServices"), r.equivalent_services || "—"],
+    ], t("detail.servicesTitle"), caspServiceDetailItems(r)),
+  },
+
   casps: {
     label: t("registers.casps.label"),
     shortLabel: t("registers.casps.shortLabel"),

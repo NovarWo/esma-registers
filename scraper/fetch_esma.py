@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable
 
+import openpyxl
 import requests
 
 BASE_URL = "https://www.esma.europa.eu/sites/default/files/2024-12/{}.csv"
@@ -292,6 +293,171 @@ def normalize_non_compliant(rows: list[dict]) -> list[dict]:
     return records
 
 
+# --------------------------------------------------------------------------
+# AFM's own crypto register (CASPs authorised/notified in the Netherlands).
+#
+# Unlike the 5 registers above (ESMA CSV exports), the AFM publishes theirs
+# as a single .xlsx download - this is the register that matters most for a
+# Dutch-licensed CASP, and AFM republishes it more often than ESMA's
+# EU-wide consolidated register. Fetched and parsed separately, but feeds
+# into the exact same diff_records()/Slack pipeline as the other 5 - see
+# the "AFM register" block in run() below.
+# --------------------------------------------------------------------------
+
+AFM_XLSX_URL = "https://www.afm.nl/~/profmedia/files/registers/register-cryptopartijen.xlsx"
+
+# AFM writes the home member state / passport countries as full English
+# names / codes in free text rather than ESMA's consistent ISO codes -
+# normalise to the same 2-letter codes used everywhere else on the site
+# (assets/js/i18n.js's `countries` dict) so country flags/filters just work.
+AFM_COUNTRY_NAME_TO_CODE = {
+    "austria": "AT", "belgium": "BE", "bulgaria": "BG", "croatia": "HR",
+    "cyprus": "CY", "czechia": "CZ", "czech republic": "CZ", "denmark": "DK",
+    "estonia": "EE", "finland": "FI", "france": "FR", "germany": "DE",
+    "greece": "EL", "hungary": "HU", "iceland": "IS", "ireland": "IE",
+    "italy": "IT", "latvia": "LV", "liechtenstein": "LI", "lithuania": "LT",
+    "luxembourg": "LU", "malta": "MT", "the netherlands": "NL", "netherlands": "NL",
+    "norway": "NO", "poland": "PL", "portugal": "PT", "romania": "RO",
+    "slovakia": "SK", "slovenia": "SI", "spain": "ES", "sweden": "SE",
+    "united kingdom": "GB", "switzerland": "CH",
+}
+_AFM_KNOWN_EEA_CODES = set(AFM_COUNTRY_NAME_TO_CODE.values())
+_AFM_SERVICE_LINE_RE = re.compile(r"^\(([a-j])\)\s*(.*)$", re.I)
+
+
+def fetch_afm_rows() -> list[tuple]:
+    """Downloads and parses the AFM crypto register (.xlsx). AFM's export has
+    a few title/blank rows before the real header, and has reformatted this
+    file before - rather than hardcoding a row offset, scan for the row
+    whose first cell is literally "Entity name" and take everything after it."""
+    resp = requests.get(AFM_XLSX_URL, timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
+    resp.raise_for_status()
+    wb = openpyxl.load_workbook(io.BytesIO(resp.content), data_only=True, read_only=True)
+    ws = wb[wb.sheetnames[0]]
+    all_rows = list(ws.iter_rows(values_only=True))
+    header_idx = next(
+        (i for i, r in enumerate(all_rows) if r and isinstance(r[0], str) and r[0].strip() == "Entity name"),
+        None,
+    )
+    if header_idx is None:
+        raise ValueError("couldn't locate the header row (looked for a first cell reading 'Entity name')")
+    return all_rows[header_idx + 1:]
+
+
+def _afm_text(value) -> str | None:
+    if value is None:
+        return None
+    s = str(value).strip()
+    if not s or s.upper() == "N/A":
+        return None
+    return s
+
+
+def _afm_date_str(value) -> str | None:
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    return _afm_text(value)
+
+
+def _afm_auth_type(raw) -> str | None:
+    text = _afm_text(raw)
+    if not text:
+        return None
+    low = text.lower()
+    if "notification" in low:
+        return "notification"
+    if "cross-border" in low or "cross border" in low:
+        return "cross_border"
+    if "authorisation" in low or "authorization" in low:
+        return "authorisation"
+    return "other"
+
+
+def _parse_afm_services(raw) -> list[dict]:
+    """AFM writes services as newline-separated "(x) description" lines
+    (e.g. "(c) exchange of crypto-assets for funds"). Converted to the same
+    "x. description" shape ESMA's CASPS register uses, with no per-service
+    country breakdown (AFM only tracks passport countries at the entity
+    level, see _parse_eu_passport) - this lets the front-end's existing
+    CASP_SERVICES/extractServiceCode machinery render these with zero
+    changes, since diff_records()'s service-level diffing also keys off
+    this same leading-letter format."""
+    text = _afm_text(raw)
+    if not text:
+        return []
+    services = []
+    for line in re.split(r"[\r\n]+", text):
+        line = line.strip().rstrip(";").strip()
+        if not line:
+            continue
+        m = _AFM_SERVICE_LINE_RE.match(line)
+        if m:
+            code, rest = m.group(1).lower(), m.group(2).strip()
+            services.append({"service": f"{code}. {rest}", "countries": []})
+        else:
+            services.append({"service": line, "countries": []})
+    return services
+
+
+def _parse_websites(raw) -> tuple[str | None, str | None]:
+    text = _afm_text(raw)
+    if not text:
+        return None, None
+    parts = [p.strip() for p in re.split(r"[\r\n]+", text) if p.strip()]
+    return (parts[0] if parts else None), (parts[1] if len(parts) > 1 else None)
+
+
+def _parse_eu_passport(raw) -> tuple[str | None, list[str]]:
+    text = _afm_text(raw)
+    if not text:
+        return None, []
+    low = text.lower()
+    direction = "outgoing" if low.startswith("outgoing") else "incoming" if low.startswith("incoming") else None
+    codes: list[str] = []
+    for tok in re.findall(r"\b[A-Za-z]{2}\b", text):
+        up = "EL" if tok.upper() == "GR" else tok.upper()
+        if up in _AFM_KNOWN_EEA_CODES and up not in codes:
+            codes.append(up)
+    return direction, codes
+
+
+def normalize_afm(rows: list[tuple]) -> list[dict]:
+    records = []
+    for row in rows:
+        if not row or not row[0] or not str(row[0]).strip():
+            continue
+        name = str(row[0]).strip()
+        auth_number = _afm_text(row[1])
+        home_state_raw = _afm_text(row[3])
+        withdrawal_date = _afm_date_str(row[5])
+        website, platform_website = _parse_websites(row[11] if len(row) > 11 else None)
+        eu_passport_raw = _afm_text(row[12] if len(row) > 12 else None)
+        eu_passport_direction, eu_passport_countries = _parse_eu_passport(row[12] if len(row) > 12 else None)
+
+        records.append({
+            "id": record_id("afm_casps", auth_number, name, home_state_raw),
+            "name": name,
+            "commercial_name": _afm_text(row[8] if len(row) > 8 else None),
+            "lei": _afm_text(row[9] if len(row) > 9 else None),
+            "authorisation_number": auth_number,
+            "authorisation_type": _afm_auth_type(row[2] if len(row) > 2 else None),
+            "home_member_state": AFM_COUNTRY_NAME_TO_CODE.get((home_state_raw or "").lower()),
+            "authorisation_date": _afm_date_str(row[4] if len(row) > 4 else None),
+            "withdrawal_date": withdrawal_date,
+            "suspension_periods": _afm_text(row[6] if len(row) > 6 else None),
+            "services": _parse_afm_services(row[7] if len(row) > 7 else None),
+            "address": _afm_text(row[10] if len(row) > 10 else None),
+            "website": website,
+            "platform_website": platform_website,
+            "eu_passport_direction": eu_passport_direction,
+            "eu_passport_countries": eu_passport_countries,
+            "eu_passport_raw": eu_passport_raw,
+            "equivalent_services": _afm_text(row[13] if len(row) > 13 else None),
+            "status": status_from(withdrawal_date),
+        })
+    return records
+
+
 NORMALIZERS: dict[str, Callable[[list[dict]], list[dict]]] = {
     "whitepapers": normalize_whitepapers,
     "art": lambda rows: normalize_art_or_emt(rows, "art"),
@@ -480,6 +646,34 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
         else:
             print(f"[info] {register}: no change ({len(current)} records)")
 
+    # AFM's own crypto register - fetched separately from the SOURCES loop
+    # above since it's an .xlsx download rather than an ESMA CSV export (see
+    # fetch_afm_rows()/normalize_afm()). Feeds the exact same
+    # diff_records()/data-file/Slack pipeline as the other 5 registers.
+    afm_register = "afm_casps"
+    try:
+        afm_rows = fetch_afm_rows()
+        previous = load_previous(afm_register)
+        current = normalize_afm(afm_rows)
+        changes = diff_records(afm_register, previous, current)
+        all_changes.extend(changes)
+        counts[afm_register] = len(current)
+
+        out_path = DATA_DIR / f"{afm_register}.json"
+        with out_path.open("w", encoding="utf-8") as f:
+            json.dump(
+                {"register": afm_register, "generated_at": now, "records": current},
+                f, ensure_ascii=False, indent=2,
+            )
+
+        if changes:
+            print(f"[info] {afm_register}: {len(changes)} change(s), {len(current)} total record(s)")
+        else:
+            print(f"[info] {afm_register}: no change ({len(current)} records)")
+    except Exception as exc:  # one register failing shouldn't kill the whole run
+        errors[afm_register] = str(exc)
+        print(f"[warn] failed to fetch {afm_register}: {exc}", file=sys.stderr)
+
     meta_path = DATA_DIR / "meta.json"
     meta = {}
     if meta_path.exists():
@@ -541,7 +735,7 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
             f.write("\n".join(summary_lines) + "\n")
             f.write("EOF\n")
 
-    if len(errors) == len(SOURCES):
+    if len(errors) == len(SOURCES) + 1:  # +1 for the AFM register, fetched separately above
         return 1  # every single register failed - a real failure, not "no change"
     return 0
 

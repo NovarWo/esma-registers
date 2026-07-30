@@ -37,13 +37,13 @@ function t(path, ...args) {
 const TRANSLATIONS = {
   nl: {
     nav: {
-      dashboard: "Dashboard", casps: "CASPs", art: "ART", emt: "EMT",
+      dashboard: "Dashboard", afm_casps: "AFM", casps: "CASPs", art: "ART", emt: "EMT",
       whitepapers: "Whitepapers", non_compliant: "Non-compliant", changelog: "Wijzigingen",
     },
     brand: { title: "ESMA MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
-      subtitle: "Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers. Automatisch bijgewerkt.",
+      subtitle: "Doorzoekbare spiegel van de ESMA- en AFM MiCAR-registers. Automatisch bijgewerkt.",
       recentChanges: "Recente wijzigingen",
       fullHistoryLink: "Volledige wijzigingsgeschiedenis →",
       noChanges: "Nog geen wijzigingen geregistreerd.",
@@ -53,6 +53,7 @@ const TRANSLATIONS = {
       unknownPrefix: "Onbekend register: ",
       loadError: (msg) => `Kon de data voor dit register nog niet laden. Is de scraper al gedraaid? (${msg})`,
       subtitle: (count, generated) => `${count} record(s) — bron: ESMA, laatst gegenereerd ${generated}.`,
+      subtitleAfm: (count, generated) => `${count} record(s) — bron: AFM, laatst gegenereerd ${generated}.`,
     },
     changelogPage: {
       title: "Wijzigingsgeschiedenis",
@@ -62,6 +63,7 @@ const TRANSLATIONS = {
       count: (n) => `${n} wijziging${n === 1 ? "" : "en"} in de afgelopen 7 dagen`,
     },
     registers: {
+      afm_casps: { label: "AFM Cryptoregister (CASP's)", shortLabel: "AFM" },
       casps: { label: "Crypto-asset service providers (CASP's)", shortLabel: "CASPs" },
       art: { label: "Uitgevers van asset-referenced tokens (ART)", shortLabel: "ART-uitgevers" },
       emt: { label: "Uitgevers van e-money tokens (EMT)", shortLabel: "EMT-uitgevers" },
@@ -73,6 +75,11 @@ const TRANSLATIONS = {
       authority: "Toezichthouder", services: "Diensten", website: "Website", status: "Status",
       creditInstitution: "Kredietinstelling", institutionType: "Type instelling",
       whitepapersCount: "Whitepapers", involvedCasp: "Betrokken CASP", reason: "Reden", decisionDate: "Besluitdatum",
+      authorisationNumber: "Vergunningsnummer", authorisationType: "Type vergunning",
+    },
+    afmAuthType: {
+      authorisation: "Vergunning (art. 63)", notification: "Notificatie (art. 60)",
+      cross_border: "Cross-border (art. 65)", other: "Overig",
     },
     filters: {
       all: "Alle",
@@ -99,6 +106,9 @@ const TRANSLATIONS = {
       offerStart: (date) => ` — start aanbieding: ${date}`,
       countriesLabel: (list) => `Landen: ${list}`,
       viaCasp: (name) => ` — via CASP: ${name}`,
+      authorisationNumber: "Vergunningsnummer", authorisationType: "Type vergunning",
+      suspensionPeriods: "Opschortingsperiodes", euPassport: "EU-paspoort (art. 65 MiCAR)",
+      equivalentServices: "Gelijkwaardige dienstverlening",
     },
     services: {
       a: { label: "Bewaring", full: "Bewaring en administratie van crypto-activa namens cliënten" },
@@ -128,6 +138,7 @@ const TRANSLATIONS = {
       neverCheckedShort: "Nog geen scrape uitgevoerd.",
       sourcePrefix: "Bron: ",
       sourceLinkText: "ESMA Interim MiCA Register",
+      sourceLinkTextAfm: "AFM Cryptoregister",
     },
     badges: { added: "Nieuw", changed: "Gewijzigd", removed: "Verwijderd" },
     misc: { unknownValue: "onbekend", fetchError: (path, status) => `Kon ${path} niet laden (${status})` },
@@ -135,13 +146,13 @@ const TRANSLATIONS = {
 
   en: {
     nav: {
-      dashboard: "Dashboard", casps: "CASPs", art: "ART", emt: "EMT",
+      dashboard: "Dashboard", afm_casps: "AFM", casps: "CASPs", art: "ART", emt: "EMT",
       whitepapers: "Whitepapers", non_compliant: "Non-compliant", changelog: "Changes",
     },
     brand: { title: "ESMA MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
-      subtitle: "Searchable mirror of the 5 official ESMA MiCAR registers. Updated automatically.",
+      subtitle: "Searchable mirror of the ESMA and AFM MiCAR registers. Updated automatically.",
       recentChanges: "Recent changes",
       fullHistoryLink: "Full change history →",
       noChanges: "No changes recorded yet.",
@@ -151,6 +162,7 @@ const TRANSLATIONS = {
       unknownPrefix: "Unknown register: ",
       loadError: (msg) => `Could not load data for this register yet. Has the scraper run? (${msg})`,
       subtitle: (count, generated) => `${count} record(s) — source: ESMA, last generated ${generated}.`,
+      subtitleAfm: (count, generated) => `${count} record(s) — source: AFM, last generated ${generated}.`,
     },
     changelogPage: {
       title: "Change history",
@@ -160,6 +172,7 @@ const TRANSLATIONS = {
       count: (n) => `${n} change${n === 1 ? "" : "s"} in the last 7 days`,
     },
     registers: {
+      afm_casps: { label: "AFM Crypto register (CASPs)", shortLabel: "AFM" },
       casps: { label: "Crypto-asset service providers (CASPs)", shortLabel: "CASPs" },
       art: { label: "Issuers of asset-referenced tokens (ART)", shortLabel: "ART issuers" },
       emt: { label: "Issuers of e-money tokens (EMT)", shortLabel: "EMT issuers" },
@@ -171,6 +184,11 @@ const TRANSLATIONS = {
       authority: "Supervisor", services: "Services", website: "Website", status: "Status",
       creditInstitution: "Credit institution", institutionType: "Institution type",
       whitepapersCount: "Whitepapers", involvedCasp: "Related CASP", reason: "Reason", decisionDate: "Decision date",
+      authorisationNumber: "Authorisation number", authorisationType: "Authorisation type",
+    },
+    afmAuthType: {
+      authorisation: "Authorisation (Art. 63)", notification: "Notification (Art. 60)",
+      cross_border: "Cross-border (Art. 65)", other: "Other",
     },
     filters: {
       all: "All",
@@ -197,6 +215,9 @@ const TRANSLATIONS = {
       offerStart: (date) => ` — offer start date: ${date}`,
       countriesLabel: (list) => `Countries: ${list}`,
       viaCasp: (name) => ` — via CASP: ${name}`,
+      authorisationNumber: "Authorisation number", authorisationType: "Authorisation type",
+      suspensionPeriods: "Suspension periods", euPassport: "EU passport (Art. 65 MiCAR)",
+      equivalentServices: "Equivalent services",
     },
     services: {
       a: { label: "Custody", full: "Custody and administration of crypto-assets on behalf of clients" },
@@ -226,6 +247,7 @@ const TRANSLATIONS = {
       neverCheckedShort: "No scrape has run yet.",
       sourcePrefix: "Source: ",
       sourceLinkText: "ESMA Interim MiCA Register",
+      sourceLinkTextAfm: "AFM Crypto register",
     },
     badges: { added: "New", changed: "Changed", removed: "Removed" },
     misc: { unknownValue: "unknown", fetchError: (path, status) => `Could not load ${path} (${status})` },

@@ -16,6 +16,7 @@
     </span>
     <div class="topnav__links">
       <a href="index.html" data-nav="dashboard" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="register.html?type=afm_casps" data-nav="afm_casps" data-i18n="nav.afm_casps">AFM</a>
       <a href="register.html?type=casps" data-nav="casps" data-i18n="nav.casps">CASPs</a>
       <a href="register.html?type=art" data-nav="art" data-i18n="nav.art">ART</a>
       <a href="register.html?type=emt" data-nav="emt" data-i18n="nav.emt">EMT</a>
@@ -37,7 +38,7 @@
 
   <footer class="site-footer">
     <span id="footer-checked" data-i18n="footer.lastCheckedLoading">Laatst gecontroleerd: laden…</span>
-    <span><span data-i18n="footer.sourcePrefix">Bron: </span><a href="https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica" target="_blank" rel="noopener" data-i18n="footer.sourceLinkText">ESMA Interim MiCA Register</a></span>
+    <span><span data-i18n="footer.sourcePrefix">Bron: </span><a id="footer-source-link" href="https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica" target="_blank" rel="noopener" data-i18n="footer.sourceLinkText">ESMA Interim MiCA Register</a></span>
   </footer>
 </div>
 
@@ -58,6 +59,15 @@ if (!config) {
   document.getElementById("register-title").textContent = config.label;
   highlightNav(type);
 
+  // Most registers mirror ESMA's EU-wide data (the default footer link/text
+  // in the markup above); the AFM register is a different source entirely,
+  // so its REGISTERS config overrides the link when present.
+  if (config.sourceUrl) {
+    const sourceLink = document.getElementById("footer-source-link");
+    sourceLink.href = config.sourceUrl;
+    sourceLink.textContent = config.sourceLinkText || sourceLink.textContent;
+  }
+
   (async function init() {
     const root = document.getElementById("register-root");
     const footerChecked = document.getElementById("footer-checked");
@@ -72,7 +82,8 @@ if (!config) {
     try {
       const data = await fetchJSON(`data/${config.file}.json`);
       const records = data.records || [];
-      sub.textContent = t("registerPage.subtitle", records.length, data.generated_at ? formatTimestamp(data.generated_at) : t("misc.unknownValue"));
+      const generated = data.generated_at ? formatTimestamp(data.generated_at) : t("misc.unknownValue");
+      sub.textContent = config.subtitleFn ? config.subtitleFn(records.length, generated) : t("registerPage.subtitle", records.length, generated);
       renderRegisterTable(root, config, records);
     } catch (e) {
       root.innerHTML = `<p class="filter-note">${escapeHtml(t("registerPage.loadError", e.message))}</p>`;

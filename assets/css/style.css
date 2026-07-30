@@ -85,9 +85,10 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 
 /* Cards / grid */
 .grid { display: grid; gap: 16px; }
+.grid--6 { grid-template-columns: repeat(6, 1fr); }
 .grid--5 { grid-template-columns: repeat(5, 1fr); }
 .grid--3 { grid-template-columns: repeat(3, 1fr); }
-@media (max-width: 960px) { .grid--5 { grid-template-columns: repeat(2, 1fr); } .grid--3 { grid-template-columns: 1fr; } }
+@media (max-width: 960px) { .grid--6 { grid-template-columns: repeat(3, 1fr); } .grid--5 { grid-template-columns: repeat(2, 1fr); } .grid--3 { grid-template-columns: 1fr; } }
 
 .card {
   background: var(--surface); border: 1px solid var(--border);
