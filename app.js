@@ -376,6 +376,12 @@ const REGISTERS = {
     label: t("registers.casps.label"),
     shortLabel: t("registers.casps.shortLabel"),
     file: "casps",
+    // Unlike the other registers, CASPs blends ESMA's own export with AFM-
+    // sourced entities not yet in it (see merge_esma_and_afm_casps() in
+    // fetch_esma.py) - the footer's default "Bron: ESMA..." line only tells
+    // half the story here, so register.html appends this second source too.
+    extraSourceUrl: "https://www.afm.nl/en/sector/registers/vergunningenregisters/cryptopartijen",
+    extraSourceLinkText: t("footer.sourceLinkTextAfm"),
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
       { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },

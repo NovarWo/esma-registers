@@ -37,7 +37,7 @@
 
   <footer class="site-footer">
     <span id="footer-checked" data-i18n="footer.lastCheckedLoading">Laatst gecontroleerd: laden…</span>
-    <span><span data-i18n="footer.sourcePrefix">Bron: </span><a id="footer-source-link" href="https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica" target="_blank" rel="noopener" data-i18n="footer.sourceLinkText">ESMA Interim MiCA Register</a></span>
+    <span><span data-i18n="footer.sourcePrefix">Bron: </span><a id="footer-source-link" href="https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica" target="_blank" rel="noopener" data-i18n="footer.sourceLinkText">ESMA Interim MiCA Register</a><span id="footer-source-extra"></span></span>
   </footer>
 </div>
 
@@ -58,14 +58,23 @@ if (!config) {
   document.getElementById("register-title").textContent = config.label;
   highlightNav(type);
 
-  // Every register currently mirrors ESMA's EU-wide export (the default
-  // footer link/text in the markup above) - a REGISTERS config can still
-  // override the link/text with sourceUrl/sourceLinkText/subtitleFn if a
-  // future register needs a different primary source.
+  // Every register mirrors ESMA's EU-wide export (the default footer
+  // link/text in the markup above) - a REGISTERS config can still override
+  // the link/text with sourceUrl/sourceLinkText/subtitleFn if a future
+  // register needs a different primary source.
   if (config.sourceUrl) {
     const sourceLink = document.getElementById("footer-source-link");
     sourceLink.href = config.sourceUrl;
     sourceLink.textContent = config.sourceLinkText || sourceLink.textContent;
+  }
+
+  // CASPs additionally folds in AFM-sourced entities (see app.js's REGISTERS.
+  // casps.extraSourceUrl) - append a second "en AFM Cryptoregister" link
+  // rather than replacing the ESMA one, since this register genuinely blends
+  // both sources instead of coming from just one.
+  if (config.extraSourceUrl) {
+    const extra = document.getElementById("footer-source-extra");
+    extra.innerHTML = `${escapeHtml(t("footer.sourceAnd"))}<a href="${escapeHtml(config.extraSourceUrl)}" target="_blank" rel="noopener">${escapeHtml(config.extraSourceLinkText)}</a>`;
   }
 
   (async function init() {
