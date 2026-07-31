@@ -16,7 +16,6 @@
     </span>
     <div class="topnav__links">
       <a href="index.html" data-nav="dashboard" data-i18n="nav.dashboard">Dashboard</a>
-      <a href="register.html?type=afm_casps" data-nav="afm_casps" data-i18n="nav.afm_casps">AFM</a>
       <a href="register.html?type=casps" data-nav="casps" data-i18n="nav.casps">CASPs</a>
       <a href="register.html?type=art" data-nav="art" data-i18n="nav.art">ART</a>
       <a href="register.html?type=emt" data-nav="emt" data-i18n="nav.emt">EMT</a>
@@ -34,7 +33,7 @@
     <p data-i18n="dashboard.subtitle">Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers. Automatisch bijgewerkt.</p>
   </div>
 
-  <div id="kpi-grid" class="grid grid--6" style="margin-bottom:32px;"></div>
+  <div id="kpi-grid" class="grid grid--5" style="margin-bottom:32px;"></div>
 
   <h2 data-i18n="dashboard.recentChanges">Recente wijzigingen</h2>
   <div id="recent-changes" class="changelog-list" style="margin-bottom:16px;"></div>
@@ -53,7 +52,7 @@ applyStaticTranslations();
 renderLangToggle(document.getElementById("lang-toggle-slot"));
 highlightNav("dashboard");
 
-const KPI_ORDER = ["afm_casps", "casps", "non_compliant", "emt", "art", "whitepapers"];
+const KPI_ORDER = ["casps", "non_compliant", "emt", "art", "whitepapers"];
 
 (async function init() {
   const grid = document.getElementById("kpi-grid");

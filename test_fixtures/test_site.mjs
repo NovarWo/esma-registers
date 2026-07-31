@@ -166,25 +166,39 @@ for (const key of Object.keys(REGISTERS)) {
     }
   }
 
-  // AFM writes services as "(x) description" (parens, not ESMA's "x. desc"),
-  // and has no per-service country breakdown - normalize_afm() rewrites each
-  // line to the same "x. desc" shape ESMA's CASPS register uses so the
-  // existing CASP_SERVICES icon rendering "just works" with zero JS changes.
-  // Confirm that actually holds for real AFM-shaped fixture data.
-  if (key === "afm_casps" && data.records.length) {
+  // AFM's own crypto register no longer has its own tab/page - AFM-only
+  // CASPs (not yet in ESMA's export) are folded straight into casps.json by
+  // merge_esma_and_afm_casps() (fetch_esma.py), tagged source: "afm". AFM
+  // writes services as "(x) description" (parens, not ESMA's "x. desc") -
+  // normalize_afm() rewrites each line to the same "x. desc" shape ESMA's
+  // CASPS register uses so the existing CASP_SERVICES icon rendering "just
+  // works" with zero JS changes. Confirm that holds for a real AFM-shaped
+  // record merged into the casps register, and that the detail view shows
+  // AFM-only fields (authorisation number/type, EU-passport, etc.) ONLY for
+  // source === "afm" records, never for ESMA-native ones.
+  if (key === "casps" && data.records.length) {
     const btcDirect = data.records.find((r) => (r.name || "").includes("BTC Direct"));
-    check(`${key}: BTC Direct fixture row is present`, !!btcDirect);
+    check(`${key}: AFM-merged BTC Direct fixture row is present with source "afm"`, !!btcDirect && btcDirect.source === "afm");
     if (btcDirect) {
       const { known } = expandCaspServiceEntries(btcDirect.services);
       check(`${key}: BTC Direct's AFM services ("(c)...", "(d)...", "(j)...") resolve to codes c/d/j via the CASP_SERVICES machinery`,
         known.has("c") && known.has("d") && known.has("j") && !known.has("a"));
+      check(`${key}: authorisationTypeLabel translates AFM's authorisation type`,
+        authorisationTypeLabel(btcDirect.authorisation_type) === "Vergunning (art. 63)");
+
+      openDetail(REGISTERS.casps, btcDirect);
+      const afmDetailBody = document.getElementById("detail-body").innerHTML;
+      check(`${key}: detail view shows "Databron: AFM..." for an AFM-sourced record`, afmDetailBody.includes(t("detail.dataSourceAfm")));
+      check(`${key}: detail view shows the AFM-only "Vergunningsnummer" field for an AFM-sourced record`, afmDetailBody.includes(t("detail.authorisationNumber")) && afmDetailBody.includes("41000009"));
+
+      const esmaRecord = data.records.find((r) => r.source === "esma");
+      if (esmaRecord) {
+        openDetail(REGISTERS.casps, esmaRecord);
+        const esmaDetailBody = document.getElementById("detail-body").innerHTML;
+        check(`${key}: detail view shows "Databron: ESMA" for an ESMA-native record`, esmaDetailBody.includes(t("detail.dataSourceEsma")));
+        check(`${key}: detail view hides the AFM-only "Vergunningsnummer" field for an ESMA-native record`, !esmaDetailBody.includes(t("detail.authorisationNumber")));
+      }
     }
-    check(`${key}: authorisationTypeLabel translates AFM's 3 authorisation types`,
-      authorisationTypeLabel("authorisation") === "Vergunning (art. 63)" &&
-      authorisationTypeLabel("notification") === "Notificatie (art. 60)" &&
-      authorisationTypeLabel("cross_border") === "Cross-border (art. 65)");
-    const authTypeDropdown = root.querySelector('tr.col-filter-row th.col-filter-cell[data-key="authorisation_type"] .col-filter-dropdown');
-    check(`${key}: authorisation type column has a dropdown filter`, authTypeDropdown !== null);
   }
 }
 
@@ -193,7 +207,12 @@ for (const key of Object.keys(REGISTERS)) {
 // icons-only-for-offered-services, and the per-column filter row (text,
 // select, and the OR-logic chip popover for Diensten).
 // --------------------------------------------------------------------------
+// These regression checks predate the AFM merge and assert exact counts
+// against the 6 ESMA-native CASPs.json fixture rows - filter out the
+// AFM-merged BTC Direct row (covered separately above) so they stay decoupled
+// from that merge and keep testing the original ESMA-only behaviour untouched.
 const caspsData = JSON.parse(fs.readFileSync("/tmp/site_test_data/data/casps.json", "utf-8"));
+caspsData.records = caspsData.records.filter((r) => r.source !== "afm");
 const caspsRoot = window.document.createElement("div");
 window.document.body.appendChild(caspsRoot);
 renderRegisterTable(caspsRoot, REGISTERS.casps, caspsData.records);

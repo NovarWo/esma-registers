@@ -1,8 +1,9 @@
 # ESMA MiCAR Register Tracker
 
 Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers (whitepapers, ART-uitgevers,
-EMT-uitgevers, CASPs, non-compliant entiteiten) plus het AFM-cryptoregister (CASPs
-vergund/genotificeerd in Nederland), automatisch bijgewerkt via GitHub Actions.
+EMT-uitgevers, CASPs, non-compliant entiteiten), automatisch bijgewerkt via GitHub Actions.
+Het CASPs-register bevat daarnaast ook CASPs die (nog) alleen bij de AFM vergund/genotificeerd
+zijn — zie "AFM in het CASPs-register" hieronder.
 
 Zie `ESMA_MiCAR_Register_Tracker_Ontwerp.md` voor het volledige ontwerp (datamodel, site-architectuur, UI).
 Deze repo bevat zowel de **scraper** als de **site** (statisch, voor GitHub Pages).
@@ -12,33 +13,49 @@ Deze repo bevat zowel de **scraper** als de **site** (statisch, voor GitHub Page
 `scraper/fetch_esma.py`:
 
 1. Downloadt de 5 officiële CSV's rechtstreeks van esma.europa.eu, én het AFM-cryptoregister
-   (een los `.xlsx`-bestand van afm.nl — zie "AFM-register" hieronder) rechtstreeks van
-   afm.nl.
+   (een los `.xlsx`-bestand van afm.nl — zie "AFM in het CASPs-register" hieronder)
+   rechtstreeks van afm.nl.
 2. Normaliseert elk bestand naar JSON (`data/*.json`), waarbij herhaalde rijen per
    entiteit (CASPs-diensten, whitepapers per uitgever) worden gegroepeerd tot één record
-   met een array-veld.
+   met een array-veld. Voor CASPs worden ESMA's eigen export en AFM's register hierbij ook
+   direct samengevoegd (zie hieronder).
 3. Vergelijkt de nieuwe stand met de vorige commit van `/data` en bepaalt wat is
-   toegevoegd, gewijzigd of verdwenen — inclusief een veldniveau-omschrijving voor CASPs/AFM
+   toegevoegd, gewijzigd of verdwenen — inclusief een veldniveau-omschrijving voor CASPs
    (bv. "Bewaring toegevoegd aan dienstverlening", "nu ook aangeboden in: BE, DE") die ook in
    de Slack-melding terechtkomt (zie "Slack-meldingen" hieronder).
 4. Schrijft `data/meta.json` (laatst gecontroleerd, aantallen per register) en
    `data/history/changelog.json` (append-only wijzigingslog).
 
-### AFM-register
+### AFM in het CASPs-register
 
-Naast de 5 ESMA-registers scraped dit project ook het
-[AFM-cryptoregister](https://www.afm.nl/en/sector/registers/vergunningenregisters/cryptopartijen)
-(`data/afm_casps.json`, zichtbaar op de site onder "AFM"). Dit is het register van CASPs die
-een MiCAR-vergunning of -notificatie hebben bij de AFM zelf (of die vanuit een andere lidstaat
-naar Nederland passporten) — voor een in Nederland gevestigde en vergunde CASP is dit vaak
-relevanter en eerder bijgewerkt dan ESMA's EU-brede, ietwat trager gepubliceerde
-verzamelregister.
+Er is bewust géén apart AFM-register (meer) op de site — AFM's
+[cryptoregister](https://www.afm.nl/en/sector/registers/vergunningenregisters/cryptopartijen)
+bevat toch alleen CASPs, dus die worden direct in `data/casps.json` opgenomen in plaats van in
+een eigen tabblad. AFM publiceert een Nederlandse CASP's vergunning/notificatie/dienst vaak
+eerder dan ESMA's EU-brede, ietwat trager gepubliceerde verzamelregister — voor een in
+Nederland gevestigde en vergunde CASP is de AFM-bron dus geregeld actueler.
+
+`merge_esma_and_afm_casps()` in `fetch_esma.py` regelt dit samenvoegen:
+
+- Een AFM-entiteit wordt gematcht aan een ESMA-entiteit op LEI (of, als een van beide geen LEI
+  heeft, op genormaliseerde naam).
+- Staat een AFM-entiteit al in ESMA's eigen export? Dan wordt er niets toegevoegd — geen
+  dubbele rij, geen dubbele "toegevoegd"-melding.
+- Staat een AFM-entiteit nog niet in ESMA's export? Dan komt hij erbij, gemarkeerd
+  `source: "afm"` (zichtbaar in het detailpaneel als "Databron: AFM"), mét de AFM-specifieke
+  velden (vergunningsnummer, type vergunning, EU-paspoort, gelijkwaardige dienstverlening) die
+  ESMA's CASPS-export niet heeft.
+- Zodra diezelfde entiteit later ook in ESMA's eigen export verschijnt, neemt de ESMA-versie
+  het over (`source: "esma"`) — het record behoudt daarbij zijn bestaande id, zodat dit nooit
+  als een "verwijderd" + "toegevoegd"-paar in de changelog/Slack-melding verschijnt.
 
 De AFM publiceert dit register als een los `.xlsx`-bestand (geen CSV-API zoals ESMA), dus
 `fetch_afm_rows()`/`normalize_afm()` in `fetch_esma.py` gebruiken `openpyxl` om het in te
 lezen. AFM herformatteert dit bestand af en toe (kolomvolgorde, titelregels) — de parser zoekt
 daarom dynamisch naar de rij die begint met "Entity name" in plaats van een vaste rij-offset
-aan te nemen.
+aan te nemen. Is AFM's bestand tijdelijk niet bereikbaar? Dan valt de scraper terug op
+ESMA-only data voor CASPs — dat telt niet mee als "alle bronnen mislukt" en faalt de run dus
+niet.
 
 ## Automatisering
 
@@ -57,7 +74,7 @@ eerstvolgende geplande check.
 ## Slack-meldingen
 
 De workflow post een Slack-bericht zodra een run een échte wijziging vindt (nieuw/gewijzigd/
-verwijderd record in één van de 6 registers) — niet bij elke run, want elke run herschrijft
+verwijderd record in één van de 5 registers) — niet bij elke run, want elke run herschrijft
 `generated_at`/`last_checked` sowieso (zie `steps.scrape.outputs.real_changes` in
 `scrape.yml`). Het bericht noemt per wijziging de partij, het register, en — waar mogelijk —
 wát er precies veranderde (bv. welke dienst is toegevoegd, welke landen erbij).
@@ -80,9 +97,10 @@ Volledig statisch (geen build-stap, geen backend) — vanilla HTML/CSS/JS die `d
 rechtstreeks met `fetch()` uitleest:
 
 - `index.html` — dashboard met aantallen per register en de meest recente wijzigingen.
-- `register.html?type=afm_casps|casps|art|emt|whitepapers|non_compliant` — doorzoekbare/
-  filterbare/sorteerbare tabel per register, met een detailpaneel per record en CSV-export
-  van de huidige selectie.
+- `register.html?type=casps|art|emt|whitepapers|non_compliant` — doorzoekbare/filterbare/
+  sorteerbare tabel per register, met een detailpaneel per record en CSV-export van de huidige
+  selectie. Voor CASPs toont het detailpaneel bij AFM-gemergde records ("Databron: AFM")
+  ook de AFM-specifieke velden.
 - `changelog.html` — volledige wijzigingsgeschiedenis, filterbaar op register en type
   (nieuw/gewijzigd/verwijderd).
 - `assets/js/app.js` — alle rendering/filter/sort/zoek-logica; `assets/css/style.css` —
@@ -121,17 +139,23 @@ letterlijk dubbele rij in het non-compliant register, en correcte detectie van
 toegevoegde/gewijzigde/verwijderde records tussen twee runs. `normalize_afm()` is apart
 getest tegen echte rijen uit het live AFM-register (vergunning, notificatie, cross-border/
 incoming passport, ingetrokken vergunning, gemengde hoofdletters in landcodes) om te
-verifiëren dat de datums, diensten-codes en EU-paspoortlanden correct worden geparsed. Alle
-checks slagen.
+verifiëren dat de datums, diensten-codes en EU-paspoortlanden correct worden geparsed.
+`merge_esma_and_afm_casps()` is apart getest op: een AFM-only entiteit die eenmalig wordt
+toegevoegd (`source: "afm"`), een AFM-entiteit die al in ESMA's export staat (geen dubbele
+rij), een AFM-entiteit die later "overstapt" naar ESMA's eigen export met behoud van hetzelfde
+id (nooit een verwijderd+toegevoegd-paar, en de interne source-wisseling zelf genereert nooit
+een melding), matching op genormaliseerde naam wanneer een LEI ontbreekt, en correcte
+gewijzigd-detail bij een dienst-wijziging op een AFM-only record. Alle checks slagen.
 
 De front-end (`assets/js/app.js`) is los daarvan getest met een jsdom-harnas tegen dezelfde
-echte ESMA-fragmenten plus AFM-fixturedata: per register is gecontroleerd dat de tabel
-rendert, zoeken de resultaten terecht versmalt, kolomsortering (op/neer) niet crasht, en het
-detailpaneel correct opent — voor alle 6 registers, inclusief het lege ART-register. Voor het
-AFM-register is bovendien gecontroleerd dat AFM's "(x) omschrijving"-format voor diensten
-correct wordt herkend door dezelfde dienst-iconen als bij CASPs, en dat het vergunningstype
-(vergunning/notificatie/cross-border) correct wordt vertaald en filterbaar is. Alle checks
-slagen.
+echte ESMA-fragmenten plus een AFM-gemergde CASP-fixture: per register is gecontroleerd dat de
+tabel rendert, zoeken de resultaten terecht versmalt, kolomsortering (op/neer) niet crasht, en
+het detailpaneel correct opent — voor alle 5 registers, inclusief het lege ART-register. Voor
+CASPs is bovendien gecontroleerd dat AFM's "(x) omschrijving"-format voor diensten correct
+wordt herkend door dezelfde dienst-iconen als bij ESMA-native CASPs, dat het detailpaneel
+"Databron: AFM" plus de AFM-specifieke velden alleen toont bij een AFM-gemergd record (en niet
+bij een ESMA-native record), en dat het vergunningstype (vergunning/notificatie/cross-border)
+in dat detailpaneel correct wordt vertaald. Alle checks slagen.
 
 `test_fixtures/` is alleen voor lokale verificatie en hoeft niet mee de deploy in —
 `data/` staat momenteel op lege placeholders totdat de workflow voor het eerst draait.

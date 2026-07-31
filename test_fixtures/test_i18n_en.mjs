@@ -11,8 +11,8 @@ global.window = window;
 global.document = window.document;
 window.localStorage.setItem("esma-tracker-lang", "en");
 
-for (const rel of ["/tmp/jstest/i18n.js", "/sessions/wonderful-zen-planck/mnt/outputs/esma-micar-tracker/assets/js/app.js"]) {
-  const src = fs.readFileSync(rel, "utf-8");
+for (const rel of ["../assets/js/i18n.js", "../assets/js/app.js"]) {
+  const src = fs.readFileSync(new URL(rel, import.meta.url), "utf-8");
   const s = window.document.createElement("script");
   s.textContent = src;
   window.document.body.appendChild(s);

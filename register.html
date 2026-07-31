@@ -16,7 +16,6 @@
     </span>
     <div class="topnav__links">
       <a href="index.html" data-nav="dashboard" data-i18n="nav.dashboard">Dashboard</a>
-      <a href="register.html?type=afm_casps" data-nav="afm_casps" data-i18n="nav.afm_casps">AFM</a>
       <a href="register.html?type=casps" data-nav="casps" data-i18n="nav.casps">CASPs</a>
       <a href="register.html?type=art" data-nav="art" data-i18n="nav.art">ART</a>
       <a href="register.html?type=emt" data-nav="emt" data-i18n="nav.emt">EMT</a>
@@ -59,9 +58,10 @@ if (!config) {
   document.getElementById("register-title").textContent = config.label;
   highlightNav(type);
 
-  // Most registers mirror ESMA's EU-wide data (the default footer link/text
-  // in the markup above); the AFM register is a different source entirely,
-  // so its REGISTERS config overrides the link when present.
+  // Every register currently mirrors ESMA's EU-wide export (the default
+  // footer link/text in the markup above) - a REGISTERS config can still
+  // override the link/text with sourceUrl/sourceLinkText/subtitleFn if a
+  // future register needs a different primary source.
   if (config.sourceUrl) {
     const sourceLink = document.getElementById("footer-source-link");
     sourceLink.href = config.sourceUrl;
