@@ -617,10 +617,53 @@ function detailArticle(record, fieldPairs, subitemsTitle, subitemsHtml) {
 // Generic table + filter/search/sort component
 // --------------------------------------------------------------------------
 
+// A compact segmented control (same visual pattern as the NL/EN lang-toggle)
+// for the fixed set of page-size choices — a native <select> would work too,
+// but this stays visually consistent with the rest of the toolbar and needs
+// no extra click to see all 3 options.
+function buildPageSizeToggle(sizes, current, onChange) {
+  const wrap = el("div", { class: "page-size-toggle" });
+  wrap.appendChild(el("span", { class: "page-size-toggle__label" }, escapeHtml(t("pagination.perPage"))));
+  const buttons = [];
+  for (const size of sizes) {
+    const btn = el("button", { type: "button", class: "page-size-toggle__btn" + (size === current ? " is-active" : "") }, String(size));
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains("is-active")) return;
+      for (const b of buttons) b.classList.remove("is-active");
+      btn.classList.add("is-active");
+      onChange(size);
+    });
+    buttons.push(btn);
+    wrap.appendChild(btn);
+  }
+  return wrap;
+}
+
+// Prev/next pager shown below the table, with a "page X of Y" indicator.
+function buildPaginationBar(onPrev, onNext) {
+  const bar = el("div", { class: "pagination-bar" });
+  const prevBtn = el("button", { type: "button", class: "btn pagination-bar__btn" }, escapeHtml(t("pagination.prev")));
+  const info = el("span", { class: "pagination-bar__info" });
+  const nextBtn = el("button", { type: "button", class: "btn pagination-bar__btn" }, escapeHtml(t("pagination.next")));
+  prevBtn.addEventListener("click", onPrev);
+  nextBtn.addEventListener("click", onNext);
+  bar.appendChild(prevBtn);
+  bar.appendChild(info);
+  bar.appendChild(nextBtn);
+  return { bar, prevBtn, info, nextBtn };
+}
+
+const PAGE_SIZES = [10, 25, 50];
+
 function renderRegisterTable(root, config, records) {
   let filtered = records.slice();
-  let sortKey = null;
+  // Default: alphabetical by the same "name" column every register shows
+  // first (commercial_name-or-name for CASPs/ART/EMT, name for whitepapers/
+  // non-compliant) — every REGISTERS config uses "name" as that column's key.
+  let sortKey = "name";
   let sortDir = 1;
+  let currentPage = 1;
+  let pageSize = PAGE_SIZES[0];
   const activeFilters = {};
   let searchTerm = "";
   const filterResetters = [];
@@ -632,9 +675,17 @@ function renderRegisterTable(root, config, records) {
   const resetBtn = el("button", { class: "btn btn--reset", type: "button" }, escapeHtml(t("buttons.resetFilters")));
   toolbar.appendChild(resetBtn);
 
-  const countLabel = el("span", { class: "toolbar__count" });
   const exportBtn = el("button", { class: "btn", type: "button" }, escapeHtml(t("buttons.exportCsv")));
   toolbar.appendChild(exportBtn);
+
+  const pageSizeToggle = buildPageSizeToggle(PAGE_SIZES, pageSize, (size) => {
+    pageSize = size;
+    currentPage = 1;
+    renderPage();
+  });
+  toolbar.appendChild(pageSizeToggle);
+
+  const countLabel = el("span", { class: "toolbar__count" });
   toolbar.appendChild(countLabel);
   root.appendChild(toolbar);
 
@@ -755,6 +806,12 @@ function renderRegisterTable(root, config, records) {
   tableWrap.appendChild(table);
   root.appendChild(tableWrap);
 
+  const pagination = buildPaginationBar(
+    () => { if (currentPage > 1) { currentPage--; renderPage(); } },
+    () => { const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize)); if (currentPage < totalPages) { currentPage++; renderPage(); } },
+  );
+  root.appendChild(pagination.bar);
+
   searchInput.addEventListener("input", () => {
     searchTerm = searchInput.value.trim().toLowerCase();
     applyAndRender();
@@ -798,13 +855,29 @@ function renderRegisterTable(root, config, records) {
       arrow.textContent = th.dataset.key === sortKey ? (sortDir === 1 ? "▲" : "▼") : "";
     }
 
+    // A new filter/search/sort result starts back on page 1 — otherwise
+    // narrowing a filter could leave you stranded on a now out-of-range page.
+    currentPage = 1;
+    renderPage();
+  }
+
+  // Renders just the current page's rows (+ pagination bar / count label)
+  // from the already filtered+sorted `filtered` array — used both by
+  // applyAndRender() and by the pager/page-size controls, which don't need
+  // to redo the filter/sort work themselves.
+  function renderPage() {
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    const pageRecords = filtered.slice(start, start + pageSize);
+
     tbody.innerHTML = "";
-    if (!filtered.length) {
+    if (!pageRecords.length) {
       const tr = el("tr", { class: "empty-row" });
       tr.appendChild(el("td", { colspan: config.columns.length }, escapeHtml(t("table.empty"))));
       tbody.appendChild(tr);
     } else {
-      for (const r of filtered) {
+      for (const r of pageRecords) {
         const tr = el("tr");
         for (const col of config.columns) {
           const td = el("td");
@@ -824,6 +897,11 @@ function renderRegisterTable(root, config, records) {
       }
     }
     countLabel.textContent = t("table.count", filtered.length, records.length);
+
+    pagination.info.textContent = t("pagination.pageInfo", currentPage, totalPages);
+    pagination.prevBtn.disabled = currentPage <= 1;
+    pagination.nextBtn.disabled = currentPage >= totalPages;
+    pagination.bar.style.display = totalPages <= 1 ? "none" : "";
   }
 
   exportBtn.addEventListener("click", () => exportCsv(config, filtered));

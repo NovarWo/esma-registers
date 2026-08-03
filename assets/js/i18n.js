@@ -93,6 +93,12 @@ const TRANSLATIONS = {
       count: (shown, total) => `${shown} van ${total} records`,
       empty: "Geen records gevonden voor deze zoekopdracht/filters.",
     },
+    pagination: {
+      perPage: "Per pagina:",
+      pageInfo: (page, totalPages) => `Pagina ${page} van ${totalPages}`,
+      prev: "‹ Vorige",
+      next: "Volgende ›",
+    },
     detail: {
       titleFallback: "Details",
       dataSource: "Databron",
@@ -203,6 +209,12 @@ const TRANSLATIONS = {
     table: {
       count: (shown, total) => `${shown} of ${total} records`,
       empty: "No records found for this search/filters.",
+    },
+    pagination: {
+      perPage: "Per page:",
+      pageInfo: (page, totalPages) => `Page ${page} of ${totalPages}`,
+      prev: "‹ Previous",
+      next: "Next ›",
     },
     detail: {
       titleFallback: "Details",
