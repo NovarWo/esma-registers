@@ -248,6 +248,29 @@ table.data thead tr.col-filter-row th.col-filter-cell {
 .chip-popover__btn.is-active { background: var(--color-primary); color: #fff; }
 .chip-popover__btn.is-active svg { color: #fff; }
 
+/* Page-size segmented control (10 / 25 / 50) — same visual pattern as the
+   NL/EN lang-toggle in the top nav, so the toolbar reads as one family. */
+.page-size-toggle {
+  display: inline-flex; align-items: center; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
+}
+.page-size-toggle__label { font-size: .75rem; color: var(--text-muted); font-weight: 600; padding: 0 8px 0 10px; white-space: nowrap; }
+.page-size-toggle__btn {
+  font-family: inherit; font-size: .8125rem; font-weight: 700; cursor: pointer;
+  border: none; background: none; color: var(--text-muted); border-radius: var(--radius-pill);
+  padding: 6px 13px; transition: background .15s ease, color .15s ease;
+}
+.page-size-toggle__btn:hover { color: var(--text); }
+.page-size-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
+
+/* Pager below the table */
+.pagination-bar {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 16px 0 0;
+}
+.pagination-bar__info { font-size: .8125rem; color: var(--text-muted); white-space: nowrap; }
+.pagination-bar__btn:disabled { opacity: .4; cursor: default; pointer-events: none; }
+
 /* Table */
 .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-2xl); }
 table.data { width: 100%; border-collapse: collapse; font-size: .9375rem; }
