@@ -874,7 +874,13 @@ function renderRegisterTable(root, config, records) {
     tbody.innerHTML = "";
     if (!pageRecords.length) {
       const tr = el("tr", { class: "empty-row" });
-      tr.appendChild(el("td", { colspan: config.columns.length }, escapeHtml(t("table.empty"))));
+      // Nobody's CASP/ART/EMT issuer is literally named "to the moon" or "wen
+      // lambo" - swap the generic empty-state text for something in on this
+      // joke instead of just reporting zero results, for whoever tries it.
+      const easterMessage = searchTerm.includes("to the moon") ? t("easterEgg.emptyToTheMoon")
+        : searchTerm.includes("wen lambo") ? t("easterEgg.emptyWenLambo")
+        : null;
+      tr.appendChild(el("td", { colspan: config.columns.length }, escapeHtml(easterMessage || t("table.empty"))));
       tbody.appendChild(tr);
     } else {
       for (const r of pageRecords) {
@@ -972,18 +978,20 @@ function closeDetail() {
 const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 let konamiProgress = 0;
 
-function spawnBitcoinConfetti() {
-  const layer = el("div", { class: "btc-confetti-layer" });
+// Launched from the bottom of the viewport up past the top, like fireworks -
+// see .btc-firework-piece's keyframes in style.css for the actual motion.
+function spawnBitcoinFireworks() {
+  const layer = el("div", { class: "btc-firework-layer" });
   for (let i = 0; i < 28; i++) {
-    const piece = el("span", { class: "btc-confetti-piece" }, "₿");
+    const piece = el("span", { class: "btc-firework-piece" }, "₿");
     piece.style.left = `${Math.random() * 100}vw`;
     piece.style.fontSize = `${14 + Math.random() * 18}px`;
-    piece.style.animationDuration = `${2.2 + Math.random() * 1.6}s`;
-    piece.style.animationDelay = `${Math.random() * 0.5}s`;
+    piece.style.animationDuration = `${1.6 + Math.random() * 1.2}s`;
+    piece.style.animationDelay = `${Math.random() * 0.6}s`;
     layer.appendChild(piece);
   }
   document.body.appendChild(layer);
-  setTimeout(() => layer.remove(), 4200);
+  setTimeout(() => layer.remove(), 3400);
 }
 
 function triggerKonamiEasterEgg() {
@@ -991,7 +999,7 @@ function triggerKonamiEasterEgg() {
   // arrow-key press would - on a long register table that can easily carry
   // the topnav (and the logo the coin-spin plays on) off-screen by the time
   // the code completes. Scroll back to the top so the spin is actually seen;
-  // the confetti is `position: fixed` so it's visible regardless either way.
+  // the fireworks are `position: fixed` so they're visible regardless either way.
   window.scrollTo({ top: 0, behavior: "smooth" });
   const logo = document.querySelector(".topnav__brand svg");
   if (logo) {
@@ -999,7 +1007,7 @@ function triggerKonamiEasterEgg() {
     void logo.offsetWidth; // force reflow so re-adding the class restarts the keyframes
     logo.classList.add("coin-spin");
   }
-  spawnBitcoinConfetti();
+  spawnBitcoinFireworks();
 }
 
 document.addEventListener("keydown", (e) => {

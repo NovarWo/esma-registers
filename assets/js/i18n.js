@@ -153,6 +153,8 @@ const TRANSLATIONS = {
     easterEgg: {
       genesisTitle: "Genesisblok, 3 januari 2009:",
       genesisQuote: "\"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.\"",
+      emptyToTheMoon: "Deze bestemming valt buiten het territoriale toepassingsgebied van MiCAR (Verordening (EU) 2023/1114). Voor toezicht op de Maan verwijzen wij u door naar een bevoegde autoriteit die nog moet worden opgericht.",
+      emptyWenLambo: "Er is geen entiteit geregistreerd die \"Lambo-as-a-Service\" aanbiedt als dienst in de zin van MiCAR art. 3(1)(16). Cliëntenwens genoteerd; wetgeving volgt (nog) niet.",
     },
   },
 
@@ -274,6 +276,8 @@ const TRANSLATIONS = {
     easterEgg: {
       genesisTitle: "Genesis block, 3 January 2009:",
       genesisQuote: "\"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.\"",
+      emptyToTheMoon: "This destination falls outside MiCAR's (Regulation (EU) 2023/1114) territorial scope. For lunar supervisory matters, please contact a competent authority that has yet to be established.",
+      emptyWenLambo: "No entity is registered as offering \"Lambo-as-a-Service\" within the meaning of MiCAR Art. 3(1)(16). Client demand noted; legislation does not (yet) follow.",
     },
   },
 };

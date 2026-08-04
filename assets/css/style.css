@@ -342,9 +342,9 @@ table.data tr:last-child td { border-bottom: none; }
 
 .filter-note { font-size: .75rem; color: var(--text-muted); }
 
-/* Easter eggs — Konami code (logo coin-spin + falling ₿ confetti) and typing
-   "satoshi" anywhere (a toast with the Bitcoin genesis block's headline). See
-   the "Easter eggs" section in assets/js/app.js. */
+/* Easter eggs — Konami code (logo coin-spin + ₿ fireworks shooting up from
+   the bottom of the screen) and typing "satoshi" anywhere (a toast with the
+   Bitcoin genesis block's headline). See "Easter eggs" in assets/js/app.js. */
 .topnav__brand svg.coin-spin { animation: coin-spin-anim .9s ease-in-out; }
 @keyframes coin-spin-anim {
   0% { transform: rotate(0deg) scale(1); }
@@ -352,14 +352,15 @@ table.data tr:last-child td { border-bottom: none; }
   100% { transform: rotate(720deg) scale(1); }
 }
 
-.btc-confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
-.btc-confetti-piece {
-  position: absolute; top: -40px; color: var(--color-primary); font-weight: 700;
-  animation-name: btc-confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
+.btc-firework-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+.btc-firework-piece {
+  position: absolute; bottom: -40px; color: var(--color-primary); font-weight: 700;
+  animation-name: btc-firework-launch; animation-timing-function: cubic-bezier(.15, .6, .4, 1); animation-fill-mode: forwards;
 }
-@keyframes btc-confetti-fall {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(110vh) rotate(360deg); opacity: .15; }
+@keyframes btc-firework-launch {
+  0% { transform: translateY(0) rotate(0deg) scale(.7); opacity: 1; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-115vh) rotate(360deg) scale(1.15); opacity: 0; }
 }
 
 .easter-toast {
