@@ -963,6 +963,85 @@ function closeDetail() {
 }
 
 // --------------------------------------------------------------------------
+// Easter eggs — wired unconditionally at script load, since app.js is loaded
+// on every page (index/register/changelog), so these work site-wide with no
+// per-page setup call needed. Both listen globally, so they still fire while
+// a search/filter input has focus (harmless — neither calls preventDefault).
+// --------------------------------------------------------------------------
+
+const KONAMI_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
+let konamiProgress = 0;
+
+function spawnBitcoinConfetti() {
+  const layer = el("div", { class: "btc-confetti-layer" });
+  for (let i = 0; i < 28; i++) {
+    const piece = el("span", { class: "btc-confetti-piece" }, "₿");
+    piece.style.left = `${Math.random() * 100}vw`;
+    piece.style.fontSize = `${14 + Math.random() * 18}px`;
+    piece.style.animationDuration = `${2.2 + Math.random() * 1.6}s`;
+    piece.style.animationDelay = `${Math.random() * 0.5}s`;
+    layer.appendChild(piece);
+  }
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 4200);
+}
+
+function triggerKonamiEasterEgg() {
+  const logo = document.querySelector(".topnav__brand svg");
+  if (logo) {
+    logo.classList.remove("coin-spin"); // restart the animation if triggered twice in a row
+    void logo.offsetWidth; // force reflow so re-adding the class restarts the keyframes
+    logo.classList.add("coin-spin");
+  }
+  spawnBitcoinConfetti();
+}
+
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  if (key === KONAMI_SEQUENCE[konamiProgress]) {
+    konamiProgress++;
+    if (konamiProgress === KONAMI_SEQUENCE.length) {
+      konamiProgress = 0;
+      triggerKonamiEasterEgg();
+    }
+  } else {
+    konamiProgress = key === KONAMI_SEQUENCE[0] ? 1 : 0;
+  }
+});
+
+// Typing "satoshi" anywhere on the page reveals the Bitcoin genesis block's
+// famous embedded headline — a real (and rather pointed) 12-word newspaper
+// quote Satoshi Nakamoto mined into block 0 on 3 January 2009 as a timestamp
+// and comment on the financial system Bitcoin was built to route around.
+const SATOSHI_WORD = "satoshi";
+let satoshiBuffer = "";
+
+function showSatoshiToast() {
+  const existing = document.querySelector(".easter-toast");
+  if (existing) existing.remove();
+  const toast = el("div", { class: "easter-toast" },
+    `🥚 <strong>${escapeHtml(t("easterEgg.genesisTitle"))}</strong><br>${escapeHtml(t("easterEgg.genesisQuote"))}`);
+  document.body.appendChild(toast);
+  // Fall back to running synchronously in environments without rAF (e.g. this
+  // project's jsdom test harness) - real browsers always have it, so this is
+  // just defensive, not something users will ever notice either way.
+  (window.requestAnimationFrame || ((fn) => fn()))(() => toast.classList.add("is-visible"));
+  setTimeout(() => {
+    toast.classList.remove("is-visible");
+    setTimeout(() => toast.remove(), 350);
+  }, 6000);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.length !== 1) return;
+  satoshiBuffer = (satoshiBuffer + e.key.toLowerCase()).slice(-SATOSHI_WORD.length);
+  if (satoshiBuffer === SATOSHI_WORD) {
+    satoshiBuffer = "";
+    showSatoshiToast();
+  }
+});
+
+// --------------------------------------------------------------------------
 // Shared page chrome
 // --------------------------------------------------------------------------
 

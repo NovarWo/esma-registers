@@ -150,6 +150,10 @@ const TRANSLATIONS = {
     },
     badges: { added: "Nieuw", changed: "Gewijzigd", removed: "Verwijderd" },
     misc: { unknownValue: "onbekend", fetchError: (path, status) => `Kon ${path} niet laden (${status})` },
+    easterEgg: {
+      genesisTitle: "Genesisblok, 3 januari 2009:",
+      genesisQuote: "\"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.\"",
+    },
   },
 
   en: {
@@ -267,6 +271,10 @@ const TRANSLATIONS = {
     },
     badges: { added: "New", changed: "Changed", removed: "Removed" },
     misc: { unknownValue: "unknown", fetchError: (path, status) => `Could not load ${path} (${status})` },
+    easterEgg: {
+      genesisTitle: "Genesis block, 3 January 2009:",
+      genesisQuote: "\"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.\"",
+    },
   },
 };
 
