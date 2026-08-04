@@ -280,7 +280,11 @@ table.data th { font-weight: 600; color: var(--text); background: var(--surface-
 table.data th .arrow { color: var(--text-muted); font-size: .75rem; margin-left: 4px; }
 table.data tbody tr:hover { background: var(--surface-2); cursor: pointer; }
 table.data tr:last-child td { border-bottom: none; }
-.empty-row td { text-align: center; color: var(--text-muted); padding: 32px; white-space: normal; }
+/* Higher selector specificity than "table.data td"'s white-space: nowrap
+   above (which otherwise wins regardless of source order) - needed so long
+   empty-state text (e.g. the "to the moon"/"wen lambo" easter eggs) actually
+   wraps instead of overflowing the table in one unbroken line. */
+table.data tr.empty-row td { text-align: center; color: var(--text-muted); padding: 32px; white-space: normal; }
 
 /* Compact "ellipsis" cells — long text truncates with "…", full text on hover */
 .cell-ellipsis {
