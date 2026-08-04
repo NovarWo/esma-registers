@@ -34,7 +34,6 @@
 <div class="wrap">
   <div class="page-header">
     <h1 id="register-title" data-i18n="registerPage.titleFallback">Register</h1>
-    <p id="register-sub"></p>
   </div>
 
   <div id="register-root"></div>
@@ -84,7 +83,6 @@ if (!config) {
   (async function init() {
     const root = document.getElementById("register-root");
     const footerChecked = document.getElementById("footer-checked");
-    const sub = document.getElementById("register-sub");
 
     let meta = {};
     try { meta = await fetchJSON("data/meta.json"); } catch (e) { /* ignore */ }
@@ -93,10 +91,12 @@ if (!config) {
       : t("footer.neverChecked");
 
     try {
+      // Record count + "last generated" used to also repeat as a subtitle
+      // right under the page title - redundant with the toolbar's own
+      // "X van Y records" count and the footer's "Laatst gecontroleerd" line
+      // just below the table, so it's been dropped here.
       const data = await fetchJSON(`data/${config.file}.json`);
       const records = data.records || [];
-      const generated = data.generated_at ? formatTimestamp(data.generated_at) : t("misc.unknownValue");
-      sub.textContent = config.subtitleFn ? config.subtitleFn(records.length, generated) : t("registerPage.subtitle", records.length, generated);
       renderRegisterTable(root, config, records);
     } catch (e) {
       root.innerHTML = `<p class="filter-note">${escapeHtml(t("registerPage.loadError", e.message))}</p>`;
