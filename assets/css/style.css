@@ -341,3 +341,31 @@ table.data tr:last-child td { border-bottom: none; }
 .site-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .8125rem; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; }
 
 .filter-note { font-size: .75rem; color: var(--text-muted); }
+
+/* Easter eggs — Konami code (logo coin-spin + falling ₿ confetti) and typing
+   "satoshi" anywhere (a toast with the Bitcoin genesis block's headline). See
+   the "Easter eggs" section in assets/js/app.js. */
+.topnav__brand svg.coin-spin { animation: coin-spin-anim .9s ease-in-out; }
+@keyframes coin-spin-anim {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(360deg) scale(1.25); }
+  100% { transform: rotate(720deg) scale(1); }
+}
+
+.btc-confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+.btc-confetti-piece {
+  position: absolute; top: -40px; color: var(--color-primary); font-weight: 700;
+  animation-name: btc-confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
+}
+@keyframes btc-confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: .15; }
+}
+
+.easter-toast {
+  position: fixed; right: 20px; bottom: 20px; z-index: 9999; max-width: 340px;
+  background: var(--surface); border: 1px solid var(--color-primary-light); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-medium); padding: 14px 18px; font-size: .8125rem; color: var(--text); line-height: 1.5;
+  opacity: 0; transform: translateY(12px); transition: opacity .3s ease, transform .3s ease;
+}
+.easter-toast.is-visible { opacity: 1; transform: translateY(0); }
