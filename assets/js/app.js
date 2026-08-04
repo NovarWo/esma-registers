@@ -987,6 +987,12 @@ function spawnBitcoinConfetti() {
 }
 
 function triggerKonamiEasterEgg() {
+  // The ↑↓ presses used to enter the code scroll the page like any other
+  // arrow-key press would - on a long register table that can easily carry
+  // the topnav (and the logo the coin-spin plays on) off-screen by the time
+  // the code completes. Scroll back to the top so the spin is actually seen;
+  // the confetti is `position: fixed` so it's visible regardless either way.
+  window.scrollTo({ top: 0, behavior: "smooth" });
   const logo = document.querySelector(".topnav__brand svg");
   if (logo) {
     logo.classList.remove("coin-spin"); // restart the animation if triggered twice in a row
