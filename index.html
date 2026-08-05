@@ -82,12 +82,15 @@ const KPI_ORDER = ["casps", "non_compliant", "emt", "art", "whitepapers"];
   let changelog = [];
   try { changelog = await fetchJSON("data/history/changelog.json"); } catch (e) { /* none yet */ }
 
-  const recent = changelog.slice(-15).reverse();
+  // Newest run first, most important (CASPs - especially brand-new ones -
+  // then EMT/ART/Whitepapers/Non-compliant) first within that run; see
+  // sortChangelogForDisplay() in app.js.
+  const recent = sortChangelogForDisplay(changelog).slice(0, 15);
   if (!recent.length) {
     recentEl.innerHTML = `<p class="filter-note">${escapeHtml(t("dashboard.noChanges"))}</p>`;
   } else {
     for (const c of recent) {
-      recentEl.appendChild(el("div", { class: "changelog-item" }, changelogItemHtml(c)));
+      recentEl.appendChild(buildChangelogItem(c));
     }
   }
 })();

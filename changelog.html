@@ -72,10 +72,13 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
   let changelog = [];
   try { changelog = await fetchJSON("data/history/changelog.json"); } catch (e) { /* none yet */ }
 
-  // Always the last 7 days, newest first — no fixed-count cap. ESMA itself
-  // only refreshes weekly, so a rolling week is the natural "what's new" window.
+  // Always the last 7 days — no fixed-count cap. ESMA itself only refreshes
+  // weekly, so a rolling week is the natural "what's new" window. Ordered
+  // newest run first, then by importance within a run (CASPs - especially
+  // brand-new ones - then EMT/ART/Whitepapers/Non-compliant); see
+  // sortChangelogForDisplay() in app.js.
   const cutoff = Date.now() - SEVEN_DAYS_MS;
-  changelog = changelog.filter((c) => new Date(c.timestamp).getTime() >= cutoff).slice().reverse();
+  changelog = sortChangelogForDisplay(changelog.filter((c) => new Date(c.timestamp).getTime() >= cutoff));
 
   let registerFilter = null;
   let typeFilter = null;
@@ -111,7 +114,7 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
       return;
     }
     for (const c of filtered) {
-      listEl.appendChild(el("div", { class: "changelog-item" }, changelogItemHtml(c)));
+      listEl.appendChild(buildChangelogItem(c));
     }
   }
 
