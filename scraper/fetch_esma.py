@@ -717,6 +717,23 @@ def _comparable(rec: dict) -> dict:
     return {k: v for k, v in rec.items() if k != "source"}
 
 
+# User-requested importance ranking for the Slack notification's line-by-line
+# summary: CASPs matter most (a brand-new CASP most of all - it's floated
+# above every other CASP change too, not just other registers), then EMT,
+# ART, Whitepapers, and Non-compliant last. This only reorders how the Slack
+# summary is written - data/history/changelog.json itself still gets each
+# run's changes appended in plain per-register order; the site applies the
+# equivalent ranking when *displaying* the changelog instead (see
+# changelogPriorityKey()/sortChangelogForDisplay() in assets/js/app.js).
+REGISTER_PRIORITY = {"casps": 0, "emt": 1, "art": 2, "whitepapers": 3, "non_compliant": 4}
+
+
+def _change_priority_key(c: dict) -> tuple:
+    register_rank = REGISTER_PRIORITY.get(c["register"], 99)
+    is_new_casp = 0 if (c["register"] == "casps" and c["type"] == "added") else 1
+    return (register_rank, is_new_casp)
+
+
 def diff_records(register: str, previous: dict[str, dict], current: list[dict]) -> list[dict]:
     changes = []
     current_ids = set()
@@ -829,7 +846,7 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
         TYPE_LABELS_NL = {"added": "toegevoegd", "changed": "gewijzigd", "removed": "verwijderd"}
         MAX_SUMMARY_LINES = 20
         detail_lines = []
-        for c in all_changes:
+        for c in sorted(all_changes, key=_change_priority_key):
             header = f"{c['register']}: {c.get('name') or c['id']}"
             # "changed" records with a field-level description (see
             # describe_record_change) get one line per changed aspect, e.g.
