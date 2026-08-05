@@ -11099,5 +11099,979 @@
     "id": "984e8977c08d4b36",
     "name": "Corona Fondenza",
     "timestamp": "2026-08-03T12:01:51+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "9237e6df6b88f9a1",
+    "name": "KUBE ECOSYSTEM S.L.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "dc16b7a92af31c0e",
+    "name": "COOL EARTH COIN, S.A.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "2f568667c786011a",
+    "name": "VeChain Foundation San Marino S.r.l.",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "0e7df395ff499ba5",
+    "name": "MANTRA Chain Association",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "e2203d0e88fa3233",
+    "name": "DuckChain Foundation",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "74aaed88efe6a0dc",
+    "name": "Safe Ecosystem Foundation",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "3eaefefd7224df07",
+    "name": "MiCA Crypto Alliance Opco Limited",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "640f65cfb52e86b7",
+    "name": "Rails ServicesCo (BVI) Ltd.",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "7b3cc702fc2ceb4e",
+    "name": "KulaDAO Foundation Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "9dba2c0d3519aed9",
+    "name": "ALLORA FOUNDATION",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "443f531b64066ee0",
+    "name": "Hexagon Foundation Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "61f5fdef756e4cb7",
+    "name": "Birbish Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "10bae2fdf76f2a78",
+    "name": "PepeCoin Co.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "85050935b2a11537",
+    "name": "ETHGas Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d4580eca94cf8b90",
+    "name": "Tea Association",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d23a8576e1cfd633",
+    "name": "Beldex International Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "551f3b5a17245e33",
+    "name": "VX Eight Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "74d9f477f3053e99",
+    "name": "Luminary Digital Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "9de2c24cb7b779d9",
+    "name": "Reppo Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "05fe0d4e9bc3940f",
+    "name": "Bluefin Holdings Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "100c230bb388dfff",
+    "name": "Amnis AI Inc.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b40b5a05bb8e5bfb",
+    "name": "SYNAPSE LABS INC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "5dca22b0ab49ed66",
+    "name": "Rain Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "4db83612823ce272",
+    "name": "NESA LABS INC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "f102c0fea0cdc9fb",
+    "name": "edgeX DAO Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "07de6c56e7540725",
+    "name": "Neo Global Development Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "504df6ba436b3f28",
+    "name": "Paimon Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "6575ed8c52ce0874",
+    "name": "Conflux Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "5d8d7259bf2d06f9",
+    "name": "NATGOLD INTEGRITY VAULT LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "899b38e8556ee7cd",
+    "name": "Beezie Labs Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "0ddce02ecd32f31b",
+    "name": "IO TRADE LAB LIMITED",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "1901554037775df9",
+    "name": "Pepecoin LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "7cc240985037d7d4",
+    "name": "AVA Holdings (BVI) Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "8bede37985a1336c",
+    "name": "Hyperlend Inc.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "1715e3b958b98d27",
+    "name": "Sustainable Digital Solutions Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "eb51caf0552432ee",
+    "name": "Ekubo, Inc.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "5e43659413d31440",
+    "name": "MantleLSP Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "7e93dcd1d088c207",
+    "name": "Visionare Capital AG",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "0953eccd7017cbad",
+    "name": "DGrid AI Labs Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "9026cfa390f7af77",
+    "name": "Citrea Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "697c06588f687675",
+    "name": "Spirit Protocol Labs, Inc.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "3375e6af128a6ec6",
+    "name": "Morph Organisation Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "71a5402dcc7d73bf",
+    "name": "Cheqd Foundation Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "bf09ec5619dd8c0f",
+    "name": "OPTION TECHNOLOGIES SOLUTIONS INTERNATIONAL, LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "0c1405c2ac025b2d",
+    "name": "Superp Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "7eaebbc186cc79ef",
+    "name": "Resilience Core Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "6ea7d0090f4e8807",
+    "name": "Axon Tech Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "e689e5e20cac2e22",
+    "name": "ICON Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "804ff637e10990c4",
+    "name": "Wojak CTO LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "8e15f4563a3c6c1c",
+    "name": "Grove (BVI) Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "c678b05b008b5f96",
+    "name": "VerifiedX LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b2760623844272d5",
+    "name": "EarthX Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "4b626cac26ea40a0",
+    "name": "RWAX Holdings Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "25f2471f1853f5e4",
+    "name": "Stronghold Anchor Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "992f93915aaab0ed",
+    "name": "Bitcoin HT, LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "3764c9130c2adace",
+    "name": "Fanpla Inc",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "adf4b8006d4a7a71",
+    "name": "Discovery (BVI) Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "24c0fe35e1d76e90",
+    "name": "StorX Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "129aa437e5e6ed7d",
+    "name": "Cygnus Information Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "2dca9fe765d08eee",
+    "name": "SLX Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "c49585de6dafc05a",
+    "name": "Polaris Wallet Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "2ea9c525d6b7e8a5",
+    "name": "Fort Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "bcf30f88c45e4a77",
+    "name": "Arcium Association",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "2237908b0aa5da60",
+    "name": "Acurast Association",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "36099dfaae73519e",
+    "name": "EquationX Ltd.",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "3151119d1ddbbb1f",
+    "name": "MYX Technology Limited",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "96b91ef35f3bf881",
+    "name": "Propy Inc",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "3e8c15fc18e62aae",
+    "name": "Not Multiverse Ltd",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "c5ee928dd978e9c3",
+    "name": "Zee World Association",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "506b9a77c4fe5ec6",
+    "name": "BlockBen SIA",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "afae56e2f1b9c025",
+    "name": "Comet Technologies Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "58c15e6afaf16b4c",
+    "name": "Gen6 USA LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b793487ca5ba8e89",
+    "name": "TBT Global Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "441fd5102fd4f9bf",
+    "name": "Humanity Reserve Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "74d6a0dc0b444c72",
+    "name": "Stichting Tonomy",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "ecd49a7119bcba46",
+    "name": "World Mobile Token bvi ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b75b685bcdb254e0",
+    "name": "Animecoin Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "babe94af8929ee54",
+    "name": "Solv Legos ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "bbcbaf38629cf65c",
+    "name": "Wandilla",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "14e136e4e171fbe0",
+    "name": "Union Build",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "1cff7dc39c6c71ca",
+    "name": "Subscrypts",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "2e3c2296d886e40b",
+    "name": "375ai ServiceCo (BVI) Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d102a8bb25e13750",
+    "name": "Dropee SA",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "6712deddc315fcb3",
+    "name": "Lumen ServiceCo (BVI) Ltd.",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "e0c028367ba6409c",
+    "name": "infinifi Foundation",
+    "detail": [
+      "whitepapers gewijzigd"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b76e68ecc156f667",
+    "name": "RA2 TECH SA",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d434d301fde5559c",
+    "name": "AMGI Animation LLC",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "6cef9b03fd8367d6",
+    "name": "YOM Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "b16e7aa221300ef1",
+    "name": "CAP Labs Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "80d2356cfc5f13f5",
+    "name": "Pharos ServiceCo (BVI) Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "c91ea733c1d6b39a",
+    "name": "Green Minter LTD",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "87067a0021378a79",
+    "name": "ProtoWardo Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "cab4fbd7b6c3b696",
+    "name": "TownSquare Services Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "867c1edad7701cc6",
+    "name": "Phoenix Veritas Ventures Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "4d96f0f083fbe7fc",
+    "name": "Ritual Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "45a3c2d4e3cd325a",
+    "name": "Dac Labs Sagl",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "594851fc8fbc0220",
+    "name": "Genius Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "0e356fe53262e0ea",
+    "name": "Ethos Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "463fbb94da2b6853",
+    "name": "Dapp OS Technology Pte. Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "bd5b35e1b11a2c0b",
+    "name": "GEODAO FOUNDATION PTE. LTD.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "03e0fbe44df1ed41",
+    "name": "The Interfold Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "bdfe158b93106fec",
+    "name": "Tread Foundry Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "021a805c34a768f5",
+    "name": "CANOPY NETWORK CORP.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "004fb18347d1ab08",
+    "name": "Linera Digital Assets Ltd.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "53992c1c3de928c6",
+    "name": "BlockBen SIA",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "a51a03efccee3dc4",
+    "name": "TBT Global Ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "a6cf5a9f8d39e36d",
+    "name": "Humanity Reserve Limited",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "4eb2c33f5e0b7197",
+    "name": "World Mobile Token bvi ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "6410d9ded3963440",
+    "name": "Animecoin Foundation",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "cf695ac58e17831f",
+    "name": "Solv Legos ltd",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "d74d864d1f454594",
+    "name": "Wandilla",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "d51f95894a7fa733",
+    "name": "Union Build",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "f08c8e01bc9f29db",
+    "name": "375ai ServicesCo",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "1df64765cadf1681",
+    "name": "Dropee SA",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "emt",
+    "id": "30a01f8fc9cdb70b",
+    "name": "Bridge Building S.A.",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "b904b3184a2e08ab",
+    "name": "Ronin EM Ltd",
+    "detail": [
+      "Bewaring nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "ee7779d8025fed51",
+    "name": "TRIA BRIDGE LIMITED (ex Tokenomica Bridge Ltd)",
+    "detail": [
+      "Orderdoorgifte toegevoegd aan dienstverlening",
+      "Bewaring nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Wisselen — fiat nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Wisselen — crypto nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Orderuitvoering nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Advies nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Vermogensbeheer nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK",
+      "Overdracht nu ook aangeboden in: AT, BE, BG, CZ, DE, DK, EE, EL, ES, FI, FR, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NL, NO, PL, PT, RO, SE, SI, SK"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "d5b223adcc1a4866",
+    "name": "Deutsche WertpapierService Bank AG",
+    "detail": [
+      "Bewaring toegevoegd aan dienstverlening",
+      "Wisselen — fiat toegevoegd aan dienstverlening",
+      "Wisselen — crypto toegevoegd aan dienstverlening",
+      "Overdracht toegevoegd aan dienstverlening"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "8c2e9bf4befb5952",
+    "name": "Volksbank eG - Die Gestalterbank",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "3b8e4664e0229bb6",
+    "name": "VBU Volksbank im Unterland eG",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "58eb6bc3e4f172e9",
+    "name": "VR-Bank Erding eG",
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "f104ed08faf685f0",
+    "name": "OPEN BANK S.A.",
+    "detail": [
+      "address: Avenida de Cantabria s/n. 28660 Boadilla del Monte (Madrid) → Avenida de Cantabria s/n. 28660 Boadilla del Monte (Madrid)."
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "12a4d23fda6353e8",
+    "name": "CRIPTAN TRADE S.L.",
+    "detail": [
+      "Bewaring niet langer aangeboden in: AT, BE, BG, CY, CZ, DE, DK, EE, FI, FR, GR, HR, HU, IE, IT, LT, LU, LV, MT, NL, PL, PT, RO, SE, SI, SK",
+      "Wisselen — fiat niet langer aangeboden in: AT, BE, BG, CY, CZ, DE, DK, EE, FI, FR, GR, HR, HU, IE, IT, LT, LU, LV, MT, NL, PL, PT, RO, SE, SI, SK",
+      "Wisselen — crypto niet langer aangeboden in: AT, BE, BG, CY, CZ, DE, DK, EE, FI, FR, GR, HR, HU, IE, IT, LT, LU, LV, MT, NL, PL, PT, RO, SE, SI, SK",
+      "Overdracht niet langer aangeboden in: AT, BE, BG, CY, CZ, DE, DK, EE, FI, FR, GR, HR, HU, IE, IT, LT, LU, LV, MT, NL, PL, PT, RO, SE, SI, SK"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "c8d2295586532205",
+    "name": "MINOS GLOBAL S.L.",
+    "detail": [
+      "name: MINOS GLOBAL, S.L. → MINOS GLOBAL S.L."
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "a5982bb4e511ac2c",
+    "name": "BASQUE PAY S.L.",
+    "detail": [
+      "name: BASQUE PAY, S.L. → BASQUE PAY S.L.",
+      "commercial name: BASQUE PAY, S.L. → BASQUE PAY S.L.",
+      "address: Calle Villa de Plentzia, 42-5 C, Getxeo, Bizcaia. → Calle Villa de Plentzia 42-5 C. Getxeo Bizcaia."
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "9ba7b1a11b5446b0",
+    "name": "FINTECH PAYMENTS PSC S.L.",
+    "detail": [
+      "name: FINTECH PAYMENTS PSC, S.L. → FINTECH PAYMENTS PSC S.L.",
+      "commercial name: FINTECH PAYMENTS PSC, S.L. → FINTECH PAYMENTS PSC S.L.",
+      "address: Calle San Juan de Ortega, núm. 10, esc 1, puerta B, local Correoslabs, 28050, Madrid → Calle San Juan de Ortega núm. 10 esc 1 puerta B local Correoslabs. 28050 Madrid"
+    ],
+    "timestamp": "2026-08-05T15:03:03+00:00"
   }
 ]

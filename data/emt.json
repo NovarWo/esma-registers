@@ -1,6 +1,6 @@
 {
   "register": "emt",
-  "generated_at": "2026-08-05T12:27:51+00:00",
+  "generated_at": "2026-08-05T15:03:03+00:00",
   "records": [
     {
       "id": "0673627ac8c1d954",
@@ -486,6 +486,33 @@
       "institution_type": "Electronic money institution",
       "exemption_48_4": "No",
       "exemption_48_5": "No"
+    },
+    {
+      "id": "30a01f8fc9cdb70b",
+      "competent_authority": "Commission de Surveillance du Secteur Financier (CSSF)",
+      "home_member_state": "LU",
+      "name": "Bridge Building S.A.",
+      "lei": "254900MVWQXMF77YZP65",
+      "head_office_country": "LU",
+      "commercial_name": "Bridge Building S.A.",
+      "address": "33, Boulevard Prince Henri, 1724 Luxembourg, Grand Duchy of Luxembourg",
+      "website": "www.bridge.xyz",
+      "authorisation_date": "23/07/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "whitepapers": [
+        {
+          "url": "https://bridge.xyz/transparency/EURR",
+          "start_date": "23/07/2026",
+          "dti": "TD3BGWM5Z (Ethereum)\n\tLP00X1Q54 (Arbitrum)\n\t9J1RXQWBK (Polygon)\n\tGR77N4VQN (Solana)\n\tR79DN2VHD (Avalanche)\n\t8KV3CMVM5 (Optimism)\n\tKHWWMMF9T (TON)\nH81G32M97 (Injective)",
+          "dti_ffg": "4ZD0FM2VG",
+          "comments": "N/A",
+          "last_update": "29/07/2026"
+        }
+      ],
+      "institution_type": "N/A",
+      "exemption_48_4": "N/A",
+      "exemption_48_5": "N/A"
     },
     {
       "id": "5100b7e850bd7656",
