@@ -336,10 +336,24 @@ table.data tr.empty-row td { text-align: center; color: var(--text-muted); paddi
 
 /* Changelog */
 .changelog-list { display: flex; flex-direction: column; gap: 8px; }
-.changelog-item { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border);
+.changelog-item { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 12px 16px; font-size: .9375rem; }
 .changelog-item time { margin-left: auto; color: var(--text-muted); font-size: .8125rem; white-space: nowrap; }
 .changelog-item .register-tag { color: var(--text-muted); font-size: .8125rem; }
+
+/* "Changed" entries with field-level detail (describe_record_change() in
+   fetch_esma.py) are clickable to reveal what actually changed vs. the
+   previous snapshot - everything else (added/removed, or a changed entry
+   with no describable detail) stays a plain, non-interactive row. */
+.changelog-item.is-expandable { cursor: pointer; }
+.changelog-item__chevron { width: 14px; height: 14px; color: var(--text-muted); flex: none; transition: transform .15s ease; }
+.changelog-item.is-expanded .changelog-item__chevron { transform: rotate(180deg); }
+.changelog-item__detail {
+  display: none; flex-basis: 100%; margin: 8px 0 0; padding: 10px 0 0; border-top: 1px dashed var(--border);
+  list-style: none; font-size: .8125rem; color: var(--text-muted);
+}
+.changelog-item.is-expanded .changelog-item__detail { display: block; }
+.changelog-item__detail li { padding: 2px 0; }
 
 /* Footer */
 .site-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .8125rem; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; }
