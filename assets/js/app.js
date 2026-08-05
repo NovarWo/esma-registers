@@ -140,6 +140,52 @@ function changelogItemHtml(c) {
   `;
 }
 
+// [registerRank, isNewCaspRank] - lower sorts first. Mirrors
+// REGISTER_PRIORITY/_change_priority_key in scraper/fetch_esma.py, which
+// ranks the Slack notification's summary the same way: CASPs first (newly
+// added ones floated above every other CASP change too), then EMT, ART,
+// Whitepapers, Non-compliant last.
+function changelogPriorityKey(c) {
+  const registerRank = REGISTERS[c.register]?.priority ?? 99;
+  const isNewCasp = c.register === "casps" && c.type === "added" ? 0 : 1;
+  return [registerRank, isNewCasp];
+}
+
+// Newest run first; within the same run (identical timestamp - every change
+// in one scrape shares the exact moment the scrape ran), most important
+// first. A plain array .reverse() would also invert priority order *within*
+// a single run's batch (since it flips everything, not just the run-to-run
+// ordering), so this sorts explicitly instead - shared by index.html's
+// "recent changes" and changelog.html's full list.
+function sortChangelogForDisplay(changelog) {
+  return changelog.slice().sort((a, b) => {
+    const byTime = new Date(b.timestamp) - new Date(a.timestamp);
+    if (byTime !== 0) return byTime;
+    const [aRank, aNew] = changelogPriorityKey(a);
+    const [bRank, bNew] = changelogPriorityKey(b);
+    return aRank !== bRank ? aRank - bRank : aNew - bNew;
+  });
+}
+
+// A "changed" entry's field-level detail (describe_record_change() in
+// fetch_esma.py) is already computed and stored in the changelog - it just
+// wasn't shown anywhere on the site. Click any changed entry that has detail
+// to expand a breakdown of what changed vs. the previous snapshot.
+function buildChangelogItem(c) {
+  const item = el("div", { class: "changelog-item" }, changelogItemHtml(c));
+  if (c.type === "changed" && c.detail && c.detail.length) {
+    item.classList.add("is-expandable");
+    item.appendChild(el("svg", {
+      class: "changelog-item__chevron", viewBox: "0 0 24 24", fill: "none",
+      stroke: "currentColor", "stroke-width": "2.6", "stroke-linecap": "round", "stroke-linejoin": "round",
+    }, `<path d="m6 9 6 6 6-6"/>`));
+    item.appendChild(el("ul", { class: "changelog-item__detail" },
+      c.detail.map((d) => `<li>${escapeHtml(d)}</li>`).join("")));
+    item.addEventListener("click", () => item.classList.toggle("is-expanded"));
+  }
+  return item;
+}
+
 function el(tag, attrs = {}, html) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
@@ -376,6 +422,12 @@ const REGISTERS = {
     label: t("registers.casps.label"),
     shortLabel: t("registers.casps.shortLabel"),
     file: "casps",
+    // Importance ranking (lower = more important) for the changelog: CASPs
+    // first, then EMT, ART, Whitepapers, Non-compliant - see
+    // changelogPriorityKey()/sortChangelogForDisplay() below. Mirrors
+    // REGISTER_PRIORITY in scraper/fetch_esma.py, which ranks the Slack
+    // notification's summary the same way.
+    priority: 0,
     // Unlike the other registers, CASPs blends ESMA's own export with AFM-
     // sourced entities not yet in it (see merge_esma_and_afm_casps() in
     // fetch_esma.py) - the footer's default "Bron: ESMA..." line only tells
@@ -441,6 +493,7 @@ const REGISTERS = {
     label: t("registers.art.label"),
     shortLabel: t("registers.art.shortLabel"),
     file: "art",
+    priority: 2,
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
       { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
@@ -481,6 +534,7 @@ const REGISTERS = {
     label: t("registers.emt.label"),
     shortLabel: t("registers.emt.shortLabel"),
     file: "emt",
+    priority: 1,
     searchFields: (r) => [r.name, r.commercial_name, r.lei, r.website, r.competent_authority],
     columns: [
       { key: "name", label: t("columns.name"), value: (r) => r.commercial_name || r.name || "—", ellipsis: true },
@@ -526,6 +580,7 @@ const REGISTERS = {
     label: t("registers.whitepapers.label"),
     shortLabel: t("registers.whitepapers.shortLabel"),
     file: "whitepapers",
+    priority: 3,
     searchFields: (r) => [r.name, r.lei, r.competent_authority],
     columns: [
       { key: "name", label: t("columns.nameIssuer"), value: (r) => r.name || "—", ellipsis: true },
@@ -560,6 +615,7 @@ const REGISTERS = {
     label: t("registers.non_compliant.label"),
     shortLabel: t("registers.non_compliant.shortLabel"),
     file: "non_compliant",
+    priority: 4,
     searchFields: (r) => [r.name, r.lei, r.website, r.competent_authority],
     columns: [
       { key: "name", label: t("columns.name"), value: (r) => r.name || "—", ellipsis: true },
