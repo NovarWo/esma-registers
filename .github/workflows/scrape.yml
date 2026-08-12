@@ -1,4 +1,4 @@
-name: ESMA MiCAR register scrape
+name: MiCAR register scrape
 
 on:
   schedule:
@@ -49,7 +49,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "chore(data): update ESMA MiCAR register snapshot ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git commit -m "chore(data): update MiCAR register snapshot ($(date -u +'%Y-%m-%d %H:%M UTC'))"
             # main may have moved (e.g. someone manually uploaded a file via the
             # GitHub web UI) between checkout and this push, so rebase onto the
             # latest remote commit first. Retry a few times in case of a race.
@@ -87,6 +87,6 @@ jobs:
           PAYLOAD=$(jq -n \
             --arg count "$CHANGE_COUNT" \
             --arg summary "$CHANGE_SUMMARY" \
-            --arg url "https://novarwo.github.io/esma-registers/changelog.html" \
-            '{message: ("📋 *ESMA MiCAR register bijgewerkt*\n" + $count + " nieuwe wijziging(en) gevonden:\n```" + $summary + "```\n<" + $url + "|Bekijk de wijzigingsgeschiedenis>")}')
+            --arg url "https://novarwo.github.io/micar-registers/changelog.html" \
+            '{message: ("📋 *MiCAR-register bijgewerkt*\n" + $count + " nieuwe wijziging(en) gevonden:\n```" + $summary + "```\n<" + $url + "|Bekijk de wijzigingsgeschiedenis>")}')
           curl -sf -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
