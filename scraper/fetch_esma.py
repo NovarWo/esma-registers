@@ -628,16 +628,29 @@ _SERVICE_KEYWORDS = [
 ]
 
 
-def extract_service_code(raw: str | None) -> str | None:
+def extract_service_codes(raw: str | None) -> list[str]:
+    """Most ESMA rows name exactly one service per segment (after splitting on
+    "|"), usually with a leading letter prefix ("a. providing custody...") -
+    for those, the prefix is authoritative and wins outright, no need to also
+    keyword-scan the rest of the sentence. But some real-world rows (e.g.
+    "Ronin EM Ltd") write ALL of a CASP's services as a single unprefixed,
+    "/"-joined sentence instead of repeating/pipe-joining per service - a
+    plain first-match keyword scan would then silently recognise only
+    whichever service happened to be mentioned first and drop the rest. So
+    without a prefix, this scans for every keyword that appears anywhere in
+    the text and returns all of them, not just the first."""
     if not raw:
-        return None
+        return []
     m = _SERVICE_CODE_RE.match(raw)
     if m:
-        return m.group(1).lower()
-    for code, pattern in _SERVICE_KEYWORDS:
-        if pattern.search(raw):
-            return code
-    return None
+        return [m.group(1).lower()]
+    return [code for code, pattern in _SERVICE_KEYWORDS if pattern.search(raw)]
+
+
+def extract_service_code(raw: str | None) -> str | None:
+    """Back-compat single-code accessor - prefer extract_service_codes()."""
+    codes = extract_service_codes(raw)
+    return codes[0] if codes else None
 
 
 def _index_services_by_code(services: list[dict] | None) -> dict[str, set[str]]:
@@ -645,8 +658,7 @@ def _index_services_by_code(services: list[dict] | None) -> dict[str, set[str]]:
     idx: dict[str, set[str]] = {}
     for s in services or []:
         for part in (s.get("service") or "").split("|"):
-            code = extract_service_code(part.strip())
-            if code:
+            for code in extract_service_codes(part.strip()):
                 idx.setdefault(code, set()).update(s.get("countries") or [])
     return idx
 
@@ -734,6 +746,23 @@ def _change_priority_key(c: dict) -> tuple:
     return (register_rank, is_new_casp)
 
 
+# Once a record is removed, data/<register>.json no longer has it - there's
+# nothing left to look up its original registration date from. So a
+# "removed" changelog entry snapshots it from the last-known record right
+# here, at the moment of removal, into the entry itself (see the site's
+# openRemovedDetail() in assets/js/app.js, which shows this alongside the
+# entry's own timestamp as the removal date). Non-compliant has no
+# authorisation date (it was never authorised) - its decision_date is the
+# closest equivalent "when this was first recorded" fact. Whitepapers has no
+# suitable entity-level date field at all, so it's intentionally omitted.
+REGISTRATION_DATE_FIELD = {
+    "casps": "authorisation_date",
+    "art": "authorisation_date",
+    "emt": "authorisation_date",
+    "non_compliant": "decision_date",
+}
+
+
 def diff_records(register: str, previous: dict[str, dict], current: list[dict]) -> list[dict]:
     changes = []
     current_ids = set()
@@ -750,7 +779,11 @@ def diff_records(register: str, previous: dict[str, dict], current: list[dict]) 
             changes.append(entry)
     for old_id, old_rec in previous.items():
         if old_id not in current_ids:
-            changes.append({"type": "removed", "register": register, "id": old_id, "name": old_rec.get("name")})
+            entry = {"type": "removed", "register": register, "id": old_id, "name": old_rec.get("name")}
+            date_field = REGISTRATION_DATE_FIELD.get(register)
+            if date_field and old_rec.get(date_field):
+                entry["registered_on"] = old_rec[date_field]
+            changes.append(entry)
     return changes
 
 
