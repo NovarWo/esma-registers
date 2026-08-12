@@ -13881,5 +13881,100 @@
     "id": "b793487ca5ba8e89",
     "name": "TBT Global Ltd",
     "timestamp": "2026-08-12T10:45:11+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "2664abde3c6d634c",
+    "name": "MINOS GLOBAL S.L.",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "8c4d938f24ad43d7",
+    "name": "BASQUE PAY S.L.",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "e3cf4c4141a5d0b5",
+    "name": "FINTECH PAYMENTS PSC S.L.",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "c8d2295586532205",
+    "name": "MINOS GLOBAL S.L.",
+    "registered_on": "30/06/2026",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "a5982bb4e511ac2c",
+    "name": "BASQUE PAY S.L.",
+    "registered_on": "31/07/2026",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "9ba7b1a11b5446b0",
+    "name": "FINTECH PAYMENTS PSC S.L.",
+    "registered_on": "31/07/2026",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "95b84cdbb7f44e35",
+    "name": "Ramp Swaps (Ireland) Limited",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "8ade0aa9b4793f5d",
+    "name": "WEB3 Technology B.V.",
+    "registered_on": "2026-02-12",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "07598c777a09d407",
+    "name": "Newrails, UAB",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "7c84311f9f752f5b",
+    "name": "NOEMON FINANCE LIMITED",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "ed909cf6fe4eff8b",
+    "name": "Decentralized, UAB",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "d91e117f94c093e9",
+    "name": "Lightspark Payments Europe AS",
+    "timestamp": "2026-08-12T17:44:45+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "4d92482cfa3443b7",
+    "name": "OSL EU GmbH",
+    "timestamp": "2026-08-12T17:44:45+00:00"
   }
 ]
