@@ -1,6 +1,6 @@
 {
   "register": "emt",
-  "generated_at": "2026-08-12T06:59:19+00:00",
+  "generated_at": "2026-08-12T08:53:33+00:00",
   "records": [
     {
       "id": "0673627ac8c1d954",
@@ -755,6 +755,33 @@
       "institution_type": "Electronic money institution",
       "exemption_48_4": "No",
       "exemption_48_5": "No"
+    },
+    {
+      "id": "ea0a1bdb24e748b9",
+      "competent_authority": "Bank of Slovenia",
+      "home_member_state": "SI",
+      "name": "DINARO company for electronic money issuing and payment services Ltd.",
+      "lei": "48510062OP64BYKPNO22",
+      "head_office_country": "SI",
+      "commercial_name": "Dinaro",
+      "address": "Bravničarjeva ulica 13, 1000 Ljubljana, Slovenia",
+      "website": "www.dinaro.si",
+      "authorisation_date": "02/11/2021",
+      "withdrawal_date": null,
+      "status": "active",
+      "whitepapers": [
+        {
+          "url": "https://dinaro.si/mica-eurgh-whitepaper",
+          "start_date": "01/09/2026",
+          "dti": "M5ZR1C4B3",
+          "dti_ffg": "2682FMR4J",
+          "comments": null,
+          "last_update": "07/08/2026"
+        }
+      ],
+      "institution_type": "Electronic money institution",
+      "exemption_48_4": null,
+      "exemption_48_5": null
     }
   ]
 }

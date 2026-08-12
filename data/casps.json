@@ -1,6 +1,6 @@
 {
   "register": "casps",
-  "generated_at": "2026-08-12T06:59:19+00:00",
+  "generated_at": "2026-08-12T08:53:33+00:00",
   "records": [
     {
       "id": "67737a1e35f92605",
@@ -4676,14 +4676,6 @@
         {
           "service": "Reception and transmission of client orders/ Execution of orders on behalf of clients/ Exchange between crypto assets and fiat currency/ Exchange between crypto assets/ Providing custody and administration of crypto-assets on behalf of clients/ Providing transfer services for crypto-assets on behalf of clients",
           "countries": [
-            "CY"
-          ],
-          "comments": null,
-          "last_update": "15/07/2026"
-        },
-        {
-          "service": "Reception and transmission of client orders/ Execution of orders on behalf of clients/ Exchange between crypto assets and fiat currency/ Exchange between crypto assets/ Providing custody and administration of crypto-assets on behalf of clients/ Providing transfer services for crypto-assets on behalf of clients",
-          "countries": [
             "AT",
             "BE",
             "BG",
@@ -7035,43 +7027,27 @@
       "source": "esma"
     },
     {
-      "id": "fdfee33c060a32ca",
+      "id": "9b32c5aa5665460c",
       "competent_authority": "Czech National Bank (CNB)",
       "home_member_state": "CZ",
-      "name": "Altlift s.r.o.",
-      "lei": "8945004PZEJSSPTTVB16",
+      "name": "Partners Banka, a.s.",
+      "lei": "315700J0QGFRKN11MF15",
       "head_office_country": "CZ",
       "commercial_name": null,
-      "address": "Korunní 2569/108, 101 00 Praha",
-      "website": "ttps://www.altlift.cz/",
+      "address": "Türkova 2319/5b, 149 00 Praha",
+      "website": "https://www.partnersbanka.cz/",
       "platform_website": null,
-      "authorisation_date": "30/06/2026",
+      "authorisation_date": "29/07/2026",
       "withdrawal_date": null,
       "status": "active",
       "services": [
-        {
-          "service": "e. execution of orders for crypto-assets on behalf of clients",
-          "countries": [
-            "CZ"
-          ],
-          "comments": null,
-          "last_update": "26/06/2026"
-        },
         {
           "service": "g. reception and transmission of orders for crypto-assets on behalf of clients",
           "countries": [
             "CZ"
           ],
           "comments": null,
-          "last_update": "26/06/2026"
-        },
-        {
-          "service": "h. providing advice on crypto-assets",
-          "countries": [
-            "CZ"
-          ],
-          "comments": null,
-          "last_update": "26/06/2026"
+          "last_update": "04/08/2026"
         }
       ],
       "source": "esma"
@@ -10526,6 +10502,32 @@
       "source": "esma"
     },
     {
+      "id": "4ea02d5e07c87abf",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Volksbank Beilstein-Ilsfeld-Abstatt eG",
+      "lei": "5299002RCY3D5M211G35",
+      "head_office_country": "DE",
+      "commercial_name": "Volksbank Beilstein-Ilsfeld-Abstatt eG",
+      "address": "Hauptstraß3 20, 71717 Beilstein",
+      "website": "www.vb-bia.de",
+      "platform_website": null,
+      "authorisation_date": "06/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "06/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
       "id": "5851ed02452fae27",
       "competent_authority": "Finanstilsynet",
       "home_member_state": "DK",
@@ -10549,6 +10551,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10585,6 +10588,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10621,6 +10625,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10657,6 +10662,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10693,6 +10699,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10729,6 +10736,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10765,6 +10773,7 @@
             "CY",
             "CZ",
             "DE",
+            "DK",
             "EE",
             "ES",
             "FI",
@@ -10814,7 +10823,8 @@
           "service": "a. providing custody and administration of crypto-assets on behalf of clients",
           "countries": [
             "NO",
-            "SE"
+            "SE",
+            "DK"
           ],
           "comments": null,
           "last_update": "04/03/2026"
@@ -10823,7 +10833,8 @@
           "service": "e. execution of orders for crypto-assets on behalf of clients",
           "countries": [
             "NO",
-            "SE"
+            "SE",
+            "DK"
           ],
           "comments": null,
           "last_update": "04/03/2026"
@@ -10849,7 +10860,8 @@
         {
           "service": "c. exchange of crypto-assets for funds",
           "countries": [
-            "NL"
+            "NL",
+            "DK"
           ],
           "comments": null,
           "last_update": "09/03/2026"
@@ -10857,7 +10869,8 @@
         {
           "service": "d. exchange of crypto-assets for other crypto-assets",
           "countries": [
-            "NL"
+            "NL",
+            "DK"
           ],
           "comments": null,
           "last_update": "09/03/2026"
@@ -10865,7 +10878,8 @@
         {
           "service": "e. execution of orders for crypto-assets on behalf of clients",
           "countries": [
-            "NL"
+            "NL",
+            "DK"
           ],
           "comments": null,
           "last_update": "09/03/2026"
@@ -10873,7 +10887,8 @@
         {
           "service": "j. providing transfer services for crypto-assets on behalf of clients",
           "countries": [
-            "NL"
+            "NL",
+            "DK"
           ],
           "comments": null,
           "last_update": "09/03/2026"
@@ -10888,8 +10903,8 @@
       "name": "Northstake ApS",
       "lei": "98450010C0CB6A4E8A79",
       "head_office_country": "DK",
-      "commercial_name": "Northstake ApS",
-      "address": "Amaliegade 45 st, 1256 Kopenhavn K",
+      "commercial_name": "Northstake",
+      "address": "Amaliegade 45 st, 1256 København K",
       "website": "www.northstake.dk",
       "platform_website": null,
       "authorisation_date": "07/04/2026",
@@ -11301,7 +11316,7 @@
       "address": "Kålundsvej 18, 3520 Farum",
       "website": "https://www.safelynx.io/",
       "platform_website": null,
-      "authorisation_date": "08/07/2026",
+      "authorisation_date": "30/06/2026",
       "withdrawal_date": null,
       "status": "active",
       "services": [
@@ -11340,7 +11355,7 @@
             "SK"
           ],
           "comments": null,
-          "last_update": "17/07/2026"
+          "last_update": "10/08/2026"
         }
       ],
       "source": "esma"

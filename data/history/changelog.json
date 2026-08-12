@@ -12073,5 +12073,101 @@
       "address: Calle San Juan de Ortega, núm. 10, esc 1, puerta B, local Correoslabs, 28050, Madrid → Calle San Juan de Ortega núm. 10 esc 1 puerta B local Correoslabs. 28050 Madrid"
     ],
     "timestamp": "2026-08-05T15:03:03+00:00"
+  },
+  {
+    "type": "added",
+    "register": "emt",
+    "id": "ea0a1bdb24e748b9",
+    "name": "DINARO company for electronic money issuing and payment services Ltd.",
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "b904b3184a2e08ab",
+    "name": "Ronin EM Ltd",
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "9b32c5aa5665460c",
+    "name": "Partners Banka, a.s.",
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "4ea02d5e07c87abf",
+    "name": "Volksbank Beilstein-Ilsfeld-Abstatt eG",
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "5851ed02452fae27",
+    "name": "Penning Financial Services ApS",
+    "detail": [
+      "Bewaring nu ook aangeboden in: DK",
+      "Wisselen — fiat nu ook aangeboden in: DK",
+      "Wisselen — crypto nu ook aangeboden in: DK",
+      "Orderuitvoering nu ook aangeboden in: DK",
+      "Orderdoorgifte nu ook aangeboden in: DK",
+      "Vermogensbeheer nu ook aangeboden in: DK",
+      "Overdracht nu ook aangeboden in: DK"
+    ],
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "a898ea88d2544344",
+    "name": "Lunar Block A/S",
+    "detail": [
+      "Bewaring nu ook aangeboden in: DK",
+      "Orderuitvoering nu ook aangeboden in: DK"
+    ],
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "79efe6d966f9e40f",
+    "name": "GC Exchange A/S",
+    "detail": [
+      "Wisselen — fiat nu ook aangeboden in: DK",
+      "Wisselen — crypto nu ook aangeboden in: DK",
+      "Orderuitvoering nu ook aangeboden in: DK",
+      "Overdracht nu ook aangeboden in: DK"
+    ],
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "120ff971130445d4",
+    "name": "Northstake ApS",
+    "detail": [
+      "commercial name: Northstake ApS → Northstake",
+      "address: Amaliegade 45 st, 1256 Kopenhavn K → Amaliegade 45 st, 1256 København K"
+    ],
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "75a781542c564d15",
+    "name": "SafeLynx Technologies ApS",
+    "detail": [
+      "authorisation date: 08/07/2026 → 30/06/2026"
+    ],
+    "timestamp": "2026-08-12T08:53:33+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "fdfee33c060a32ca",
+    "name": "Altlift s.r.o.",
+    "timestamp": "2026-08-12T08:53:33+00:00"
   }
 ]
