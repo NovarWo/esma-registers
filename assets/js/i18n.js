@@ -1,4 +1,4 @@
-/* ESMA MiCAR Register Tracker — bilingual (NL/EN) UI text.
+/* MiCAR Register Tracker — bilingual (NL/EN) UI text.
  * Loaded BEFORE app.js in every page: app.js and the inline page scripts call
  * t("some.path") to get the current-language string. No build step, no
  * framework — language switching just persists the choice and reloads the
@@ -40,7 +40,7 @@ const TRANSLATIONS = {
       dashboard: "Dashboard", casps: "CASPs", art: "ART", emt: "EMT",
       whitepapers: "Whitepapers", non_compliant: "Non-compliant", changelog: "Wijzigingen",
     },
-    brand: { title: "ESMA MiCAR Register Tracker" },
+    brand: { title: "MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
       subtitle: "Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers. Automatisch bijgewerkt.",
@@ -88,11 +88,7 @@ const TRANSLATIONS = {
       clearAll: "Alles wissen",
     },
     buttons: { resetFilters: "Reset filters", exportCsv: "Exporteer CSV", close: "Sluiten" },
-    theme: {
-      toggleLabel: "Weergave", auto: "Systeem", light: "Licht", dark: "Donker",
-      autoTitle: (mode) => `Systeeminstelling volgen (nu: ${mode})`,
-      lightTitle: "Altijd licht", darkTitle: "Altijd donker",
-    },
+    theme: { toggleLabel: "Weergave", light: "Licht", dark: "Donker" },
     status: { active: "Actief", withdrawn: "Ingetrokken", unknown: "Onbekend" },
     table: {
       count: (shown, total) => `${shown} van ${total} records`,
@@ -110,6 +106,12 @@ const TRANSLATIONS = {
       dataSourceEsma: "ESMA",
       dataSourceAfm: "AFM (nog niet in ESMA's eigen register)",
       whatChanged: "Wat is er gewijzigd",
+      changeDetail: {
+        serviceAdded: (label) => `${label} toegevoegd aan dienstverlening`,
+        serviceRemoved: (label) => `${label} niet langer aangeboden`,
+        serviceCountriesAdded: (label, list) => `${label} nu ook aangeboden in: ${list}`,
+        serviceCountriesRemoved: (label, list) => `${label} niet langer aangeboden in: ${list}`,
+      },
       registeredOn: "Geregistreerd op",
       removedOn: "Verwijderd op",
       competentAuthority: "Bevoegde autoriteit", homeMemberState: "Lidstaat", lei: "LEI",
@@ -171,7 +173,7 @@ const TRANSLATIONS = {
       dashboard: "Dashboard", casps: "CASPs", art: "ART", emt: "EMT",
       whitepapers: "Whitepapers", non_compliant: "Non-compliant", changelog: "Changes",
     },
-    brand: { title: "ESMA MiCAR Register Tracker" },
+    brand: { title: "MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
       subtitle: "Searchable mirror of the 5 official ESMA MiCAR registers. Updated automatically.",
@@ -219,11 +221,7 @@ const TRANSLATIONS = {
       clearAll: "Clear all",
     },
     buttons: { resetFilters: "Reset filters", exportCsv: "Export CSV", close: "Close" },
-    theme: {
-      toggleLabel: "Appearance", auto: "System", light: "Light", dark: "Dark",
-      autoTitle: (mode) => `Follow system setting (currently: ${mode})`,
-      lightTitle: "Always light", darkTitle: "Always dark",
-    },
+    theme: { toggleLabel: "Appearance", light: "Light", dark: "Dark" },
     status: { active: "Active", withdrawn: "Withdrawn", unknown: "Unknown" },
     table: {
       count: (shown, total) => `${shown} of ${total} records`,
@@ -241,6 +239,12 @@ const TRANSLATIONS = {
       dataSourceEsma: "ESMA",
       dataSourceAfm: "AFM (not yet in ESMA's own register)",
       whatChanged: "What changed",
+      changeDetail: {
+        serviceAdded: (label) => `${label} added to services offered`,
+        serviceRemoved: (label) => `${label} no longer offered`,
+        serviceCountriesAdded: (label, list) => `${label} now also offered in: ${list}`,
+        serviceCountriesRemoved: (label, list) => `${label} no longer offered in: ${list}`,
+      },
       registeredOn: "Registered on",
       removedOn: "Removed on",
       competentAuthority: "Competent authority", homeMemberState: "Home member state", lei: "LEI",

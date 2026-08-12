@@ -140,12 +140,13 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
   border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
 }
 .theme-toggle__btn {
-  font-family: inherit; font-size: .75rem; font-weight: 700; letter-spacing: .02em; cursor: pointer;
+  font-family: inherit; font-size: .9375rem; line-height: 1; cursor: pointer;
   border: none; background: none; color: var(--text-muted); border-radius: var(--radius-pill);
-  padding: 5px 11px; transition: background .15s ease, color .15s ease;
+  padding: 6px 9px; transition: background .15s ease, color .15s ease, opacity .15s ease;
+  opacity: .55; filter: grayscale(1);
 }
-.theme-toggle__btn:hover { color: var(--text); }
-.theme-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
+.theme-toggle__btn:hover { opacity: .85; }
+.theme-toggle__btn.is-active { background: var(--color-primary-lighter); opacity: 1; filter: none; }
 
 /* Page header */
 .page-header { margin-bottom: 28px; }

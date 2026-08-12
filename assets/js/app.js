@@ -1039,12 +1039,33 @@ function ensureOverlay() {
 // summary is shown above the record's regular fields. Used when opening this
 // same detail view from a "changed" row in the changelog (see
 // buildChangelogItem() below); register.html's own row clicks don't pass it.
+// Renders one describe_record_change() item (from scraper/fetch_esma.py) as
+// display text in the *viewer's currently selected* language. Generic
+// field-diff lines are already plain strings (their raw field names/values
+// are language-invariant, so there's nothing to translate) and pass through
+// unchanged - same as legacy changelog entries from before this structured
+// format existed, which are 100% such strings. Structured service-change
+// dicts get expanded here via t(), mirroring format_change_line_nl() in
+// fetch_esma.py (which does the same for the Slack notification, always in
+// Dutch since Slack has no per-viewer language).
+function describeChangeLine(line) {
+  if (typeof line === "string") return line;
+  const label = (CASP_SERVICE_BY_CODE[line.code] || {}).label || line.code;
+  switch (line.kind) {
+    case "service_added": return t("detail.changeDetail.serviceAdded", label);
+    case "service_removed": return t("detail.changeDetail.serviceRemoved", label);
+    case "service_countries_added": return t("detail.changeDetail.serviceCountriesAdded", label, line.countries.join(", "));
+    case "service_countries_removed": return t("detail.changeDetail.serviceCountriesRemoved", label, line.countries.join(", "));
+    default: return label;
+  }
+}
+
 function openDetail(config, record, changeLines) {
   const overlay = ensureOverlay();
   overlay.querySelector("#detail-title").textContent = record.commercial_name || record.name || t("detail.titleFallback");
   overlay.querySelector("#detail-meta").textContent = config.label;
   const changeSummaryHtml = (changeLines && changeLines.length)
-    ? `<div class="detail-change-summary"><h3>${escapeHtml(t("detail.whatChanged"))}</h3><ul>${changeLines.map((d) => `<li>${escapeHtml(d)}</li>`).join("")}</ul></div>`
+    ? `<div class="detail-change-summary"><h3>${escapeHtml(t("detail.whatChanged"))}</h3><ul>${changeLines.map((d) => `<li>${escapeHtml(describeChangeLine(d))}</li>`).join("")}</ul></div>`
     : "";
   overlay.querySelector("#detail-body").innerHTML = changeSummaryHtml + config.detail(record);
   overlay.classList.add("open");
@@ -1190,11 +1211,14 @@ function highlightNav(current) {
 }
 
 // --------------------------------------------------------------------------
-// Light/dark theme toggle - defaults to following the OS/browser's
-// prefers-color-scheme setting, with an explicit "always light"/"always dark"
-// override the user can pick instead. The actual re-theming is pure CSS (see
-// :root[data-theme="dark"] in style.css) - this just decides which value that
-// attribute should have and keeps it in sync with system-setting changes.
+// Light/dark theme toggle (☀️/🌙) - every fresh visit starts from the OS/
+// browser's prefers-color-scheme setting; picking a theme overrides that for
+// the rest of the browsing session only (sessionStorage, not localStorage),
+// so the next time someone visits, it again starts from whatever the system
+// says. The actual re-theming is pure CSS (see :root[data-theme="dark"] in
+// style.css) - this just decides which value that attribute should have and
+// keeps it in sync with system-setting changes for as long as nothing has
+// been explicitly picked yet this session.
 //
 // The very first paint is handled by a tiny inline script in each page's
 // <head> (before this file loads) that mirrors resolveTheme()'s logic, so the
@@ -1204,21 +1228,18 @@ function highlightNav(current) {
 const THEME_KEY = "esma-tracker-theme";
 const darkSchemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
-// The user's explicit choice, or null if they haven't overridden the system
-// setting (i.e. "auto"/"systeem" mode).
+// This session's explicit choice, or null if nothing's been picked yet (i.e.
+// still following the system setting).
 function getThemeOverride() {
   try {
-    const stored = localStorage.getItem(THEME_KEY);
+    const stored = sessionStorage.getItem(THEME_KEY);
     if (stored === "light" || stored === "dark") return stored;
-  } catch (e) { /* localStorage unavailable (e.g. private browsing) */ }
+  } catch (e) { /* sessionStorage unavailable (e.g. private browsing) */ }
   return null;
 }
 
 function setThemeOverride(mode) {
-  try {
-    if (mode === "light" || mode === "dark") localStorage.setItem(THEME_KEY, mode);
-    else localStorage.removeItem(THEME_KEY); // back to "auto"
-  } catch (e) { /* ignore */ }
+  try { sessionStorage.setItem(THEME_KEY, mode); } catch (e) { /* ignore */ }
   applyTheme();
 }
 
@@ -1226,7 +1247,7 @@ function systemPrefersDark() {
   return !!(darkSchemeQuery && darkSchemeQuery.matches);
 }
 
-// The concrete "light"/"dark" outcome, given the current override (if any)
+// The concrete "light"/"dark" outcome, given this session's override (if any)
 // and the current system setting.
 function resolveTheme() {
   return getThemeOverride() || (systemPrefersDark() ? "dark" : "light");
@@ -1240,32 +1261,33 @@ function applyTheme() {
 }
 
 applyTheme();
-// Keep "auto" mode live: if the user hasn't overridden the theme and the OS
-// setting flips while this tab is open, follow it immediately rather than
-// only picking it up on the next full page load.
+// Keep following the system live for as long as nothing's been explicitly
+// picked this session: if the OS setting flips while this tab is open,
+// follow it immediately rather than only picking it up on the next reload.
 if (darkSchemeQuery) {
   const onSystemChange = () => { if (!getThemeOverride()) applyTheme(); };
   if (darkSchemeQuery.addEventListener) darkSchemeQuery.addEventListener("change", onSystemChange);
   else if (darkSchemeQuery.addListener) darkSchemeQuery.addListener(onSystemChange); // older Safari
 }
 
-// Segmented Systeem/Licht/Donker control, same visual pattern as the NL/EN
-// lang-toggle. Unlike the language toggle, switching theme is a pure CSS
-// variable swap - no page reload needed, so this just re-renders its own
-// active-state highlighting in place.
+// Compact sun/moon toggle, same segmented-pill visual pattern as the NL/EN
+// lang-toggle it sits next to. Unlike the language toggle, switching theme is
+// a pure CSS variable swap - no page reload needed, so this just re-renders
+// its own active-state highlighting in place. The active button always
+// reflects the current *resolved* theme (system-followed or overridden alike)
+// - clicking the other one makes this session's choice explicit.
 function renderThemeToggle(container) {
   const wrap = el("div", { class: "theme-toggle", role: "group", "aria-label": t("theme.toggleLabel") });
   const modes = [
-    { value: null, label: t("theme.auto"), title: t("theme.autoTitle", resolveTheme() === "dark" ? t("theme.dark") : t("theme.light")) },
-    { value: "light", label: t("theme.light"), title: t("theme.lightTitle") },
-    { value: "dark", label: t("theme.dark"), title: t("theme.darkTitle") },
+    { value: "light", icon: "☀️", title: t("theme.light") },
+    { value: "dark", icon: "🌙", title: t("theme.dark") },
   ];
   const paint = () => {
-    const current = getThemeOverride();
+    const current = resolveTheme();
     [...wrap.children].forEach((btn, i) => btn.classList.toggle("is-active", modes[i].value === current));
   };
   for (const mode of modes) {
-    const btn = el("button", { type: "button", class: "theme-toggle__btn", title: mode.title }, escapeHtml(mode.label));
+    const btn = el("button", { type: "button", class: "theme-toggle__btn", title: mode.title, "aria-label": mode.title }, mode.icon);
     btn.addEventListener("click", () => { setThemeOverride(mode.value); paint(); });
     wrap.appendChild(btn);
   }
