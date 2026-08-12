@@ -663,26 +663,57 @@ def _index_services_by_code(services: list[dict] | None) -> dict[str, set[str]]:
     return idx
 
 
-def describe_service_changes(old_services: list[dict] | None, new_services: list[dict] | None) -> list[str]:
-    """Human-readable (Dutch) lines describing what changed in a CASP's
-    services: a new service type added, a service dropped, or - for a
-    service offered in both snapshots - countries added/removed."""
+def describe_service_changes(old_services: list[dict] | None, new_services: list[dict] | None) -> list[dict]:
+    """Structured, language-neutral description of what changed in a CASP's
+    services: a new service type added, a service dropped, or - for a service
+    offered in both snapshots - countries added/removed.
+
+    This used to return pre-formatted Dutch sentences directly, which baked a
+    fixed language into data/history/changelog.json - fine for the (always
+    Dutch) Slack notification, but wrong once the *website* displays the same
+    "what changed" text: a visitor with the EN toggle selected would still see
+    Dutch service names like "Wisselen — fiat" inside an otherwise-English
+    detail panel. Returning small {kind, code, ...} dicts instead lets each
+    consumer render its own language: format_change_line_nl() below expands
+    them to the Dutch sentences for Slack, and describeChangeLine() in
+    assets/js/app.js expands them via the site's own t() for the viewer's
+    current language."""
     old_idx = _index_services_by_code(old_services)
     new_idx = _index_services_by_code(new_services)
-    lines = []
+    lines: list[dict] = []
     for code in sorted(new_idx.keys() - old_idx.keys()):
-        lines.append(f"{SERVICE_LABELS_NL.get(code, code)} toegevoegd aan dienstverlening")
+        lines.append({"kind": "service_added", "code": code})
     for code in sorted(old_idx.keys() - new_idx.keys()):
-        lines.append(f"{SERVICE_LABELS_NL.get(code, code)} niet langer aangeboden")
+        lines.append({"kind": "service_removed", "code": code})
     for code in sorted(old_idx.keys() & new_idx.keys()):
-        label = SERVICE_LABELS_NL.get(code, code)
         added = sorted(new_idx[code] - old_idx[code])
         removed = sorted(old_idx[code] - new_idx[code])
         if added:
-            lines.append(f"{label} nu ook aangeboden in: {', '.join(added)}")
+            lines.append({"kind": "service_countries_added", "code": code, "countries": added})
         if removed:
-            lines.append(f"{label} niet langer aangeboden in: {', '.join(removed)}")
+            lines.append({"kind": "service_countries_removed", "code": code, "countries": removed})
     return lines
+
+
+def format_change_line_nl(line: dict | str) -> str:
+    """Renders one describe_record_change() item as the Dutch sentence it used
+    to be, for the (always-Dutch) Slack notification. Generic field-diff lines
+    are already plain strings (never had a language-specific baking problem -
+    see describe_record_change()) and pass through unchanged; structured
+    service-change dicts get expanded via SERVICE_LABELS_NL."""
+    if isinstance(line, str):
+        return line
+    label = SERVICE_LABELS_NL.get(line["code"], line["code"])
+    kind = line["kind"]
+    if kind == "service_added":
+        return f"{label} toegevoegd aan dienstverlening"
+    if kind == "service_removed":
+        return f"{label} niet langer aangeboden"
+    if kind == "service_countries_added":
+        return f"{label} nu ook aangeboden in: {', '.join(line['countries'])}"
+    if kind == "service_countries_removed":
+        return f"{label} niet langer aangeboden in: {', '.join(line['countries'])}"
+    return label
 
 
 def _fmt_value(v) -> str:
@@ -691,13 +722,17 @@ def _fmt_value(v) -> str:
     return str(v)
 
 
-def describe_record_change(old: dict, new: dict) -> list[str]:
-    """Human-readable (Dutch) lines describing what changed between two
-    snapshots of the same record - services get the detailed treatment above,
-    every other field falls back to a generic "field: oud -> nieuw" line (or
+def describe_record_change(old: dict, new: dict) -> list[dict | str]:
+    """Lines describing what changed between two snapshots of the same
+    record - services get the structured (language-neutral) treatment above,
+    every other field falls back to a generic "field: oud -> nieuw" string (or
     just "field gewijzigd" for list/dict-valued fields we don't want to dump
-    raw into a Slack message, e.g. a register's "whitepapers" list)."""
-    lines: list[str] = []
+    raw into a Slack message, e.g. a register's "whitepapers" list). Those
+    generic lines use raw field names/values, not translated prose, so - unlike
+    the service lines - a plain string is fine for them in both Slack and the
+    website; see format_change_line_nl() and describeChangeLine() (in
+    assets/js/app.js) for how each consumer renders a mixed list of these."""
+    lines: list[dict | str] = []
     if old.get("services") != new.get("services"):
         lines.extend(describe_service_changes(old.get("services"), new.get("services")))
     for key, new_val in new.items():
@@ -887,7 +922,7 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
             # - added/removed records, or a changed record where nothing
             # specific could be described, fall back to the plain type label.
             if c["type"] == "changed" and c.get("detail"):
-                detail_lines.extend(f"{header} -> {d}" for d in c["detail"])
+                detail_lines.extend(f"{header} -> {format_change_line_nl(d)}" for d in c["detail"])
             else:
                 detail_lines.append(f"{header} ({TYPE_LABELS_NL.get(c['type'], c['type'])})")
         summary_lines = detail_lines[:MAX_SUMMARY_LINES]
