@@ -258,8 +258,15 @@ table.data thead tr.col-filter-row th.col-filter-cell {
 }
 .col-filter-dropdown__chevron { width: 12px; height: 12px; flex: none; }
 
+/* position: fixed with JS-computed top/left (see positionFloatingPanel() in
+   app.js), not position: absolute anchored to .col-filter-dropdown - the
+   panel is appended straight to <body> when built, specifically so it is
+   never subject to .table-wrap's overflow-x: auto (which - per the CSS
+   Overflow spec - forces overflow-y to compute as "auto" too, silently
+   clipping an absolutely-positioned child once a filter narrows the table
+   down to too few rows to contain the open panel). */
 .col-filter-dropdown__list {
-  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 30;
+  display: none; position: fixed; z-index: 30;
   min-width: 210px; max-width: 280px; max-height: 260px; overflow-y: auto;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
   box-shadow: var(--shadow-medium); padding: 6px;
@@ -313,8 +320,10 @@ table.data thead tr.col-filter-row th.col-filter-cell {
   font-size: .6875rem; font-weight: 700; line-height: 1;
 }
 
+/* position: fixed + JS-computed top/left, appended to <body> - same reasoning
+   as .col-filter-dropdown__list above. */
 .chip-popover {
-  display: none; flex-wrap: wrap; gap: 6px; position: absolute; top: calc(100% + 6px); left: 0; z-index: 30;
+  display: none; flex-wrap: wrap; gap: 6px; position: fixed; z-index: 30;
   width: max-content; max-width: 280px; background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-medium); padding: 10px;
 }

@@ -215,6 +215,41 @@ function wireGlobalPopoverClose() {
   if (popoverCloseWired) return;
   popoverCloseWired = true;
   document.addEventListener("click", () => closeAllPopovers());
+  // Both panel types are position: fixed, anchored to their trigger button's
+  // own on-screen position (see positionFloatingPanel() below) rather than
+  // being laid out by their original <th> ancestor - so if the page (or the
+  // table's own horizontal scrollbar) scrolls, or the window resizes, while
+  // one is open, it needs to be re-measured or it'll visibly drift away from
+  // its button. `capture: true` also catches scrolling inside .table-wrap
+  // itself, which doesn't bubble as a normal "scroll" event on window/document.
+  const repositionOpenPanels = () => {
+    document.querySelectorAll(".col-filter-dropdown__list.open, .chip-popover.open").forEach((p) => {
+      if (p._anchorEl) positionFloatingPanel(p, p._anchorEl);
+    });
+  };
+  window.addEventListener("scroll", repositionOpenPanels, { capture: true, passive: true });
+  window.addEventListener("resize", repositionOpenPanels);
+}
+
+// Positions a floating filter panel (a direct <body> child, position: fixed -
+// see the "appended to document.body" comments at each call site) from its
+// trigger button's current getBoundingClientRect(), instead of the CSS
+// `position: absolute; top: calc(100% + 6px)` the panel used to rely on. That
+// old approach anchored the panel inside .table-wrap, which needs
+// `overflow-x: auto` for horizontal scrolling on narrow screens - and per the
+// CSS Overflow spec, a non-"visible" overflow-x forces overflow-y to compute
+// as "auto" too (there is no way to keep one axis truly "visible" while the
+// other clips), so .table-wrap was always going to clip the panel once a
+// filter narrowed the table down to too few rows to contain it. Rendering the
+// panel as a <body> child sidesteps that ancestor entirely.
+function positionFloatingPanel(panel, anchor) {
+  const rect = anchor.getBoundingClientRect();
+  const gap = 6;
+  const panelWidth = panel.offsetWidth || 210;
+  let left = rect.left;
+  if (left + panelWidth > window.innerWidth - 8) left = Math.max(8, window.innerWidth - panelWidth - 8);
+  panel.style.top = `${rect.bottom + gap}px`;
+  panel.style.left = `${left}px`;
 }
 
 // A single-select dropdown (button + popover list), styled to match the
@@ -229,6 +264,12 @@ function buildDropdownFilter({ label, options, getValue, getLabel, optionIcon, o
     `<span class="col-filter-dropdown__current"></span><svg class="col-filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`);
   const currentLabel = btn.querySelector(".col-filter-dropdown__current");
   const list = el("div", { class: "col-filter-dropdown__list" });
+  // Appended straight to <body> (not to `wrap`/the <th> it visually belongs
+  // to) so it's positioned with position: fixed + JS-computed coordinates -
+  // see positionFloatingPanel() - instead of being clipped by .table-wrap's
+  // overflow once a filter narrows the table down to very few rows.
+  list._anchorEl = btn;
+  document.body.appendChild(list);
 
   let searchInput = null;
   if (searchable && options.length > 6) {
@@ -285,6 +326,7 @@ function buildDropdownFilter({ label, options, getValue, getLabel, optionIcon, o
     const willOpen = !list.classList.contains("open");
     closeAllPopovers();
     if (willOpen) {
+      positionFloatingPanel(list, btn);
       list.classList.add("open");
       if (searchInput) {
         searchInput.value = "";
@@ -295,7 +337,6 @@ function buildDropdownFilter({ label, options, getValue, getLabel, optionIcon, o
   });
 
   wrap.appendChild(btn);
-  wrap.appendChild(list);
   return { el: wrap, btn, list, reset: () => { current = null; updateSelected(); } };
 }
 
@@ -818,6 +859,10 @@ function renderRegisterTable(root, config, records) {
         `<span>${escapeHtml(col.label)}</span><span class="col-filter-chips__count" hidden></span>`);
       const countBadge = btn.querySelector(".col-filter-chips__count");
       const popover = el("div", { class: "chip-popover" });
+      // Appended straight to <body>, positioned via positionFloatingPanel() -
+      // see the matching comment in buildDropdownFilter() above for why.
+      popover._anchorEl = btn;
+      document.body.appendChild(popover);
       const clearBtn = el("button", { type: "button", class: "chip-popover__clear" }, escapeHtml(t("filters.clearAll")));
       clearBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -852,10 +897,12 @@ function renderRegisterTable(root, config, records) {
         e.stopPropagation();
         const willOpen = !popover.classList.contains("open");
         closeAllPopovers();
-        if (willOpen) popover.classList.add("open");
+        if (willOpen) {
+          positionFloatingPanel(popover, btn);
+          popover.classList.add("open");
+        }
       });
       wrap.appendChild(btn);
-      wrap.appendChild(popover);
       cell.appendChild(wrap);
       filterResetters.push(() => { activeFilters[col.key] = []; updateChipVisual(); });
     } else {
