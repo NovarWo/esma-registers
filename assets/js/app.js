@@ -167,21 +167,27 @@ function sortChangelogForDisplay(changelog) {
   });
 }
 
-// A "changed" entry's field-level detail (describe_record_change() in
-// fetch_esma.py) is already computed and stored in the changelog - it just
-// wasn't shown anywhere on the site. Click any changed entry that has detail
-// to expand a breakdown of what changed vs. the previous snapshot.
+// Clicking a changelog row opens the same detail overlay a register-table
+// row would: "added"/"changed" entries look up the entity's current data
+// (lazily fetched + cached per register, see loadRegisterRecords() below) and
+// reuse the register's own detail() renderer - a "changed" entry additionally
+// passes along its already-computed field-level detail (describe_record_
+// change() in fetch_esma.py) so openDetail() can show a "what changed"
+// summary on top. "removed" entries have no current record to look up (see
+// openRemovedDetail()).
 function buildChangelogItem(c) {
   const item = el("div", { class: "changelog-item" }, changelogItemHtml(c));
-  if (c.type === "changed" && c.detail && c.detail.length) {
-    item.classList.add("is-expandable");
-    item.appendChild(el("svg", {
-      class: "changelog-item__chevron", viewBox: "0 0 24 24", fill: "none",
-      stroke: "currentColor", "stroke-width": "2.6", "stroke-linecap": "round", "stroke-linejoin": "round",
-    }, `<path d="m6 9 6 6 6-6"/>`));
-    item.appendChild(el("ul", { class: "changelog-item__detail" },
-      c.detail.map((d) => `<li>${escapeHtml(d)}</li>`).join("")));
-    item.addEventListener("click", () => item.classList.toggle("is-expanded"));
+  if (c.type === "removed") {
+    item.classList.add("is-clickable");
+    item.addEventListener("click", () => openRemovedDetail(c));
+  } else if (c.type === "added" || c.type === "changed") {
+    item.classList.add("is-clickable");
+    item.addEventListener("click", async () => {
+      const records = await loadRegisterRecords(c.register);
+      const record = records.find((r) => r.id === c.id);
+      if (!record) return; // e.g. added, then removed again since - nothing current to show
+      openDetail(REGISTERS[c.register], record, c.type === "changed" ? c.detail : undefined);
+    });
   }
   return item;
 }
@@ -347,29 +353,46 @@ const CASP_SERVICE_KEYWORDS = [
   { code: "j", re: /transfer services/i },
 ];
 
-function extractServiceCode(rawPart) {
+// Most ESMA rows name exactly one service per segment (after splitting on
+// "|"), usually with a leading letter prefix ("a. providing custody...") -
+// for those, the prefix is authoritative and wins outright, no need to also
+// keyword-scan the rest of the sentence. But some real-world rows (e.g.
+// "Ronin EM Ltd") write ALL of a CASP's services as a single unprefixed,
+// "/"-joined sentence instead of repeating/pipe-joining per service - a
+// plain first-match keyword scan would then silently recognise only
+// whichever service happened to be mentioned first and drop the rest. So
+// without a prefix, this scans for every keyword that appears anywhere in
+// the text and returns all of them, not just the first.
+function extractServiceCodes(rawPart) {
   const m = /^\s*([a-j])\s*[.)]/i.exec(rawPart || "");
-  if (m) return m[1].toLowerCase();
-  const hit = CASP_SERVICE_KEYWORDS.find(({ re }) => re.test(rawPart || ""));
-  return hit ? hit.code : null;
+  if (m) return [m[1].toLowerCase()];
+  return CASP_SERVICE_KEYWORDS.filter(({ re }) => re.test(rawPart || "")).map(({ code }) => code);
+}
+
+// Back-compat single-code accessor - prefer extractServiceCodes().
+function extractServiceCode(rawPart) {
+  return extractServiceCodes(rawPart)[0] || null;
 }
 
 // Splits every service row (defensively re-splitting on "|" in case the row
 // bundles several services into one field) and buckets each part into either
-// a known MiCAR service code or an "unknown" fallback so nothing is silently
-// dropped even if ESMA's export doesn't match the expected letter-prefix shape.
+// one-or-more known MiCAR service codes or an "unknown" fallback so nothing
+// is silently dropped even if ESMA's export doesn't match the expected
+// letter-prefix shape.
 function expandCaspServiceEntries(services) {
   const known = new Map(); // code -> { countries: Set, comments: Set }
   const unknown = [];
   for (const s of services || []) {
     const parts = (s.service || "").split("|").map((p) => p.trim()).filter(Boolean);
     for (const part of parts) {
-      const code = extractServiceCode(part);
-      if (code && CASP_SERVICE_BY_CODE[code]) {
-        if (!known.has(code)) known.set(code, { countries: new Set(), comments: new Set() });
-        const entry = known.get(code);
-        (s.countries || []).forEach((c) => entry.countries.add(c));
-        if (s.comments) entry.comments.add(s.comments);
+      const codes = extractServiceCodes(part).filter((code) => CASP_SERVICE_BY_CODE[code]);
+      if (codes.length) {
+        for (const code of codes) {
+          if (!known.has(code)) known.set(code, { countries: new Set(), comments: new Set() });
+          const entry = known.get(code);
+          (s.countries || []).forEach((c) => entry.countries.add(c));
+          if (s.comments) entry.comments.add(s.comments);
+        }
       } else if (part) {
         unknown.push({ label: cleanServiceLabel(part), countries: s.countries || [], comments: s.comments });
       }
@@ -1011,17 +1034,62 @@ function ensureOverlay() {
   return overlay;
 }
 
-function openDetail(config, record) {
+// `changeLines` (optional) is a changelog entry's already-computed
+// describe_record_change() output - when given, a highlighted "what changed"
+// summary is shown above the record's regular fields. Used when opening this
+// same detail view from a "changed" row in the changelog (see
+// buildChangelogItem() below); register.html's own row clicks don't pass it.
+function openDetail(config, record, changeLines) {
   const overlay = ensureOverlay();
   overlay.querySelector("#detail-title").textContent = record.commercial_name || record.name || t("detail.titleFallback");
   overlay.querySelector("#detail-meta").textContent = config.label;
-  overlay.querySelector("#detail-body").innerHTML = config.detail(record);
+  const changeSummaryHtml = (changeLines && changeLines.length)
+    ? `<div class="detail-change-summary"><h3>${escapeHtml(t("detail.whatChanged"))}</h3><ul>${changeLines.map((d) => `<li>${escapeHtml(d)}</li>`).join("")}</ul></div>`
+    : "";
+  overlay.querySelector("#detail-body").innerHTML = changeSummaryHtml + config.detail(record);
+  overlay.classList.add("open");
+}
+
+// A "removed" changelog entry has no current record left to look up (it's no
+// longer in data/<register>.json) - show what we do still know: which
+// register it was in, when it was first registered (captured at removal
+// time into the changelog entry itself, see REGISTRATION_DATE_FIELD in
+// fetch_esma.py - "Onbekend" for whitepapers, which has no suitable date
+// field, or for older removals recorded before this was tracked), and when
+// it was removed (the entry's own timestamp).
+function openRemovedDetail(c) {
+  const overlay = ensureOverlay();
+  const config = REGISTERS[c.register];
+  overlay.querySelector("#detail-title").textContent = c.name || t("detail.titleFallback");
+  overlay.querySelector("#detail-meta").textContent = config?.label || c.register;
+  overlay.querySelector("#detail-body").innerHTML = detailArticle(c, [
+    [t("detail.registeredOn"), c.registered_on || t("misc.unknownValue")],
+    [t("detail.removedOn"), formatTimestamp(c.timestamp)],
+  ]);
   overlay.classList.add("open");
 }
 
 function closeDetail() {
   const overlay = document.getElementById("detail-overlay");
   if (overlay) overlay.classList.remove("open");
+}
+
+// --------------------------------------------------------------------------
+// Changelog entry -> register detail lookup, with a per-register fetch+cache
+// so clicking several changelog items for the same register only fetches
+// data/<register>.json once. Caches the in-flight promise (not just the
+// resolved value) so near-simultaneous clicks don't trigger duplicate fetches.
+// --------------------------------------------------------------------------
+
+const _registerRecordsCache = {};
+function loadRegisterRecords(registerKey) {
+  if (!_registerRecordsCache[registerKey]) {
+    const file = REGISTERS[registerKey]?.file || registerKey;
+    _registerRecordsCache[registerKey] = fetchJSON(`data/${file}.json`)
+      .then((data) => data.records || [])
+      .catch(() => []);
+  }
+  return _registerRecordsCache[registerKey];
 }
 
 // --------------------------------------------------------------------------

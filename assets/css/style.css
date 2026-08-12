@@ -341,19 +341,23 @@ table.data tr.empty-row td { text-align: center; color: var(--text-muted); paddi
 .changelog-item time { margin-left: auto; color: var(--text-muted); font-size: .8125rem; white-space: nowrap; }
 .changelog-item .register-tag { color: var(--text-muted); font-size: .8125rem; }
 
-/* "Changed" entries with field-level detail (describe_record_change() in
-   fetch_esma.py) are clickable to reveal what actually changed vs. the
-   previous snapshot - everything else (added/removed, or a changed entry
-   with no describable detail) stays a plain, non-interactive row. */
-.changelog-item.is-expandable { cursor: pointer; }
-.changelog-item__chevron { width: 14px; height: 14px; color: var(--text-muted); flex: none; transition: transform .15s ease; }
-.changelog-item.is-expanded .changelog-item__chevron { transform: rotate(180deg); }
-.changelog-item__detail {
-  display: none; flex-basis: 100%; margin: 8px 0 0; padding: 10px 0 0; border-top: 1px dashed var(--border);
-  list-style: none; font-size: .8125rem; color: var(--text-muted);
+/* Added/changed/removed rows are clickable to open the same detail overlay a
+   register-table row would (see buildChangelogItem() in app.js) - same hover
+   affordance as a register table row (table.data tbody tr:hover above). */
+.changelog-item.is-clickable { cursor: pointer; }
+.changelog-item.is-clickable:hover { background: var(--surface-2); }
+
+/* "What changed" callout shown above a changed record's regular fields in
+   the detail overlay, when opened from the changelog (see openDetail()'s
+   optional changeLines argument in app.js) - warning-tinted so it visually
+   reads as "the delta," distinct from the rest of the (unstyled) fields. */
+.detail-change-summary {
+  background: var(--color-warning-lighter); border: 1px solid var(--color-warning);
+  border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 20px;
 }
-.changelog-item.is-expanded .changelog-item__detail { display: block; }
-.changelog-item__detail li { padding: 2px 0; }
+.detail-change-summary h3 { margin: 0 0 8px; font-size: .9375rem; color: var(--color-warning-ink); }
+.detail-change-summary ul { margin: 0; padding-left: 18px; font-size: .875rem; color: var(--color-warning-ink); }
+.detail-change-summary li { padding: 2px 0; }
 
 /* Footer */
 .site-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .8125rem; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; }
