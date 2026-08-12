@@ -76,8 +76,19 @@ eerstvolgende geplande check.
 De workflow post een Slack-bericht zodra een run een échte wijziging vindt (nieuw/gewijzigd/
 verwijderd record in één van de 5 registers) — niet bij elke run, want elke run herschrijft
 `generated_at`/`last_checked` sowieso (zie `steps.scrape.outputs.real_changes` in
-`scrape.yml`). Het bericht noemt per wijziging de partij, het register, en — waar mogelijk —
-wát er precies veranderde (bv. welke dienst is toegevoegd, welke landen erbij).
+`scrape.yml`). Elke regel is één gewijzigde partij: een 🆕/✏️/❌-icoon voor het type, de naam,
+het register tussen haakjes, en — bij een wijziging — een korte omschrijving van wát er precies
+veranderde (bv. welke dienst is toegevoegd, welke landen erbij).
+
+`summarize_change_detail()` in `fetch_esma.py` bouwt die omschrijving en voegt daarbij alle
+gewijzigde aspecten van één partij samen tot één regel, in plaats van een aparte regel per
+dienst/land (dat maakte de melding rommelig als bv. één CASP in één keer 7 diensten in
+hetzelfde land erbij kreeg). Drie caps houden een enkele partij-regel behapbaar: meer dan 4
+diensten in dezelfde groep wordt een aantal ("7 diensten ..." i.p.v. alle namen), meer dan 6
+landen in één lijst wordt de eerste 6 plus een "+N andere"-rest, en meer dan 3 losse gewijzigde
+aspecten op één partij wordt de eerste 3 plus een "+N andere wijziging(en)"-rest. Net als de
+bestaande `MAX_SUMMARY_LINES`-afkap (max. 20 partij-regels per melding) gaat er hierbij geen
+data verloren — de volledige lijst blijft altijd zichtbaar op de changelog-pagina zelf.
 
 Eenmalige setup:
 
