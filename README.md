@@ -1,6 +1,6 @@
-# ESMA MiCAR Register Tracker
+# MiCAR Register Tracker
 
-Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers (whitepapers, ART-uitgevers,
+Doorzoekbare spiegel van de 5 officiële MiCAR-registers (whitepapers, ART-uitgevers,
 EMT-uitgevers, CASPs, non-compliant entiteiten), automatisch bijgewerkt via GitHub Actions.
 Het CASPs-register bevat daarnaast ook CASPs die (nog) alleen bij de AFM vergund/genotificeerd
 zijn — zie "AFM in het CASPs-register" hieronder.
