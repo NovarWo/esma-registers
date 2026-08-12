@@ -106,17 +106,24 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 }
 .topnav__inner {
   max-width: 1180px; margin: 0 auto; padding: 16px 24px;
-  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
 }
 .topnav__brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--color-space-blue); font-size: 1.125rem; }
 .topnav__brand svg { height: 22px; width: auto; }
 .topnav__links { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
 .topnav__links a {
   color: var(--grey-600); font-weight: 600; font-size: .9375rem;
-  padding: 8px 14px; border-radius: var(--radius-pill); text-decoration: none;
+  padding: 8px 10px; border-radius: var(--radius-pill); text-decoration: none;
 }
 .topnav__links a:hover { background: var(--nav-hover-tint); }
 .topnav__links a.active { background: var(--color-primary); color: #fff; }
+
+/* Groups the NL/EN and ☀️/🌙 toggles so they always move together at the far
+   right of the nav, instead of being able to wrap apart independently (which
+   used to strand one of them alone on its own line). Side by side - language
+   toggle to the left of the theme toggle - whenever there's room; below
+   header-controls-stacked-breakpoint further down, they stack instead. */
+.header-controls { display: flex; align-items: center; gap: 6px; flex: none; }
 
 /* NL/EN language toggle, top right of the nav */
 .lang-toggle {
@@ -131,10 +138,10 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 .lang-toggle__btn:hover { color: var(--text); }
 .lang-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
 
-/* Systeem/Licht/Donker theme toggle, same segmented-pill pattern as the NL/EN
-   lang-toggle above (and .page-size-toggle further down) - kept as its own
-   class rather than reusing .lang-toggle so the two independent toggles in
-   the topnav can be told apart/targeted separately if either needs to change. */
+/* ☀️/🌙 theme toggle, same segmented-pill pattern as the NL/EN lang-toggle
+   above (and .page-size-toggle further down) - kept as its own class rather
+   than reusing .lang-toggle so the two independent toggles in the topnav can
+   be told apart/targeted separately if either needs to change. */
 .theme-toggle {
   display: inline-flex; align-items: center; background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
@@ -147,6 +154,16 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 }
 .theme-toggle__btn:hover { opacity: .85; }
 .theme-toggle__btn.is-active { background: var(--color-primary-lighter); opacity: 1; filter: none; }
+
+/* Below the nav's own max-width (1180px - see .topnav__inner), the language
+   and theme toggles no longer reliably fit on the same row as the nav links
+   without crowding/wrapping oddly - stack them instead, equal width, in the
+   same order (language above theme) rather than letting them wrap apart
+   unpredictably. */
+@media (max-width: 1180px) {
+  .header-controls { flex-direction: column; align-items: stretch; gap: 6px; width: 100%; max-width: 220px; }
+  .header-controls .lang-toggle, .header-controls .theme-toggle { display: flex; width: 100%; justify-content: center; }
+}
 
 /* Page header */
 .page-header { margin-bottom: 28px; }

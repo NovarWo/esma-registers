@@ -43,7 +43,7 @@ const TRANSLATIONS = {
     brand: { title: "MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
-      subtitle: "Doorzoekbare spiegel van de 5 officiële ESMA MiCAR-registers. Automatisch bijgewerkt.",
+      subtitle: "Doorzoekbare spiegel van de 5 officiële MiCAR-registers. Automatisch bijgewerkt.",
       recentChanges: "Recente wijzigingen",
       fullHistoryLink: "Volledige wijzigingsgeschiedenis →",
       noChanges: "Nog geen wijzigingen geregistreerd.",
@@ -176,7 +176,7 @@ const TRANSLATIONS = {
     brand: { title: "MiCAR Register Tracker" },
     dashboard: {
       title: "Dashboard",
-      subtitle: "Searchable mirror of the 5 official ESMA MiCAR registers. Updated automatically.",
+      subtitle: "Searchable mirror of the 5 official MiCAR registers. Updated automatically.",
       recentChanges: "Recent changes",
       fullHistoryLink: "Full change history →",
       noChanges: "No changes recorded yet.",
