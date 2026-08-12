@@ -716,6 +716,80 @@ def format_change_line_nl(line: dict | str) -> str:
     return label
 
 
+def _format_countries(countries: tuple[str, ...], max_named: int) -> str:
+    """Spells out a country list up to `max_named` codes, then folds the rest
+    into a "+N andere" remainder - without this, a service gaining EU-passport
+    coverage in, say, 20 countries at once would print all 20 codes on a
+    single Slack line, exactly the kind of clutter this whole redesign is
+    meant to avoid."""
+    if len(countries) <= max_named:
+        return ", ".join(countries)
+    shown = countries[:max_named]
+    return f"{', '.join(shown)} +{len(countries) - max_named} andere"
+
+
+def summarize_change_detail(detail: list[dict | str]) -> str:
+    """Combines every detail item for a single changed record into ONE Slack
+    line, instead of the old one-line-per-item behaviour that made a record
+    with many detail items (e.g. a CASP adding 7 services in the same new
+    country) repeat its own name on 7 separate, near-identical lines.
+
+    Service-change dicts that share the same kind and country list are
+    grouped into a single segment (e.g. "Bewaring, Wisselen — fiat nu ook
+    aangeboden in: DK" instead of two separate lines), and three independent
+    caps keep any one record from blowing up the whole message:
+    - MAX_SERVICES_NAMED: past this many services in one group, name the
+      count instead of every service ("7 diensten ..." instead of listing
+      all 7).
+    - MAX_COUNTRIES_NAMED: past this many countries in one list, name the
+      first few plus a "+N andere" remainder (see _format_countries()).
+    - MAX_SEGMENTS: past this many distinct aspects changed on one record
+      (mixing service changes with generic field diffs, say), name the first
+      few plus a "+N andere wijziging(en)" remainder.
+
+    Generic field-diff strings (e.g. "status: actief → ingetrokken") pass
+    through as their own segment, appended after the grouped service
+    segments - see describe_record_change()."""
+    MAX_SERVICES_NAMED = 4
+    MAX_COUNTRIES_NAMED = 6
+    MAX_SEGMENTS = 3
+
+    groups: dict[tuple, list[str]] = {}
+    group_order: list[tuple] = []
+    strings: list[str] = []
+
+    for item in detail:
+        if isinstance(item, str):
+            strings.append(item)
+            continue
+        key = (item["kind"], tuple(item.get("countries", [])))
+        if key not in groups:
+            groups[key] = []
+            group_order.append(key)
+        groups[key].append(SERVICE_LABELS_NL.get(item["code"], item["code"]))
+
+    segments: list[str] = []
+    for kind, countries in group_order:
+        labels = groups[(kind, countries)]
+        name_part = f"{len(labels)} diensten" if len(labels) > MAX_SERVICES_NAMED else ", ".join(labels)
+        if kind == "service_added":
+            segments.append(f"{name_part} toegevoegd aan dienstverlening")
+        elif kind == "service_removed":
+            segments.append(f"{name_part} niet langer aangeboden")
+        elif kind == "service_countries_added":
+            segments.append(f"{name_part} nu ook aangeboden in: {_format_countries(countries, MAX_COUNTRIES_NAMED)}")
+        elif kind == "service_countries_removed":
+            segments.append(f"{name_part} niet langer aangeboden in: {_format_countries(countries, MAX_COUNTRIES_NAMED)}")
+        else:
+            segments.append(name_part)
+    segments.extend(strings)
+
+    if len(segments) > MAX_SEGMENTS:
+        segments = segments[:MAX_SEGMENTS] + [f"+{len(segments) - MAX_SEGMENTS} andere wijziging(en)"]
+
+    return "; ".join(segments)
+
+
 def _fmt_value(v) -> str:
     if v is None or v == "":
         return "onbekend"
@@ -773,6 +847,18 @@ def _comparable(rec: dict) -> dict:
 # equivalent ranking when *displaying* the changelog instead (see
 # changelogPriorityKey()/sortChangelogForDisplay() in assets/js/app.js).
 REGISTER_PRIORITY = {"casps": 0, "emt": 1, "art": 2, "whitepapers": 3, "non_compliant": 4}
+
+# Short display labels for the Slack summary (see run()'s github_output block
+# below) - mirrors the site's nav.* labels closely enough for a one-word
+# register tag, but isn't shared with i18n.js since Slack messages are always
+# Dutch regardless of a visitor's site language preference.
+REGISTER_LABELS_NL = {
+    "casps": "CASPs",
+    "emt": "EMT",
+    "art": "ART",
+    "whitepapers": "Whitepapers",
+    "non_compliant": "Non-compliant",
+}
 
 
 def _change_priority_key(c: dict) -> tuple:
@@ -911,20 +997,26 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
     # and say *what* changed rather than just how many.
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
-        TYPE_LABELS_NL = {"added": "toegevoegd", "changed": "gewijzigd", "removed": "verwijderd"}
+        # Emoji type-indicator instead of a text label ("toegevoegd"/
+        # "gewijzigd"/"verwijderd") - faster to scan a list of these than a
+        # column of words, and it means the entity name can lead the line
+        # instead of being buried after "register: ".
+        TYPE_EMOJI = {"added": "🆕", "changed": "✏️", "removed": "❌"}
         MAX_SUMMARY_LINES = 20
         detail_lines = []
         for c in sorted(all_changes, key=_change_priority_key):
-            header = f"{c['register']}: {c.get('name') or c['id']}"
-            # "changed" records with a field-level description (see
-            # describe_record_change) get one line per changed aspect, e.g.
-            # "casps: BTC Direct B.V. -> Bewaring toegevoegd aan dienstverlening"
-            # - added/removed records, or a changed record where nothing
-            # specific could be described, fall back to the plain type label.
+            emoji = TYPE_EMOJI.get(c["type"], "•")
+            register_label = REGISTER_LABELS_NL.get(c["register"], c["register"])
+            name = c.get("name") or c["id"]
+            # One line per changed *record*, not per changed aspect -
+            # summarize_change_detail() folds every item in c["detail"] (e.g.
+            # 7 services all gaining the same new country) into a single
+            # combined, capped segment string, instead of the old behaviour
+            # of repeating the entity's own name once per detail item.
             if c["type"] == "changed" and c.get("detail"):
-                detail_lines.extend(f"{header} -> {format_change_line_nl(d)}" for d in c["detail"])
+                detail_lines.append(f"{emoji} {name} _({register_label})_ — {summarize_change_detail(c['detail'])}")
             else:
-                detail_lines.append(f"{header} ({TYPE_LABELS_NL.get(c['type'], c['type'])})")
+                detail_lines.append(f"{emoji} {name} _({register_label})_")
         summary_lines = detail_lines[:MAX_SUMMARY_LINES]
         if len(detail_lines) > MAX_SUMMARY_LINES:
             summary_lines.append(f"... en {len(detail_lines) - MAX_SUMMARY_LINES} andere wijziging(en)")
