@@ -37,39 +37,47 @@
   --font-sans: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-/* Dark mode - follows the OS/browser-level preference automatically (no manual
-   toggle), so it switches the instant the device's setting changes. Every rule
-   in this file is already written against these custom properties, so redefining
-   them here is enough to re-theme the whole site with no other changes needed. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-primary: #6d8cff;
-    --color-primary-dark: #dbe6ff;
-    --color-primary-light: #4fb3ff;
-    --color-primary-lighter: #16264a;
-    --color-space-blue: #eef4fa;
+/* Dark mode - driven by a data-theme="light"/"dark" attribute on <html>, not a
+   plain @media query, so it can be a user-controlled toggle rather than being
+   locked to the OS setting. The actual light-vs-dark resolution (device
+   preference by default, saved override once the user picks one) happens in
+   JS - see the no-flash inline snippet in each page's <head> (sets the
+   attribute before first paint) and renderThemeToggle()/applyTheme() in
+   app.js (the toggle itself, and reacting live if the OS setting changes
+   while "systeem/auto" is active). This file only needs the final outcome. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-primary: #6d8cff;
+  --color-primary-dark: #dbe6ff;
+  --color-primary-light: #4fb3ff;
+  --color-primary-lighter: #16264a;
+  --color-space-blue: #eef4fa;
 
-    --color-success: #34d399; --color-success-lighter: #123626;
-    --color-warning: #ffb84d; --color-warning-lighter: #3a2a08; --color-warning-ink: #ffd699;
-    --color-error: #ff7a68; --color-error-lighter: #3a1712;
+  --color-success: #34d399; --color-success-lighter: #123626;
+  --color-warning: #ffb84d; --color-warning-lighter: #3a2a08; --color-warning-ink: #ffd699;
+  --color-error: #ff7a68; --color-error-lighter: #3a1712;
 
-    --grey-700: #eef4fa; --grey-600: #c3d2e0; --grey-500: #93a8bd;
-    --grey-400: #7d93a8; --grey-300: #3a526b; --grey-100: #16263b; --white: #f2f6fa;
+  --grey-700: #eef4fa; --grey-600: #c3d2e0; --grey-500: #93a8bd;
+  --grey-400: #7d93a8; --grey-300: #3a526b; --grey-100: #16263b; --white: #f2f6fa;
 
-    --shadow-small: 0 2px 4px 0 rgba(0,0,0,.24);
-    --shadow-medium: 0 4px 28px 0 rgba(0,0,0,.45);
+  --shadow-small: 0 2px 4px 0 rgba(0,0,0,.24);
+  --shadow-medium: 0 4px 28px 0 rgba(0,0,0,.45);
 
-    --bg: #0b1f33;
-    --surface: #122a44;
-    --surface-2: #1a3a5c;
-    --text: #eef4fa;
-    --text-muted: #93a8bd;
-    --border: #24435f;
+  --bg: #0b1f33;
+  --surface: #122a44;
+  --surface-2: #1a3a5c;
+  --text: #eef4fa;
+  --text-muted: #93a8bd;
+  --border: #24435f;
 
-    --focus-ring: rgba(109,140,255,.28);
-    --nav-hover-tint: rgba(109,140,255,.16);
-  }
+  --focus-ring: rgba(109,140,255,.28);
+  --nav-hover-tint: rgba(109,140,255,.16);
 }
+
+/* Explicit "light" choice needs no var overrides (the base :root above already
+   holds the light values) - just tells the browser to render native form
+   controls/scrollbars light too, even if the OS itself is set to dark. */
+:root[data-theme="light"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 
@@ -122,6 +130,22 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 }
 .lang-toggle__btn:hover { color: var(--text); }
 .lang-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
+
+/* Systeem/Licht/Donker theme toggle, same segmented-pill pattern as the NL/EN
+   lang-toggle above (and .page-size-toggle further down) - kept as its own
+   class rather than reusing .lang-toggle so the two independent toggles in
+   the topnav can be told apart/targeted separately if either needs to change. */
+.theme-toggle {
+  display: inline-flex; align-items: center; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
+}
+.theme-toggle__btn {
+  font-family: inherit; font-size: .75rem; font-weight: 700; letter-spacing: .02em; cursor: pointer;
+  border: none; background: none; color: var(--text-muted); border-radius: var(--radius-pill);
+  padding: 5px 11px; transition: background .15s ease, color .15s ease;
+}
+.theme-toggle__btn:hover { color: var(--text); }
+.theme-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
 
 /* Page header */
 .page-header { margin-bottom: 28px; }

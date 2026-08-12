@@ -1188,3 +1188,88 @@ function highlightNav(current) {
     if (a.dataset.nav === current) a.classList.add("active");
   });
 }
+
+// --------------------------------------------------------------------------
+// Light/dark theme toggle - defaults to following the OS/browser's
+// prefers-color-scheme setting, with an explicit "always light"/"always dark"
+// override the user can pick instead. The actual re-theming is pure CSS (see
+// :root[data-theme="dark"] in style.css) - this just decides which value that
+// attribute should have and keeps it in sync with system-setting changes.
+//
+// The very first paint is handled by a tiny inline script in each page's
+// <head> (before this file loads) that mirrors resolveTheme()'s logic, so the
+// page never flashes the wrong theme while waiting for app.js to arrive.
+// --------------------------------------------------------------------------
+
+const THEME_KEY = "esma-tracker-theme";
+const darkSchemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+// The user's explicit choice, or null if they haven't overridden the system
+// setting (i.e. "auto"/"systeem" mode).
+function getThemeOverride() {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+  } catch (e) { /* localStorage unavailable (e.g. private browsing) */ }
+  return null;
+}
+
+function setThemeOverride(mode) {
+  try {
+    if (mode === "light" || mode === "dark") localStorage.setItem(THEME_KEY, mode);
+    else localStorage.removeItem(THEME_KEY); // back to "auto"
+  } catch (e) { /* ignore */ }
+  applyTheme();
+}
+
+function systemPrefersDark() {
+  return !!(darkSchemeQuery && darkSchemeQuery.matches);
+}
+
+// The concrete "light"/"dark" outcome, given the current override (if any)
+// and the current system setting.
+function resolveTheme() {
+  return getThemeOverride() || (systemPrefersDark() ? "dark" : "light");
+}
+
+function applyTheme() {
+  const theme = resolveTheme();
+  document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.style.colorScheme = theme;
+  document.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
+}
+
+applyTheme();
+// Keep "auto" mode live: if the user hasn't overridden the theme and the OS
+// setting flips while this tab is open, follow it immediately rather than
+// only picking it up on the next full page load.
+if (darkSchemeQuery) {
+  const onSystemChange = () => { if (!getThemeOverride()) applyTheme(); };
+  if (darkSchemeQuery.addEventListener) darkSchemeQuery.addEventListener("change", onSystemChange);
+  else if (darkSchemeQuery.addListener) darkSchemeQuery.addListener(onSystemChange); // older Safari
+}
+
+// Segmented Systeem/Licht/Donker control, same visual pattern as the NL/EN
+// lang-toggle. Unlike the language toggle, switching theme is a pure CSS
+// variable swap - no page reload needed, so this just re-renders its own
+// active-state highlighting in place.
+function renderThemeToggle(container) {
+  const wrap = el("div", { class: "theme-toggle", role: "group", "aria-label": t("theme.toggleLabel") });
+  const modes = [
+    { value: null, label: t("theme.auto"), title: t("theme.autoTitle", resolveTheme() === "dark" ? t("theme.dark") : t("theme.light")) },
+    { value: "light", label: t("theme.light"), title: t("theme.lightTitle") },
+    { value: "dark", label: t("theme.dark"), title: t("theme.darkTitle") },
+  ];
+  const paint = () => {
+    const current = getThemeOverride();
+    [...wrap.children].forEach((btn, i) => btn.classList.toggle("is-active", modes[i].value === current));
+  };
+  for (const mode of modes) {
+    const btn = el("button", { type: "button", class: "theme-toggle__btn", title: mode.title }, escapeHtml(mode.label));
+    btn.addEventListener("click", () => { setThemeOverride(mode.value); paint(); });
+    wrap.appendChild(btn);
+  }
+  paint();
+  container.appendChild(wrap);
+  return wrap;
+}

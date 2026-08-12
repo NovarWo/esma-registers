@@ -88,6 +88,11 @@ const TRANSLATIONS = {
       clearAll: "Alles wissen",
     },
     buttons: { resetFilters: "Reset filters", exportCsv: "Exporteer CSV", close: "Sluiten" },
+    theme: {
+      toggleLabel: "Weergave", auto: "Systeem", light: "Licht", dark: "Donker",
+      autoTitle: (mode) => `Systeeminstelling volgen (nu: ${mode})`,
+      lightTitle: "Altijd licht", darkTitle: "Altijd donker",
+    },
     status: { active: "Actief", withdrawn: "Ingetrokken", unknown: "Onbekend" },
     table: {
       count: (shown, total) => `${shown} van ${total} records`,
@@ -214,6 +219,11 @@ const TRANSLATIONS = {
       clearAll: "Clear all",
     },
     buttons: { resetFilters: "Reset filters", exportCsv: "Export CSV", close: "Close" },
+    theme: {
+      toggleLabel: "Appearance", auto: "System", light: "Light", dark: "Dark",
+      autoTitle: (mode) => `Follow system setting (currently: ${mode})`,
+      lightTitle: "Always light", darkTitle: "Always dark",
+    },
     status: { active: "Active", withdrawn: "Withdrawn", unknown: "Unknown" },
     table: {
       count: (shown, total) => `${shown} of ${total} records`,
