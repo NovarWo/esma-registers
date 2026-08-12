@@ -531,6 +531,11 @@ const REGISTERS = {
     ],
     detail: (r) => detailArticle(r, [
       [t("detail.dataSource"), r.source === "afm" ? t("detail.dataSourceAfm") : t("detail.dataSourceEsma")],
+      // Only shown when there actually is a distinct trade name - most CASPs
+      // have none, and a "Commercial name: —" row for every single one of
+      // those would just be noise. See the #detail-title comment in
+      // openDetail() for why the title itself no longer shows this instead.
+      ...(r.commercial_name && r.commercial_name !== r.name ? [[t("detail.commercialName"), r.commercial_name]] : []),
       [t("detail.competentAuthority"), r.competent_authority],
       [t("detail.homeMemberState"), countryName(r.home_member_state)],
       [t("detail.lei"), r.lei],
@@ -581,6 +586,7 @@ const REGISTERS = {
       },
     ],
     detail: (r) => detailArticle(r, [
+      ...(r.commercial_name && r.commercial_name !== r.name ? [[t("detail.commercialName"), r.commercial_name]] : []),
       [t("detail.competentAuthority"), r.competent_authority],
       [t("detail.homeMemberState"), countryName(r.home_member_state)],
       [t("detail.lei"), r.lei],
@@ -625,6 +631,7 @@ const REGISTERS = {
       },
     ],
     detail: (r) => detailArticle(r, [
+      ...(r.commercial_name && r.commercial_name !== r.name ? [[t("detail.commercialName"), r.commercial_name]] : []),
       [t("detail.competentAuthority"), r.competent_authority],
       [t("detail.homeMemberState"), countryName(r.home_member_state)],
       [t("detail.lei"), r.lei],
@@ -1097,6 +1104,13 @@ function ensureOverlay() {
 // Dutch since Slack has no per-viewer language).
 function describeChangeLine(line) {
   if (typeof line === "string") return line;
+  // "field_changed" (a list/dict-valued field like "whitepapers" that changed
+  // shape - too complex to render as a diff, see describe_record_change() in
+  // fetch_esma.py) used to be a pre-baked Dutch string ("whitepapers
+  // gewijzigd") that leaked into the English site verbatim. It's now a
+  // {kind, field} dict like the service-change kinds below, so it can be
+  // rendered in the viewer's own language too.
+  if (line.kind === "field_changed") return t("detail.changeDetail.fieldChanged", line.field.replace(/_/g, " "));
   const label = (CASP_SERVICE_BY_CODE[line.code] || {}).label || line.code;
   switch (line.kind) {
     case "service_added": return t("detail.changeDetail.serviceAdded", label);
@@ -1109,7 +1123,13 @@ function describeChangeLine(line) {
 
 function openDetail(config, record, changeLines) {
   const overlay = ensureOverlay();
-  overlay.querySelector("#detail-title").textContent = record.commercial_name || record.name || t("detail.titleFallback");
+  // The full legal name (record.name) is always ESMA's/AFM's official entity
+  // name; commercial_name is an optional shorter trade name some CASPs also
+  // register. The title used to prefer the trade name, which could show e.g.
+  // "Penning" instead of "Penning Financial Services ApS" - now the legal
+  // name leads, with the commercial name (if any) still visible in the body
+  // via the "Commercial name" detail field pair (see REGISTERS.casps/art/emt).
+  overlay.querySelector("#detail-title").textContent = record.name || record.commercial_name || t("detail.titleFallback");
   overlay.querySelector("#detail-meta").textContent = config.label;
   const changeSummaryHtml = (changeLines && changeLines.length)
     ? `<div class="detail-change-summary"><h3>${escapeHtml(t("detail.whatChanged"))}</h3><ul>${changeLines.map((d) => `<li>${escapeHtml(describeChangeLine(d))}</li>`).join("")}</ul></div>`
