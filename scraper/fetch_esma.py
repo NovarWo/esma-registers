@@ -697,14 +697,16 @@ def describe_service_changes(old_services: list[dict] | None, new_services: list
 
 def format_change_line_nl(line: dict | str) -> str:
     """Renders one describe_record_change() item as the Dutch sentence it used
-    to be, for the (always-Dutch) Slack notification. Generic field-diff lines
-    are already plain strings (never had a language-specific baking problem -
-    see describe_record_change()) and pass through unchanged; structured
-    service-change dicts get expanded via SERVICE_LABELS_NL."""
+    to be, for the (always-Dutch) Slack notification. Generic field-diff
+    strings (e.g. "status: active -> withdrawn") pass through unchanged;
+    structured dicts get expanded - service-change ones via SERVICE_LABELS_NL,
+    "field_changed" via its own field name."""
     if isinstance(line, str):
         return line
-    label = SERVICE_LABELS_NL.get(line["code"], line["code"])
     kind = line["kind"]
+    if kind == "field_changed":
+        return f"{line['field'].replace('_', ' ')} gewijzigd"
+    label = SERVICE_LABELS_NL.get(line["code"], line["code"])
     if kind == "service_added":
         return f"{label} toegevoegd aan dienstverlening"
     if kind == "service_removed":
@@ -749,7 +751,11 @@ def summarize_change_detail(detail: list[dict | str]) -> str:
 
     Generic field-diff strings (e.g. "status: actief → ingetrokken") pass
     through as their own segment, appended after the grouped service
-    segments - see describe_record_change()."""
+    segments - see describe_record_change(). "field_changed" dicts (a list/
+    dict-valued field like "whitepapers" that changed shape - too complex to
+    diff into a readable sentence) render the same way via
+    format_change_line_nl(), since - unlike the service kinds - there's
+    nothing to group them by (no code/countries in common)."""
     MAX_SERVICES_NAMED = 4
     MAX_COUNTRIES_NAMED = 6
     MAX_SEGMENTS = 3
@@ -761,6 +767,9 @@ def summarize_change_detail(detail: list[dict | str]) -> str:
     for item in detail:
         if isinstance(item, str):
             strings.append(item)
+            continue
+        if item["kind"] == "field_changed":
+            strings.append(format_change_line_nl(item))
             continue
         key = (item["kind"], tuple(item.get("countries", [])))
         if key not in groups:
@@ -798,14 +807,19 @@ def _fmt_value(v) -> str:
 
 def describe_record_change(old: dict, new: dict) -> list[dict | str]:
     """Lines describing what changed between two snapshots of the same
-    record - services get the structured (language-neutral) treatment above,
-    every other field falls back to a generic "field: oud -> nieuw" string (or
-    just "field gewijzigd" for list/dict-valued fields we don't want to dump
-    raw into a Slack message, e.g. a register's "whitepapers" list). Those
-    generic lines use raw field names/values, not translated prose, so - unlike
-    the service lines - a plain string is fine for them in both Slack and the
-    website; see format_change_line_nl() and describeChangeLine() (in
-    assets/js/app.js) for how each consumer renders a mixed list of these."""
+    record - services get the structured (language-neutral) treatment above;
+    a plain scalar field ("field: oud -> nieuw") is a language-invariant
+    string, since it's just the raw field name plus raw values (fine to pass
+    through unchanged in both Slack and the website, on either language - see
+    format_change_line_nl() and describeChangeLine() in assets/js/app.js).
+
+    A list/dict-valued field (e.g. a register's "whitepapers" list) is too
+    complex to diff into a readable "oud -> nieuw" string, so it gets a
+    generic {"kind": "field_changed", "field": key} marker instead of a
+    pre-baked "field gewijzigd" string - unlike the scalar case, that word
+    itself ("gewijzigd"/"changed") IS language-dependent, so it needs the same
+    structured treatment as the service-change kinds above to render correctly
+    on an English-language site visit."""
     lines: list[dict | str] = []
     if old.get("services") != new.get("services"):
         lines.extend(describe_service_changes(old.get("services"), new.get("services")))
@@ -819,10 +833,10 @@ def describe_record_change(old: dict, new: dict) -> list[dict | str]:
         old_val = old.get(key)
         if old_val == new_val:
             continue
-        label = key.replace("_", " ")
         if isinstance(old_val, (list, dict)) or isinstance(new_val, (list, dict)):
-            lines.append(f"{label} gewijzigd")
+            lines.append({"kind": "field_changed", "field": key})
         else:
+            label = key.replace("_", " ")
             lines.append(f"{label}: {_fmt_value(old_val)} → {_fmt_value(new_val)}")
     return lines
 
