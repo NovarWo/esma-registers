@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Resolves and applies the light/dark theme before the stylesheet paints, so
+// the page never flashes the "wrong" theme while assets/js/app.js (which
+// re-derives the same value - see resolveTheme()/applyTheme() there, the
+// source of truth for this logic) is still loading. Defaults to the OS/
+// browser's prefers-color-scheme setting; esma-tracker-theme in localStorage
+// (set via the Systeem/Licht/Donker toggle in the topnav) overrides it.
+(function () {
+  try {
+    var stored = localStorage.getItem("esma-tracker-theme");
+    var dark = stored === "dark" || (stored !== "light" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var theme = dark ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = theme;
+  } catch (e) { /* localStorage/matchMedia unavailable - CSS default (light) applies */ }
+})();
+</script>
 <title data-i18n="brand.title">ESMA MiCAR Register Tracker</title>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
@@ -27,6 +44,7 @@
       <a href="register.html?type=non_compliant" data-nav="non_compliant" data-i18n="nav.non_compliant">Non-compliant</a>
       <a href="changelog.html" data-nav="changelog" data-i18n="nav.changelog">Wijzigingen</a>
     </div>
+    <div id="theme-toggle-slot"></div>
     <div id="lang-toggle-slot"></div>
   </div>
 </nav>
@@ -53,6 +71,7 @@
 <script src="assets/js/app.js"></script>
 <script>
 applyStaticTranslations();
+renderThemeToggle(document.getElementById("theme-toggle-slot"));
 renderLangToggle(document.getElementById("lang-toggle-slot"));
 highlightNav("dashboard");
 
