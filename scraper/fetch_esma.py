@@ -93,6 +93,38 @@ def record_id(*parts) -> str:
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]
 
 
+def clean_lei(raw: str | None) -> str | None:
+    """Normalises a raw LEI for use as both a display value and an identity
+    key. Real-world ESMA/AFM exports occasionally carry a malformed LEI for
+    the same entity between pulls - a stray trailing period, extra
+    whitespace, or an off-by-one truncated character - which, left as-is,
+    makes record_id() and _casps_match_keys()'s LEI match treat the SAME
+    company as a different identity from one run to the next (observed in
+    production: "Ramp Swaps (Ireland) Limited" with LEI
+    "89450036UW3ID72T1M84." vs "89450036UW3ID72T1M84", and "WEB3 Technology
+    B.V." with a 19-character LEI missing its last character - both caused
+    duplicate rows and repeated spurious added/removed Slack notifications
+    for the same real entity).
+
+    Strips anything that isn't a letter or digit and uppercases (LEIs are
+    always uppercase alphanumeric per ISO 17442), then validates the result
+    is exactly 20 characters - the fixed length every real LEI has. Anything
+    that doesn't clean up to that shape is treated as "no LEI" (record_id()/
+    _casps_match_keys() then fall back to name-based identity/matching)
+    rather than silently keeping a corrupt value that would never match
+    anything anyway.
+
+    Note: this can't fix every case - if a source genuinely replaces one
+    valid-looking LEI with a different valid-looking one for the same entity
+    (rather than just mangling the same LEI's formatting), that still reads
+    as a LEI change; there's no way to tell that apart from an actual
+    re-registration without also weighing the (also-fallible) entity name."""
+    if not raw:
+        return None
+    cleaned = re.sub(r"[^A-Za-z0-9]", "", raw).upper()
+    return cleaned if len(cleaned) == 20 else None
+
+
 def split_pipe(value: str | None) -> list[str]:
     if not value:
         return []
@@ -141,7 +173,7 @@ def group_rows(rows: Iterable[dict], key_fn: Callable[[dict], object],
 
 def normalize_casps(rows: list[dict]) -> list[dict]:
     def key_fn(r):
-        return r.get("ae_lei") or (r.get("ae_lei_name", ""), r.get("ae_competentAuthority", ""))
+        return clean_lei(r.get("ae_lei")) or (r.get("ae_lei_name", ""), r.get("ae_competentAuthority", ""))
 
     def item_fn(r):
         code = r.get("ac_serviceCode")
@@ -167,12 +199,13 @@ def normalize_casps(rows: list[dict]) -> list[dict]:
     records = []
     for r in grouped:
         end_date = r.get("ac_authorisationEndDate")
+        lei = clean_lei(r.get("ae_lei"))
         records.append({
-            "id": record_id("casps", r.get("ae_lei"), r.get("ae_lei_name"), r.get("ae_competentAuthority")),
+            "id": record_id("casps", lei, r.get("ae_lei_name"), r.get("ae_competentAuthority")),
             "competent_authority": r.get("ae_competentAuthority") or None,
             "home_member_state": r.get("ae_homeMemberState") or None,
             "name": r.get("ae_lei_name") or None,
-            "lei": r.get("ae_lei") or None,
+            "lei": lei,
             "head_office_country": r.get("ae_lei_cou_code") or None,
             "commercial_name": r.get("ae_commercial_name") or None,
             "address": r.get("ae_address") or None,
@@ -190,7 +223,7 @@ def normalize_art_or_emt(rows: list[dict], register: str) -> list[dict]:
     is_emt = register == "emt"
 
     def key_fn(r):
-        return r.get("ae_lei") or (r.get("ae_lei_name", ""), r.get("ae_competentAuthority", ""))
+        return clean_lei(r.get("ae_lei")) or (r.get("ae_lei_name", ""), r.get("ae_competentAuthority", ""))
 
     def item_fn(r):
         url = r.get("wp_url")
@@ -212,12 +245,13 @@ def normalize_art_or_emt(rows: list[dict], register: str) -> list[dict]:
     records = []
     for r in grouped:
         end_date = r.get("ac_authorisationEndDate")
+        lei = clean_lei(r.get("ae_lei"))
         rec = {
-            "id": record_id(register, r.get("ae_lei"), r.get("ae_lei_name"), r.get("ae_competentAuthority")),
+            "id": record_id(register, lei, r.get("ae_lei_name"), r.get("ae_competentAuthority")),
             "competent_authority": r.get("ae_competentAuthority") or None,
             "home_member_state": r.get("ae_homeMemberState") or None,
             "name": r.get("ae_lei_name") or None,
-            "lei": r.get("ae_lei") or None,
+            "lei": lei,
             "head_office_country": r.get("ae_lei_cou_code") or None,
             "commercial_name": r.get("ae_commercial_name") or None,
             "address": r.get("ae_address") or None,
@@ -239,7 +273,7 @@ def normalize_art_or_emt(rows: list[dict], register: str) -> list[dict]:
 
 def normalize_whitepapers(rows: list[dict]) -> list[dict]:
     def key_fn(r):
-        return r.get("ae_lei") or r.get("ae_lei_name", "")
+        return clean_lei(r.get("ae_lei")) or r.get("ae_lei_name", "")
 
     def item_fn(r):
         url = r.get("wp_url")
@@ -259,12 +293,13 @@ def normalize_whitepapers(rows: list[dict]) -> list[dict]:
     grouped = group_rows(rows, key_fn, "whitepapers", item_fn)
     records = []
     for r in grouped:
+        lei = clean_lei(r.get("ae_lei"))
         records.append({
-            "id": record_id("whitepapers", r.get("ae_lei"), r.get("ae_lei_name")),
+            "id": record_id("whitepapers", lei, r.get("ae_lei_name")),
             "competent_authority": r.get("ae_competentAuthority") or None,
             "home_member_state": r.get("ae_homeMemberState") or None,
             "name": r.get("ae_lei_name") or None,
-            "lei": r.get("ae_lei") or None,
+            "lei": lei,
             "head_office_country": r.get("ae_lei_cou_code") or None,
             "whitepapers": r["whitepapers"],
         })
@@ -275,7 +310,8 @@ def normalize_non_compliant(rows: list[dict]) -> list[dict]:
     seen: set[str] = set()
     records = []
     for r in rows:
-        rid = record_id("ncasp", r.get("ae_lei"), r.get("ae_lei_name"),
+        lei = clean_lei(r.get("ae_lei"))
+        rid = record_id("ncasp", lei, r.get("ae_lei_name"),
                          r.get("ae_decision_date"), r.get("ae_website"))
         if rid in seen:
             continue  # exact duplicate row present in ESMA's own export
@@ -285,7 +321,7 @@ def normalize_non_compliant(rows: list[dict]) -> list[dict]:
             "competent_authority": r.get("ae_competentAuthority") or None,
             "home_member_state": r.get("ae_homeMemberState") or None,
             "name": r.get("ae_lei_name") or None,
-            "lei": r.get("ae_lei") or None,
+            "lei": lei,
             "head_office_country": r.get("ae_lei_cou_code") or None,
             "website": r.get("ae_website") or None,
             "article_17_infringement": r.get("ae_infrigment") or None,
@@ -442,7 +478,7 @@ def normalize_afm(rows: list[tuple]) -> list[dict]:
             "id": record_id("afm_casps", auth_number, name, home_state_raw),
             "name": name,
             "commercial_name": _afm_text(row[8] if len(row) > 8 else None),
-            "lei": _afm_text(row[9] if len(row) > 9 else None),
+            "lei": clean_lei(_afm_text(row[9] if len(row) > 9 else None)),
             "authorisation_number": auth_number,
             "authorisation_type": _afm_auth_type(row[2] if len(row) > 2 else None),
             "home_member_state": AFM_COUNTRY_NAME_TO_CODE.get((home_state_raw or "").lower()),
@@ -486,16 +522,41 @@ def _normalize_name(name: str | None) -> str:
     return re.sub(r"\s+", " ", n).strip()
 
 
-def _casps_match_key(rec: dict) -> tuple[str, str] | None:
-    """A (kind, value) key used to recognise "the same real-world CASP"
-    across ESMA/AFM and across runs - LEI first (it's the standardised,
-    reliable identifier both sources carry), normalised name as a fallback
-    for the rare case a LEI is missing on one side."""
-    lei = (rec.get("lei") or "").strip().upper()
+def _casps_match_keys(rec: dict) -> list[tuple[str, str]]:
+    """Every key that could recognise "the same real-world CASP" as this
+    record, in priority order - not just "LEI if present, else name".
+
+    A normalised-name key is always included alongside the LEI key (when
+    there is one), because a single preferred-key-per-record scheme breaks
+    the moment only ONE side of an ESMA/AFM pair has a usable LEI: that side
+    matches on ("lei", ...), the other falls back to ("name", ...), and the
+    two keys can never meet even though every _casps_match_keys() call is
+    trying to recognise the exact same entity. This is exactly what happened
+    with "WEB3 Technology B.V." in production - ESMA's LEI was truncated to
+    19 characters (invalid per clean_lei()), AFM's was the real 20-character
+    one, so the old single-key version put them in different buckets and
+    the AFM row showed up as a spurious duplicate instead of being merged.
+    Checking every key finds the match via name in that situation, while
+    still preferring an actual LEI hit (listed first) when both records have
+    one - LEI is the more reliable identifier when it's usable at all."""
+    keys: list[tuple[str, str]] = []
+    lei = clean_lei(rec.get("lei"))
     if lei:
-        return ("lei", lei)
+        keys.append(("lei", lei))
     name = _normalize_name(rec.get("name"))
-    return ("name", name) if name else None
+    if name:
+        keys.append(("name", name))
+    return keys
+
+
+def _match_lookup(index: dict[tuple, object], keys: list[tuple[str, str]]):
+    """Returns the first index hit across `keys`, in priority order, or None
+    if none of them match - used to look a record up in a match-key index
+    built by _casps_match_keys() without caring which specific key hit."""
+    for key in keys:
+        if key in index:
+            return index[key]
+    return None
 
 
 def _map_afm_to_casps_shape(afm_rec: dict) -> dict:
@@ -532,37 +593,41 @@ def merge_esma_and_afm_casps(
     esma_current: list[dict], afm_current: list[dict], previous_merged: dict[str, dict]
 ) -> list[dict]:
     # previous_merged is {id: record} from load_previous("casps") - the last
-    # committed, already-merged data/casps.json. Index it by match-key so we
-    # can recognise "we've tracked this exact entity before" regardless of
-    # which source (co)produced it that time.
+    # committed, already-merged data/casps.json. Index it by EVERY match key
+    # each record has (see _casps_match_keys()) so we can recognise "we've
+    # tracked this exact entity before" regardless of which source
+    # (co)produced it that time, and regardless of which key (LEI or name)
+    # happens to be usable on either side this run.
     previous_by_key: dict[tuple, str] = {}
     for rec in previous_merged.values():
-        key = _casps_match_key(rec)
-        if key:
+        for key in _casps_match_keys(rec):
             previous_by_key[key] = rec["id"]
 
     esma_by_key: dict[tuple, dict] = {}
     for rec in esma_current:
-        key = _casps_match_key(rec)
-        if key:
+        for key in _casps_match_keys(rec):
             esma_by_key[key] = rec
 
     merged: list[dict] = []
     for rec in esma_current:
-        key = _casps_match_key(rec)
+        keys = _casps_match_keys(rec)
         # If we've tracked this entity before (via ESMA or a since-superseded
         # AFM stand-in), keep its existing id rather than ESMA's freshly
         # computed one, so the tracked record's identity never changes.
-        final_id = previous_by_key.get(key, rec["id"]) if key else rec["id"]
+        prev_id = _match_lookup(previous_by_key, keys)
+        final_id = prev_id if prev_id is not None else rec["id"]
         merged.append({**rec, "id": final_id, "source": "esma"})
 
     for afm_rec in afm_current:
-        key = _casps_match_key(afm_rec)
-        if key and key in esma_by_key:
+        keys = _casps_match_keys(afm_rec)
+        if _match_lookup(esma_by_key, keys) is not None:
             continue  # already covered by ESMA's own export this run - skip, no duplicate row
         mapped = _map_afm_to_casps_shape(afm_rec)
-        if key:
-            mapped["id"] = previous_by_key.get(key, record_id("casps_afm", key[1]))
+        prev_id = _match_lookup(previous_by_key, keys)
+        if prev_id is not None:
+            mapped["id"] = prev_id
+        elif keys:
+            mapped["id"] = record_id("casps_afm", keys[0][1])
         else:
             mapped["id"] = afm_rec["id"]
         merged.append({**mapped, "source": "afm"})
