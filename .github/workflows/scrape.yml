@@ -86,14 +86,16 @@ jobs:
           # called "message"; rename the key below if yours differs.
           #
           # $summary is NOT wrapped in a ``` code block: Slack renders code
-          # blocks as plain monospace and strips all mrkdwn from their
-          # contents, which is exactly why the old flat, repetitive-looking
-          # notification couldn't use bold/italics/bullets at all. The plain
-          # text below lets fetch_esma.py's emoji + *bold*/_italic_ formatting
-          # (see run()'s github_output block) render as intended.
+          # blocks as plain monospace, which would flatten the emoji-led
+          # layout. No *bold*/_italic_ markup is used here either: Slack
+          # Workflow Builder's "Send a message" step doesn't treat the
+          # webhook's "message" variable as an mrkdwn-typed text object, so
+          # that markup used to render as literal asterisks/underscores
+          # instead of actual formatting. Only <url|text> links (auto-parsed
+          # regardless of mrkdwn typing) and emoji render as intended.
           PAYLOAD=$(jq -n \
             --arg count "$CHANGE_COUNT" \
             --arg summary "$CHANGE_SUMMARY" \
             --arg url "https://novarwo.github.io/micar-registers/changelog.html" \
-            '{message: ("📋 *MiCAR-register bijgewerkt* — " + $count + " wijziging(en)\n\n" + $summary + "\n\n<" + $url + "|Bekijk de volledige wijzigingsgeschiedenis>")}')
+            '{message: ("📋 MiCAR-register bijgewerkt — " + $count + " wijziging(en)\n\n" + $summary + "\n\n<" + $url + "|Bekijk de volledige wijzigingsgeschiedenis>")}')
           curl -sf -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
