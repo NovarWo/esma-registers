@@ -1,6 +1,6 @@
 {
   "register": "casps",
-  "generated_at": "2026-08-13T12:35:16+00:00",
+  "generated_at": "2026-08-13T14:09:52+00:00",
   "records": [
     {
       "id": "67737a1e35f92605",
@@ -12521,7 +12521,7 @@
       "competent_authority": "Comisión Nacional del Mercado de Valores (CNMV)",
       "home_member_state": "ES",
       "name": "PROSEGUR CUSTODIA DE ACTIVOS DIGITALES",
-      "lei": "59800G0P3PV13KLX615",
+      "lei": null,
       "head_office_country": "ES",
       "commercial_name": "PROSEGUR CRYPTO",
       "address": "Calle Herberto Gut 12 Madrid 28007",
@@ -17720,11 +17720,11 @@
       "source": "esma"
     },
     {
-      "id": "2e38385ffda4be38",
+      "id": "95b84cdbb7f44e35",
       "competent_authority": "Central Bank of Ireland (CBI)",
       "home_member_state": "IE",
       "name": "Ramp Swaps (Ireland) Limited",
-      "lei": "89450036UW3ID72T1M84.",
+      "lei": "89450036UW3ID72T1M84",
       "head_office_country": "IE",
       "commercial_name": "Ramp Network",
       "address": "6th Floor, 2 Grand Canal Square, Dublin 2, D02 A342, Ireland.",
@@ -30325,7 +30325,7 @@
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
       "name": "EU Internet Ventures B.V.",
-      "lei": "69940000HAL9ODW3IMO22",
+      "lei": null,
       "head_office_country": "NL",
       "commercial_name": "EU Internet Ventures |EUIV|BNXA",
       "address": "Piet Heinkade 93B - 1019 GM Amsterdam - The Netherlands",
@@ -31160,11 +31160,11 @@
       "source": "esma"
     },
     {
-      "id": "141c1836030ab083",
+      "id": "8ade0aa9b4793f5d",
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
       "name": "WEB3 Technology B.V.",
-      "lei": "724500YJVIN0Q94ZZG5",
+      "lei": null,
       "head_office_country": "NL",
       "commercial_name": "Ari10 | Ari10 NL |  WEB3 Technology B.V.",
       "address": "Prins Hendrikkade 21E - 1012TL - The Netherlands",
@@ -33690,143 +33690,6 @@
     },
     {
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
-      "home_member_state": "IE",
-      "name": "Ramp Swaps (Ireland) Limited",
-      "lei": "89450036UW3ID72T1M84",
-      "head_office_country": null,
-      "commercial_name": "Ramp Network",
-      "address": "6th Floor, 2 Grand Canal Square, Dublin 2, D02 A342, Ireland",
-      "website": null,
-      "platform_website": null,
-      "authorisation_date": null,
-      "withdrawal_date": null,
-      "status": "active",
-      "services": [
-        {
-          "service": "c. exchange of crypto-assets for funds",
-          "countries": []
-        }
-      ],
-      "authorisation_number": null,
-      "authorisation_type": "cross_border",
-      "suspension_periods": null,
-      "eu_passport_direction": "incoming",
-      "eu_passport_countries": [
-        "IE"
-      ],
-      "eu_passport_raw": "Incoming from IE:\nStarting date of the provision of the crypto-asset services: 02-12-2025",
-      "equivalent_services": null,
-      "id": "95b84cdbb7f44e35",
-      "source": "afm"
-    },
-    {
-      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
-      "home_member_state": "NL",
-      "name": "WEB3 Technology B.V.",
-      "lei": "724500YJVIN0Q94ZZG58",
-      "head_office_country": null,
-      "commercial_name": "ARI10 NL, ARI10, WEB3 Technology B.V., RGLTD\nCashify",
-      "address": "Prins Hendrikkade 21E \n1012 TL AMSTERDAM",
-      "website": "https://ari10.c",
-      "platform_website": "https://ari10.com/en/encashify.eu",
-      "authorisation_date": "2026-02-12",
-      "withdrawal_date": null,
-      "status": "active",
-      "services": [
-        {
-          "service": "a. providing custody and administration of crypto-assets on behalf of clients",
-          "countries": []
-        },
-        {
-          "service": "c. exchange of crypto-assets for funds",
-          "countries": []
-        },
-        {
-          "service": "d. exchange of crypto-assets for other crypto-assets",
-          "countries": []
-        },
-        {
-          "service": "j. providing transfer services for crypto-assets on behalf of clients",
-          "countries": []
-        }
-      ],
-      "authorisation_number": "41000022",
-      "authorisation_type": "authorisation",
-      "suspension_periods": null,
-      "eu_passport_direction": "outgoing",
-      "eu_passport_countries": [
-        "AT",
-        "BE",
-        "BG",
-        "CY",
-        "CZ",
-        "DE",
-        "DK",
-        "EE",
-        "EL",
-        "ES",
-        "FI",
-        "FR",
-        "HR",
-        "HU",
-        "IE",
-        "IS",
-        "IT",
-        "LI",
-        "LT",
-        "LU",
-        "LV",
-        "MT",
-        "NO",
-        "PL",
-        "PT",
-        "RO",
-        "SE",
-        "SI",
-        "SK"
-      ],
-      "eu_passport_raw": "Outgoing to: AT, BE, BG, CY, CZ, DE, DK, EE, EL, ES, Fi, FR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MT, NO, PL, PT, RO, SE, SI, SK",
-      "equivalent_services": null,
-      "id": "8ade0aa9b4793f5d",
-      "source": "afm"
-    },
-    {
-      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
-      "home_member_state": "LT",
-      "name": "Newrails, UAB",
-      "lei": "875500AX7AO0XVYSQD64",
-      "head_office_country": null,
-      "commercial_name": "Newrails, UAB",
-      "address": "Švitrigailos str. 11C, LT-03228, Vilnius, Lithuania.",
-      "website": "https://www.newrails.xyz/",
-      "platform_website": null,
-      "authorisation_date": null,
-      "withdrawal_date": null,
-      "status": "active",
-      "services": [
-        {
-          "service": "a. providing custody and administration of crypto-assets on behalf of clients",
-          "countries": []
-        },
-        {
-          "service": "j. providing transfer services for crypto-assets on behalf of clients",
-          "countries": []
-        }
-      ],
-      "authorisation_number": null,
-      "authorisation_type": "cross_border",
-      "suspension_periods": null,
-      "eu_passport_direction": "incoming",
-      "eu_passport_countries": [
-        "LT"
-      ],
-      "eu_passport_raw": "Incoming from LT:\nStarting date of the provision of the crypto-asset services: 12-04-2026",
-      "equivalent_services": null,
-      "id": "07598c777a09d407",
-      "source": "afm"
-    },
-    {
-      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "CY",
       "name": "NOEMON FINANCE LIMITED",
       "lei": "25490004TC93R2OKW073",
@@ -33921,92 +33784,6 @@
       "eu_passport_raw": "Incoming from LT:\nStarting date of the provision of the crypto-asset services: 16-12-2025",
       "equivalent_services": null,
       "id": "ed909cf6fe4eff8b",
-      "source": "afm"
-    },
-    {
-      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
-      "home_member_state": "EE",
-      "name": "Lightspark Payments Europe AS",
-      "lei": null,
-      "head_office_country": null,
-      "commercial_name": "Lightspark Payments Europe AS",
-      "address": "Harju maakond, Tallinn, Kesklinna linnaosa, Pärnu mnt 110, 11313, Estonia",
-      "website": null,
-      "platform_website": null,
-      "authorisation_date": null,
-      "withdrawal_date": null,
-      "status": "active",
-      "services": [
-        {
-          "service": "a. providing custody and administration of crypto-assets on behalf of clients",
-          "countries": []
-        },
-        {
-          "service": "c. exchange of crypto-assets for funds",
-          "countries": []
-        },
-        {
-          "service": "d. exchange of crypto-assets for other crypto-assets",
-          "countries": []
-        },
-        {
-          "service": "j. providing transfer services for crypto-assets on behalf of clients",
-          "countries": []
-        }
-      ],
-      "authorisation_number": null,
-      "authorisation_type": "cross_border",
-      "suspension_periods": null,
-      "eu_passport_direction": "incoming",
-      "eu_passport_countries": [
-        "EE"
-      ],
-      "eu_passport_raw": "Incoming from EE:\nStarting date of the provision of the crypto-assets services: 01-07-2026",
-      "equivalent_services": null,
-      "id": "d91e117f94c093e9",
-      "source": "afm"
-    },
-    {
-      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
-      "home_member_state": "AT",
-      "name": "OSL EU GmbH",
-      "lei": "8945001TKX2A5OJMNR95",
-      "head_office_country": null,
-      "commercial_name": "OSL EU",
-      "address": "Julius-Tandler-Platz 3/Stiege B, Stock 9, 1090 Vienna, Austria",
-      "website": null,
-      "platform_website": null,
-      "authorisation_date": null,
-      "withdrawal_date": null,
-      "status": "active",
-      "services": [
-        {
-          "service": "a. providing custody and administration of crypto-assets on behalf of clients",
-          "countries": []
-        },
-        {
-          "service": "c. exchange of crypto-assets for funds",
-          "countries": []
-        },
-        {
-          "service": "d. exchange of crypto-assets for other crypto-assets",
-          "countries": []
-        },
-        {
-          "service": "j. providing transfer services for crypto-assets on behalf of clients",
-          "countries": []
-        }
-      ],
-      "authorisation_number": null,
-      "authorisation_type": "cross_border",
-      "suspension_periods": null,
-      "eu_passport_direction": "incoming",
-      "eu_passport_countries": [
-        "AT"
-      ],
-      "eu_passport_raw": "Incoming from AT:\nStarting date of the provision of the crypto-assets services: 07-07-2026",
-      "equivalent_services": null,
-      "id": "4d92482cfa3443b7",
       "source": "afm"
     }
   ]

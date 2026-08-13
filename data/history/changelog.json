@@ -14025,5 +14025,362 @@
     "id": "4d92482cfa3443b7",
     "name": "OSL EU GmbH",
     "timestamp": "2026-08-12T18:39:48+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "dfbfe9f3b6888849",
+    "name": "Hassan Systems GmbH",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "0bf6a7c563ee6ec1",
+    "name": "ABC Labs, LLC",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "839dc7d1d0f36aa4",
+    "name": "Gensyn Network Ltd",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "60e7777cb8b71a4b",
+    "name": "PERSPECTIVE SAS",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "ad09d733bd05ca35",
+    "name": "Nexus Sub (BVI) Limited",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "ed07ed98fab5ad47",
+    "name": "Fanpla Inc",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "0ba553e2b321f8e7",
+    "name": "Hassan Systems GmbH",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "c857cd56d537f385",
+    "name": "ABC Labs, LLC",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "8e74205ff9361bb1",
+    "name": "Gensyn Network Ltd",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "4b3796d5c1cd55f9",
+    "name": "PERSPECTIVE SAS",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "bc043bbf4da82206",
+    "name": "Nexus Sub (BVI) Limited",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "3764c9130c2adace",
+    "name": "Fanpla Inc",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "6e67fdd206360724",
+    "name": "PROSEGUR CUSTODIA DE ACTIVOS DIGITALES",
+    "detail": [
+      "lei: 59800G0P3PV13KLX615 → onbekend"
+    ],
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "95b84cdbb7f44e35",
+    "name": "Ramp Swaps (Ireland) Limited",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "c",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "ES",
+          "FI",
+          "FR",
+          "GR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      "competent authority: Netherlands Authority for the Financial Markets (AFM) → Central Bank of Ireland (CBI)",
+      "head office country: onbekend → IE",
+      "address: 6th Floor, 2 Grand Canal Square, Dublin 2, D02 A342, Ireland → 6th Floor, 2 Grand Canal Square, Dublin 2, D02 A342, Ireland.",
+      "website: onbekend → rampnetwork.com",
+      "authorisation date: onbekend → 02/12/2025"
+    ],
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "5c69cc252f3ea623",
+    "name": "EU Internet Ventures B.V.",
+    "detail": [
+      "lei: 69940000HAL9ODW3IMO22 → onbekend"
+    ],
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "8ade0aa9b4793f5d",
+    "name": "WEB3 Technology B.V.",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "a",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "c",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "d",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "j",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      "lei: 724500YJVIN0Q94ZZG58 → onbekend",
+      "head office country: onbekend → NL",
+      "commercial name: ARI10 NL, ARI10, WEB3 Technology B.V., RGLTD\nCashify → Ari10 | Ari10 NL |  WEB3 Technology B.V.",
+      "address: Prins Hendrikkade 21E \n1012 TL AMSTERDAM → Prins Hendrikkade 21E - 1012TL - The Netherlands",
+      "website: https://ari10.c → https://ari10.com/en",
+      "platform website: https://ari10.com/en/encashify.eu → onbekend",
+      "authorisation date: 2026-02-12 → 12/02/2026"
+    ],
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "2e38385ffda4be38",
+    "name": "Ramp Swaps (Ireland) Limited",
+    "registered_on": "02/12/2025",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "141c1836030ab083",
+    "name": "WEB3 Technology B.V.",
+    "registered_on": "12/02/2026",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "07598c777a09d407",
+    "name": "Newrails, UAB",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "d91e117f94c093e9",
+    "name": "Lightspark Payments Europe AS",
+    "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "casps",
+    "id": "4d92482cfa3443b7",
+    "name": "OSL EU GmbH",
+    "timestamp": "2026-08-13T14:09:52+00:00"
   }
 ]
