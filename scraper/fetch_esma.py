@@ -1093,9 +1093,9 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
             # combined, capped segment string, instead of the old behaviour
             # of repeating the entity's own name once per detail item.
             if c["type"] == "changed" and c.get("detail"):
-                detail_lines.append(f"{emoji} {name} _({register_label})_ — {summarize_change_detail(c['detail'])}")
+                detail_lines.append(f"{emoji} {name} ({register_label}) — {summarize_change_detail(c['detail'])}")
             else:
-                detail_lines.append(f"{emoji} {name} _({register_label})_")
+                detail_lines.append(f"{emoji} {name} ({register_label})")
         summary_lines = detail_lines[:MAX_SUMMARY_LINES]
         if len(detail_lines) > MAX_SUMMARY_LINES:
             summary_lines.append(f"... en {len(detail_lines) - MAX_SUMMARY_LINES} andere wijziging(en)")
