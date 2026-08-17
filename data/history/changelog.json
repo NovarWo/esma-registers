@@ -14412,5 +14412,85 @@
       "lei: onbekend → 724500YJVIN0Q94ZZG58"
     ],
     "timestamp": "2026-08-17T13:28:24+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "79efe6d966f9e40f",
+    "name": "GC Exchange A/S",
+    "detail": [
+      "commercial name: GCEX|GC Exchange → GCEX, GC Exchange"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "db24a64f8c348488",
+    "name": "Acheron Europe B.V.",
+    "detail": [
+      "commercial name: Acheron | Acheron Trading → Acheron, Acheron Trading"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "a9686143956716ca",
+    "name": "Amdax B.V.",
+    "detail": [
+      "commercial name: Amdax B.V.|Amdax Group|Novelist → Amdax B.V., Amdax Group, Novelist"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "5c69cc252f3ea623",
+    "name": "EU Internet Ventures B.V.",
+    "detail": [
+      "commercial name: EU Internet Ventures |EUIV|BNXA → EU Internet Ventures, EUIV, BNXA"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "8ade0aa9b4793f5d",
+    "name": "WEB3 Technology B.V.",
+    "detail": [
+      "commercial name: Ari10 | Ari10 NL |  WEB3 Technology B.V. → Ari10, Ari10 NL, WEB3 Technology B.V."
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "ddad2db13c297260",
+    "name": "Digital Currency Services B.V.",
+    "detail": [
+      "commercial name: DCS | HappyCoins → DCS, HappyCoins"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "b59d66688bf2ceb8",
+    "name": "Webull Securities (Europe) B.V.",
+    "detail": [
+      "commercial name: Webull | Webull Europe → Webull, Webull Europe"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "68e0f31ddfdfab30",
+    "name": "Madison Six j. s. a.",
+    "detail": [
+      "commercial name: Madison Six|crypto4me → Madison Six, crypto4me"
+    ],
+    "timestamp": "2026-08-17T14:12:16+00:00"
   }
 ]
