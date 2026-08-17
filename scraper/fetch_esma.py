@@ -206,6 +206,11 @@ def normalize_casps(rows: list[dict]) -> list[dict]:
             "home_member_state": r.get("ae_homeMemberState") or None,
             "name": r.get("ae_lei_name") or None,
             "lei": lei,
+            # Kept only for merge_esma_and_afm_casps()'s LEI reconciliation
+            # (comparing ESMA's raw cell against AFM's raw cell even when one
+            # or both fail clean_lei()) - stripped from every record before
+            # it's written to disk, never part of the public data shape.
+            "_raw_lei": r.get("ae_lei"),
             "head_office_country": r.get("ae_lei_cou_code") or None,
             "commercial_name": r.get("ae_commercial_name") or None,
             "address": r.get("ae_address") or None,
@@ -474,11 +479,15 @@ def normalize_afm(rows: list[tuple]) -> list[dict]:
         eu_passport_raw = _afm_text(row[12] if len(row) > 12 else None)
         eu_passport_direction, eu_passport_countries = _parse_eu_passport(row[12] if len(row) > 12 else None)
 
+        raw_lei = _afm_text(row[9] if len(row) > 9 else None)
         records.append({
             "id": record_id("afm_casps", auth_number, name, home_state_raw),
             "name": name,
             "commercial_name": _afm_text(row[8] if len(row) > 8 else None),
-            "lei": clean_lei(_afm_text(row[9] if len(row) > 9 else None)),
+            "lei": clean_lei(raw_lei),
+            # See the matching comment in normalize_casps() - scratch data for
+            # merge_esma_and_afm_casps()'s LEI reconciliation only.
+            "_raw_lei": raw_lei,
             "authorisation_number": auth_number,
             "authorisation_type": _afm_auth_type(row[2] if len(row) > 2 else None),
             "home_member_state": AFM_COUNTRY_NAME_TO_CODE.get((home_state_raw or "").lower()),
@@ -559,6 +568,84 @@ def _match_lookup(index: dict[tuple, object], keys: list[tuple[str, str]]):
     return None
 
 
+GLEIF_API_URL = "https://api.gleif.org/api/v1/lei-records"
+
+
+def _gleif_lookup_lei(name: str | None, country: str | None, fetcher=requests.get) -> str | None:
+    """Last-resort LEI lookup against GLEIF's free, public LEI database, used
+    only when neither ESMA's nor AFM's raw LEI for an entity passes
+    clean_lei() - i.e. both sides are malformed/missing, so there's nothing
+    left to cross-check between our own two sources. Searches by legal name
+    (optionally narrowed by country) and only trusts the result if it's a
+    single, unambiguous, ACTIVE match - anything else (no match, several
+    candidates, a wrong/expired entity) returns None rather than guessing.
+
+    Network failures, timeouts, and unexpected response shapes are swallowed
+    here and turned into None: a GLEIF outage should never fail the hourly
+    scrape or block the rest of the CASPs merge, it just means this one
+    entity's LEI stays "unknown" a bit longer, same as before this feature
+    existed. `fetcher` is injectable so tests never hit the real network."""
+    if not name:
+        return None
+    params = {"filter[entity.legalName]": name, "page[size]": "5"}
+    if country:
+        params["filter[entity.legalAddress.country]"] = country
+    try:
+        resp = fetcher(GLEIF_API_URL, params=params, timeout=10, headers={"Accept": "application/vnd.api+json"})
+        resp.raise_for_status()
+        results = resp.json().get("data", [])
+    except Exception as exc:
+        print(f"[warn] GLEIF lookup failed for '{name}': {exc}", file=sys.stderr)
+        return None
+
+    active = [r for r in results if r.get("attributes", {}).get("entity", {}).get("status") == "ACTIVE"]
+    if len(active) != 1:
+        return None  # no match, or too ambiguous to trust automatically
+    return clean_lei(active[0].get("attributes", {}).get("lei"))
+
+
+def _reconcile_lei(
+    esma_raw: str | None,
+    afm_raw: str | None,
+    name: str | None,
+    country: str | None,
+    gleif_lookup=_gleif_lookup_lei,
+) -> str | None:
+    """Decides the final LEI for a CASP that (potentially) has readings from
+    both ESMA and AFM this run, instead of always trusting whichever source
+    merge_esma_and_afm_casps() otherwise prefers (ESMA). Real-world example
+    that motivated this: ESMA's raw cell for EU Internet Ventures B.V. was
+    "69940000HAL9ODW3IMO22" (21 characters, one stray extra "0" - invalid per
+    clean_lei()), while the entity's real, GLEIF-verified LEI is
+    "6994000HAL9ODW3IMO22" - correctly rejecting the malformed value used to
+    mean the record just showed "unknown" even though a usable LEI was sat
+    right there in AFM's own export.
+
+    Priority: an entity that cleans up fine on exactly one side wins outright
+    (no need to consult GLEIF at all - the other side is simply wrong or
+    missing). Only when both sides are invalid, or both are valid but
+    disagree, is GLEIF consulted as an independent third opinion; if it can't
+    resolve things either, this falls back to ESMA's raw value's cleaned form
+    (which, in the both-disagree case, matches the existing pre-reconciliation
+    behaviour - never worse than before)."""
+    esma_clean = clean_lei(esma_raw)
+    afm_clean = clean_lei(afm_raw)
+
+    if esma_clean and afm_clean:
+        if esma_clean == afm_clean:
+            return esma_clean
+        gleif_pick = gleif_lookup(name, country)
+        if gleif_pick in (esma_clean, afm_clean):
+            return gleif_pick
+        return esma_clean  # unresolved conflict - keep the existing ESMA-first default
+
+    if esma_clean:
+        return esma_clean
+    if afm_clean:
+        return afm_clean
+    return gleif_lookup(name, country)
+
+
 def _map_afm_to_casps_shape(afm_rec: dict) -> dict:
     """Reshapes an AFM record into the same field shape ESMA's own CASPS
     records use, so the site's existing CASPs table/detail-view code needs
@@ -570,6 +657,7 @@ def _map_afm_to_casps_shape(afm_rec: dict) -> dict:
         "home_member_state": afm_rec.get("home_member_state"),
         "name": afm_rec.get("name"),
         "lei": afm_rec.get("lei"),
+        "_raw_lei": afm_rec.get("_raw_lei"),
         "head_office_country": None,
         "commercial_name": afm_rec.get("commercial_name"),
         "address": afm_rec.get("address"),
@@ -589,9 +677,27 @@ def _map_afm_to_casps_shape(afm_rec: dict) -> dict:
     }
 
 
+def _raw_lei_of(rec: dict) -> str | None:
+    """Returns the pre-clean_lei() LEI text a normalize_casps()/normalize_afm()
+    record carries in its internal "_raw_lei" field, for _reconcile_lei() to
+    compare. Falls back to the already-cleaned "lei" field when "_raw_lei" is
+    absent entirely (e.g. handcrafted test fixtures, or any caller that only
+    ever populates "lei") - clean_lei() is idempotent, so re-validating an
+    already-clean value inside _reconcile_lei() is harmless."""
+    return rec.get("_raw_lei", rec.get("lei"))
+
+
 def merge_esma_and_afm_casps(
-    esma_current: list[dict], afm_current: list[dict], previous_merged: dict[str, dict]
+    esma_current: list[dict],
+    afm_current: list[dict],
+    previous_merged: dict[str, dict],
+    gleif_lookup=_gleif_lookup_lei,
 ) -> list[dict]:
+    # gleif_lookup is threaded through to every _reconcile_lei() call below
+    # and is injectable purely so tests can stub GLEIF's response instead of
+    # making a real network call - production callers should never need to
+    # pass it explicitly (the default already is the real GLEIF lookup).
+    #
     # previous_merged is {id: record} from load_previous("casps") - the last
     # committed, already-merged data/casps.json. Index it by EVERY match key
     # each record has (see _casps_match_keys()) so we can recognise "we've
@@ -608,6 +714,15 @@ def merge_esma_and_afm_casps(
         for key in _casps_match_keys(rec):
             esma_by_key[key] = rec
 
+    # Indexed the same way so an ESMA record can look up "is there an AFM
+    # reading of this same entity this run?" for _reconcile_lei() below - see
+    # that function's docstring for why comparing both sides' raw LEI (rather
+    # than just trusting ESMA's) matters.
+    afm_by_key: dict[tuple, dict] = {}
+    for afm_rec in afm_current:
+        for key in _casps_match_keys(afm_rec):
+            afm_by_key[key] = afm_rec
+
     merged: list[dict] = []
     for rec in esma_current:
         keys = _casps_match_keys(rec)
@@ -616,13 +731,33 @@ def merge_esma_and_afm_casps(
         # computed one, so the tracked record's identity never changes.
         prev_id = _match_lookup(previous_by_key, keys)
         final_id = prev_id if prev_id is not None else rec["id"]
-        merged.append({**rec, "id": final_id, "source": "esma"})
+        afm_match = _match_lookup(afm_by_key, keys)
+        reconciled_lei = _reconcile_lei(
+            _raw_lei_of(rec),
+            _raw_lei_of(afm_match) if afm_match else None,
+            rec.get("name"),
+            rec.get("head_office_country"),
+            gleif_lookup=gleif_lookup,
+        )
+        merged.append({
+            **{k: v for k, v in rec.items() if k != "_raw_lei"},
+            "id": final_id,
+            "lei": reconciled_lei,
+            "source": "esma",
+        })
 
     for afm_rec in afm_current:
         keys = _casps_match_keys(afm_rec)
         if _match_lookup(esma_by_key, keys) is not None:
             continue  # already covered by ESMA's own export this run - skip, no duplicate row
         mapped = _map_afm_to_casps_shape(afm_rec)
+        # No ESMA reading to cross-check against this run, but AFM's own raw
+        # LEI might still be malformed on its own - same GLEIF-by-name
+        # fallback applies (esma_raw=None short-circuits straight past the
+        # "both present" branch in _reconcile_lei()).
+        afm_raw_lei = _raw_lei_of(mapped)
+        mapped.pop("_raw_lei", None)
+        mapped["lei"] = _reconcile_lei(None, afm_raw_lei, mapped.get("name"), None, gleif_lookup=gleif_lookup)
         prev_id = _match_lookup(previous_by_key, keys)
         if prev_id is not None:
             mapped["id"] = prev_id
@@ -1020,7 +1155,20 @@ def run(fetcher: Callable[[str], list[dict]] = fetch_csv) -> int:
                 current = merge_esma_and_afm_casps(current, afm_current, previous)
             except Exception as exc:
                 print(f"[warn] failed to fetch/merge AFM register: {exc}", file=sys.stderr)
-                current = [{**rec, "source": "esma"} for rec in current]
+                # No AFM reading available this run to cross-check against,
+                # but still worth a GLEIF-by-name fallback for an ESMA LEI
+                # that's malformed on its own - and "_raw_lei" must be
+                # stripped here too, same as inside merge_esma_and_afm_casps()
+                # itself, since it's scratch data that should never reach
+                # data/casps.json.
+                current = [
+                    {
+                        **{k: v for k, v in rec.items() if k != "_raw_lei"},
+                        "lei": _reconcile_lei(_raw_lei_of(rec), None, rec.get("name"), rec.get("head_office_country")),
+                        "source": "esma",
+                    }
+                    for rec in current
+                ]
 
         changes = diff_records(register, previous, current)
         all_changes.extend(changes)
