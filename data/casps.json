@@ -1,6 +1,6 @@
 {
   "register": "casps",
-  "generated_at": "2026-08-17T12:02:24+00:00",
+  "generated_at": "2026-08-17T13:28:24+00:00",
   "records": [
     {
       "id": "67737a1e35f92605",
@@ -12521,7 +12521,7 @@
       "competent_authority": "Comisión Nacional del Mercado de Valores (CNMV)",
       "home_member_state": "ES",
       "name": "PROSEGUR CUSTODIA DE ACTIVOS DIGITALES",
-      "lei": null,
+      "lei": "959800G0P3PV13KLX615",
       "head_office_country": "ES",
       "commercial_name": "PROSEGUR CRYPTO",
       "address": "Calle Herberto Gut 12 Madrid 28007",
@@ -30325,7 +30325,7 @@
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
       "name": "EU Internet Ventures B.V.",
-      "lei": null,
+      "lei": "6994000HAL9ODW3IMO22",
       "head_office_country": "NL",
       "commercial_name": "EU Internet Ventures |EUIV|BNXA",
       "address": "Piet Heinkade 93B - 1019 GM Amsterdam - The Netherlands",
@@ -31164,7 +31164,7 @@
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
       "name": "WEB3 Technology B.V.",
-      "lei": null,
+      "lei": "724500YJVIN0Q94ZZG58",
       "head_office_country": "NL",
       "commercial_name": "Ari10 | Ari10 NL |  WEB3 Technology B.V.",
       "address": "Prins Hendrikkade 21E - 1012TL - The Netherlands",

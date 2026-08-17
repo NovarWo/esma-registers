@@ -14382,5 +14382,35 @@
     "id": "4d92482cfa3443b7",
     "name": "OSL EU GmbH",
     "timestamp": "2026-08-13T14:09:52+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "6e67fdd206360724",
+    "name": "PROSEGUR CUSTODIA DE ACTIVOS DIGITALES",
+    "detail": [
+      "lei: onbekend → 959800G0P3PV13KLX615"
+    ],
+    "timestamp": "2026-08-17T13:28:24+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "5c69cc252f3ea623",
+    "name": "EU Internet Ventures B.V.",
+    "detail": [
+      "lei: onbekend → 6994000HAL9ODW3IMO22"
+    ],
+    "timestamp": "2026-08-17T13:28:24+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "8ade0aa9b4793f5d",
+    "name": "WEB3 Technology B.V.",
+    "detail": [
+      "lei: onbekend → 724500YJVIN0Q94ZZG58"
+    ],
+    "timestamp": "2026-08-17T13:28:24+00:00"
   }
 ]
