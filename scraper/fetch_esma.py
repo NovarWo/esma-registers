@@ -131,6 +131,20 @@ def split_pipe(value: str | None) -> list[str]:
     return [v.strip() for v in value.split("|") if v.strip()]
 
 
+def clean_commercial_name(value: str | None) -> str | None:
+    """ESMA occasionally pipe-joins several trade names/aliases into a single
+    ae_commercial_name cell instead of picking one - real-world example: "EU
+    Internet Ventures |EUIV|BNXA" for the entity that trades as Banxa,
+    complete with a stray leading space before the first pipe. Left as-is
+    this showed up verbatim (pipes and all) as the site's "Handelsnaam"
+    value. Same fix idiom already used for ESMA's pipe-joined services/
+    countries (split_pipe()): split on "|", trim each part, drop empties, and
+    rejoin as a clean comma-separated list so every alias is kept but
+    displayed properly instead of as a raw delimiter dump."""
+    parts = split_pipe(value)
+    return ", ".join(parts) if parts else None
+
+
 def status_from(end_date: str | None) -> str:
     return "withdrawn" if end_date else "active"
 
@@ -212,7 +226,7 @@ def normalize_casps(rows: list[dict]) -> list[dict]:
             # it's written to disk, never part of the public data shape.
             "_raw_lei": r.get("ae_lei"),
             "head_office_country": r.get("ae_lei_cou_code") or None,
-            "commercial_name": r.get("ae_commercial_name") or None,
+            "commercial_name": clean_commercial_name(r.get("ae_commercial_name")),
             "address": r.get("ae_address") or None,
             "website": r.get("ae_website") or None,
             "platform_website": r.get("ae_website_platform") or None,
@@ -258,7 +272,7 @@ def normalize_art_or_emt(rows: list[dict], register: str) -> list[dict]:
             "name": r.get("ae_lei_name") or None,
             "lei": lei,
             "head_office_country": r.get("ae_lei_cou_code") or None,
-            "commercial_name": r.get("ae_commercial_name") or None,
+            "commercial_name": clean_commercial_name(r.get("ae_commercial_name")),
             "address": r.get("ae_address") or None,
             "website": r.get("ae_website") or None,
             "authorisation_date": r.get("ac_authorisationNotificationDate") or None,
