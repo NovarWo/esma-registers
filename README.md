@@ -48,6 +48,13 @@ Nederland gevestigde en vergunde CASP is de AFM-bron dus geregeld actueler.
 - Zodra diezelfde entiteit later ook in ESMA's eigen export verschijnt, neemt de ESMA-versie
   het over (`source: "esma"`) — het record behoudt daarbij zijn bestaande id, zodat dit nooit
   als een "verwijderd" + "toegevoegd"-paar in de changelog/Slack-melding verschijnt.
+- De LEI zelf wordt ook tussen beide bronnen gereconcilieerd (`_reconcile_lei()`): is er precies
+  één kant met een geldige LEI (20 tekens, `clean_lei()`), dan wint die, ongeacht welke bron
+  verder de overhand heeft. Zijn beide ongeldig, of geldig-maar-verschillend (zeldzaam), dan
+  wordt GLEIF's publieke, gratis LEI-database (`api.gleif.org`) geraadpleegd als scheidsrechter
+  — alleen bij een ondubbelzinnige, actieve match op naam. GLEIF-aanroepen falen altijd stil
+  (nooit de scrape blokkerend); levert dat niets bruikbaars op, dan blijft de LEI "onbekend"
+  in plaats van dat er geraden wordt.
 
 De AFM publiceert dit register als een los `.xlsx`-bestand (geen CSV-API zoals ESMA), dus
 `fetch_afm_rows()`/`normalize_afm()` in `fetch_esma.py` gebruiken `openpyxl` om het in te
