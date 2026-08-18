@@ -14492,5 +14492,247 @@
       "commercial name: Madison Six|crypto4me → Madison Six, crypto4me"
     ],
     "timestamp": "2026-08-17T14:12:16+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "40dfd4223c278525",
+    "name": "Bitpanda GmbH",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "3d64177fe4ecf00f",
+    "name": "MOJO Sales GmbH",
+    "detail": [
+      "home member state: Austria → AT"
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "f1d8927264ff54ce",
+    "name": "Crypto Risk Metrics GmbH",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "465971bbec30b21d",
+    "name": "Nimiq Network Ltd.",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "99fc276427b2c065",
+    "name": "VERA POWER LTD",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "f863ecf6f697c192",
+    "name": "OGF (BVI) Ltd.",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "02c729602cdc9908",
+    "name": "DAWN Foundation",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d4932576a0c12012",
+    "name": "Midnight TGE Ltd.",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "4c95bf7053d37723",
+    "name": "QuantID Systems Inc",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "77c3f8e6c7783da6",
+    "name": "Wandilla Holdings Limited",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "03e0fbe44df1ed41",
+    "name": "The Interfold Foundation",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "bdfe158b93106fec",
+    "name": "Tread Foundry Ltd.",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "6c2dacc2d7b509b2",
+    "name": "Orbital Line Limited",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "5fd2d9e0c9587eb8",
+    "name": "Odyssey Foundation",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "removed",
+    "register": "whitepapers",
+    "id": "bbcbaf38629cf65c",
+    "name": "Wandilla",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "66192aed07312780",
+    "name": "Raiffeisenbank Aidlingen eG",
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "8c4d938f24ad43d7",
+    "name": "BASQUE PAY S.L.",
+    "detail": [
+      "lei: onbekend → 9598005WW6HZ4V82BZ26"
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "8ade0aa9b4793f5d",
+    "name": "WEB3 Technology B.V.",
+    "detail": [
+      "commercial name: Ari10, Ari10 NL, WEB3 Technology B.V. → Ari10, Ari10 NL, WEB3 Technology B.V., RGLTD\nCashify",
+      "address: Prins Hendrikkade 21E - 1012TL - The Netherlands → Prins Hendrikkade 21E - 1012TL Amsterdam - The Netherlands",
+      "website: https://ari10.com/en → https://ari10.com/en\nhttps://ari10.com/en/encashify.eu"
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "cc5d2090bae0303b",
+    "name": "BitPay B.V.",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "c",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "j",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "EL",
+          "ES",
+          "FI",
+          "FR",
+          "HR",
+          "HU",
+          "IE",
+          "IS",
+          "IT",
+          "LI",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      "commercial name: BitPay B.V. → BitPay B.V., Cashify, RGLTD",
+      "authorisation date: 15/07/2026 → 16/07/2026"
+    ],
+    "timestamp": "2026-08-18T10:12:04+00:00"
   }
 ]

@@ -1,6 +1,6 @@
 {
   "register": "casps",
-  "generated_at": "2026-08-18T09:16:32+00:00",
+  "generated_at": "2026-08-18T10:12:04+00:00",
   "records": [
     {
       "id": "67737a1e35f92605",
@@ -10528,6 +10528,32 @@
       "source": "esma"
     },
     {
+      "id": "66192aed07312780",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Raiffeisenbank Aidlingen eG",
+      "lei": "529900JEKLBM7SSTQS98",
+      "head_office_country": "DE",
+      "commercial_name": "Raiffeisenbank Aidlingen eG",
+      "address": "Hauptstraße 8, 71134 Aidlingen, Württ",
+      "website": "www.IhrZiel.de",
+      "platform_website": null,
+      "authorisation_date": "07/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "07/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
       "id": "5851ed02452fae27",
       "competent_authority": "Finanstilsynet",
       "home_member_state": "DK",
@@ -12583,7 +12609,7 @@
       "competent_authority": "Comisión Nacional del Mercado de Valores (CNMV)",
       "home_member_state": "ES",
       "name": "BASQUE PAY S.L.",
-      "lei": null,
+      "lei": "9598005WW6HZ4V82BZ26",
       "head_office_country": "ES",
       "commercial_name": "BASQUE PAY S.L.",
       "address": "Calle Villa de Plentzia 42-5 C. Getxeo Bizcaia.",
@@ -12599,7 +12625,7 @@
             "ES"
           ],
           "comments": null,
-          "last_update": "31/07/2026"
+          "last_update": "17/08/2026"
         }
       ],
       "source": "esma"
@@ -31166,9 +31192,9 @@
       "name": "WEB3 Technology B.V.",
       "lei": "724500YJVIN0Q94ZZG58",
       "head_office_country": "NL",
-      "commercial_name": "Ari10, Ari10 NL, WEB3 Technology B.V.",
-      "address": "Prins Hendrikkade 21E - 1012TL - The Netherlands",
-      "website": "https://ari10.com/en",
+      "commercial_name": "Ari10, Ari10 NL, WEB3 Technology B.V., RGLTD\nCashify",
+      "address": "Prins Hendrikkade 21E - 1012TL Amsterdam - The Netherlands",
+      "website": "https://ari10.com/en\nhttps://ari10.com/en/encashify.eu",
       "platform_website": null,
       "authorisation_date": "12/02/2026",
       "withdrawal_date": null,
@@ -31209,7 +31235,7 @@
             "SK"
           ],
           "comments": null,
-          "last_update": "19/02/2026"
+          "last_update": "17/07/2026"
         },
         {
           "service": "c. exchange of crypto-assets for funds",
@@ -31246,7 +31272,7 @@
             "SK"
           ],
           "comments": null,
-          "last_update": "19/02/2026"
+          "last_update": "17/07/2026"
         },
         {
           "service": "d. exchange of crypto-assets for other crypto-assets",
@@ -31283,7 +31309,7 @@
             "SK"
           ],
           "comments": null,
-          "last_update": "19/02/2026"
+          "last_update": "17/07/2026"
         },
         {
           "service": "j. providing transfer services for crypto-assets on behalf of clients",
@@ -31320,7 +31346,7 @@
             "SK"
           ],
           "comments": null,
-          "last_update": "19/02/2026"
+          "last_update": "17/07/2026"
         }
       ],
       "source": "esma"
@@ -31581,21 +31607,50 @@
       "name": "BitPay B.V.",
       "lei": "724500F2THLY5MHEIM78",
       "head_office_country": "NL",
-      "commercial_name": "BitPay B.V.",
+      "commercial_name": "BitPay B.V., Cashify, RGLTD",
       "address": "Keizersgracht 520H -\n1017EK  AMSTERDAM -The Netherlands",
       "website": "https://www.bitpay.com/",
       "platform_website": null,
-      "authorisation_date": "15/07/2026",
+      "authorisation_date": "16/07/2026",
       "withdrawal_date": null,
       "status": "active",
       "services": [
         {
           "service": "(c) exchange of crypto-assets for funds\n(j) providing transfer services for crypto-assets on behalf of clients",
           "countries": [
-            "NL"
+            "NL",
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "EL",
+            "ES",
+            "FI",
+            "FR",
+            "HR",
+            "HU",
+            "IE",
+            "IT",
+            "IS",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
           ],
           "comments": null,
-          "last_update": "16/07/2026"
+          "last_update": "13/08/2026"
         }
       ],
       "source": "esma"

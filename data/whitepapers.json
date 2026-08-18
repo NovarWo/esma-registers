@@ -1,6 +1,6 @@
 {
   "register": "whitepapers",
-  "generated_at": "2026-08-18T09:16:32+00:00",
+  "generated_at": "2026-08-18T10:12:04+00:00",
   "records": [
     {
       "id": "dfea4f01709f83f8",
@@ -110,7 +110,7 @@
       "head_office_country": "AT",
       "whitepapers": [
         {
-          "url": "VISION.NOW",
+          "url": "https://www.bitpanda.com/en/legal/vsn-white-paper",
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [
@@ -145,7 +145,7 @@
           "dti": null,
           "dti_ffg": null,
           "comments": null,
-          "last_update": "06/06/2025"
+          "last_update": "11/08/2026"
         }
       ]
     },
@@ -398,7 +398,7 @@
     {
       "id": "3d64177fe4ecf00f",
       "competent_authority": "Austrian Financial Market Authority (FMA)",
-      "home_member_state": "Austria",
+      "home_member_state": "AT",
       "name": "MOJO Sales GmbH",
       "lei": "875500LZF8VIDAKG7213",
       "head_office_country": "AT",
@@ -4026,6 +4026,170 @@
           "dti_ffg": "92M9B0DZ7",
           "comments": null,
           "last_update": "14/07/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/floki-ffg-r1xc4hqt5/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "JSB445WQN| MFB10VML7",
+          "dti_ffg": "R1XC4HQT5",
+          "comments": null,
+          "last_update": "29/07/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/gram-ffg-kk12jmbtx/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "QBZLT5MT1",
+          "dti_ffg": "KK12JMBTX",
+          "comments": null,
+          "last_update": "03/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/diem-ffg-zffjtq357/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "9X8LVNTLW",
+          "dti_ffg": "ZFFJTQ357",
+          "comments": null,
+          "last_update": "10/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/venice-token-ffg-p0sd47m0w/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "1J5KDD5S0",
+          "dti_ffg": "P0SD47M0W",
+          "comments": null,
+          "last_update": "13/08/2026"
         }
       ]
     },
@@ -4706,6 +4870,57 @@
           "dti_ffg": null,
           "comments": null,
           "last_update": "06/05/2026"
+        }
+      ]
+    },
+    {
+      "id": "465971bbec30b21d",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Nimiq Network Ltd.",
+      "lei": "391200RK8DW9GC5VC131",
+      "head_office_country": "DE",
+      "whitepapers": [
+        {
+          "url": "https://www.nimiq.com/",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "VW1SKQ9LS",
+          "dti_ffg": "2TF3Z8C8J",
+          "comments": null,
+          "last_update": "05/08/2026"
         }
       ]
     },
@@ -12696,6 +12911,66 @@
       ]
     },
     {
+      "id": "99fc276427b2c065",
+      "competent_authority": "Central Bank of Ireland (CBI)",
+      "home_member_state": "IE",
+      "name": "VERA POWER LTD",
+      "lei": null,
+      "head_office_country": "VG",
+      "whitepapers": [
+        {
+          "url": "https://www.upsmartytoken.com/whitepaper",
+          "casp_name": "Payward Global Solutions Ltd. (Kraken)",
+          "casp_lei": "9845003D98SCC2851458",
+          "offer_countries": [],
+          "dti": "6Z5Q30WQC",
+          "dti_ffg": "8X6CC2M83",
+          "comments": null,
+          "last_update": "14/08/2026"
+        }
+      ]
+    },
+    {
+      "id": "f863ecf6f697c192",
+      "competent_authority": "Central Bank of Ireland (CBI)",
+      "home_member_state": "IE",
+      "name": "OGF (BVI) Ltd.",
+      "lei": null,
+      "head_office_country": "VG",
+      "whitepapers": [
+        {
+          "url": "https://contents.crosstoken.io/white-paper/260713_WhitePaper_ONE_Token_OGF_BVI_Ltd_VG_EN_ID_3557280.xhtml",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "WLNJZD6PX",
+          "dti_ffg": "VWT6QCPHM",
+          "comments": null,
+          "last_update": "14/08/2026"
+        }
+      ]
+    },
+    {
+      "id": "02c729602cdc9908",
+      "competent_authority": "Central Bank of Ireland (CBI)",
+      "home_member_state": "IE",
+      "name": "DAWN Foundation",
+      "lei": "9845006AE39E8473AE22",
+      "head_office_country": "KY",
+      "whitepapers": [
+        {
+          "url": "http://dawninternet.com/micawhitepaper",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "RPD4J4HF4",
+          "dti_ffg": "6KJBFS0GP",
+          "comments": null,
+          "last_update": "14/08/2026"
+        }
+      ]
+    },
+    {
       "id": "1d468e8800be3896",
       "competent_authority": "Commissione Nazionale per le Societa e la Borsa (CONSOB)",
       "home_member_state": "IT",
@@ -18345,6 +18620,46 @@
       ]
     },
     {
+      "id": "d4932576a0c12012",
+      "competent_authority": "Malta Financial Services Authority (MFSA)",
+      "home_member_state": "MT",
+      "name": "Midnight TGE Ltd.",
+      "lei": null,
+      "head_office_country": "VG",
+      "whitepapers": [
+        {
+          "url": "https://www.midnight.gd/night-mica-white-paper",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "7RDLF2HF6",
+          "dti_ffg": "3XKBBLRKC",
+          "comments": null,
+          "last_update": "12/08/2026"
+        }
+      ]
+    },
+    {
+      "id": "4c95bf7053d37723",
+      "competent_authority": "Malta Financial Services Authority (MFSA)",
+      "home_member_state": "MT",
+      "name": "QuantID Systems Inc",
+      "lei": null,
+      "head_office_country": "PA",
+      "whitepapers": [
+        {
+          "url": "https://api.s.technology/wp-content/uploads/2026/08/WhitePaper-RWS-Token_v8.xhtml",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "F759V559X",
+          "dti_ffg": "Q43DT3QLV",
+          "comments": null,
+          "last_update": "12/08/2026"
+        }
+      ]
+    },
+    {
       "id": "8f68a09a7e99bf74",
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
@@ -18685,22 +19000,53 @@
       ]
     },
     {
-      "id": "bbcbaf38629cf65c",
+      "id": "77c3f8e6c7783da6",
       "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
       "home_member_state": "NL",
-      "name": "Wandilla",
-      "lei": null,
-      "head_office_country": null,
+      "name": "Wandilla Holdings Limited",
+      "lei": "254900VUJZADND4ASW88",
+      "head_office_country": "VG",
       "whitepapers": [
         {
-          "url": "https://xion.burnt.com/mica_whitepaper",
+          "url": "https://verona.micarwhitepapers.eu",
           "casp_name": null,
           "casp_lei": null,
-          "offer_countries": [],
-          "dti": null,
-          "dti_ffg": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "W87LBV98Z |N6Q82SW8Q | 1XVWJFM70 | S5HLN69Z3",
+          "dti_ffg": "HFKC0NXKJ",
           "comments": "wp update",
-          "last_update": "05/08/2025"
+          "last_update": "05/08/2026"
         }
       ]
     },
@@ -20524,7 +20870,7 @@
       "head_office_country": "KY",
       "whitepapers": [
         {
-          "url": "https://interfold.micarwhitepaper.eu",
+          "url": "https://interfold.micarwhitepapers.eu",
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [
@@ -20575,7 +20921,7 @@
       "head_office_country": "VG",
       "whitepapers": [
         {
-          "url": "https://tread.micarwhitepaper.eu",
+          "url": "https://tread.micarwhitepapers.eu",
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [
@@ -20716,6 +21062,107 @@
           "dti_ffg": "JTZ166XGD",
           "comments": "wp update",
           "last_update": "31/07/2026"
+        }
+      ]
+    },
+    {
+      "id": "6c2dacc2d7b509b2",
+      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
+      "home_member_state": "NL",
+      "name": "Orbital Line Limited",
+      "lei": null,
+      "head_office_country": "KY",
+      "whitepapers": [
+        {
+          "url": "https://grvt.micarwhitepapers.eu",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "2JX1R770F |72F9DN9T8 | D00DWX6C3",
+          "dti_ffg": "M2NP48MKX",
+          "comments": "wp update",
+          "last_update": "05/08/2026"
+        }
+      ]
+    },
+    {
+      "id": "5fd2d9e0c9587eb8",
+      "competent_authority": "Netherlands Authority for the Financial Markets (AFM)",
+      "home_member_state": "NL",
+      "name": "Odyssey Foundation",
+      "lei": "984500D53C1CCEEDC313",
+      "head_office_country": "KY",
+      "whitepapers": [
+        {
+          "url": "https://odyssey.micarwhitepapers.eu",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "1ZX1X7FM5 | 642RTWX3H | 2M0XTNSTM",
+          "dti_ffg": "K52LZ52BB",
+          "comments": "wp update",
+          "last_update": "06/08/2026"
         }
       ]
     },
