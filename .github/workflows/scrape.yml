@@ -87,15 +87,22 @@ jobs:
           #
           # $summary is NOT wrapped in a ``` code block: Slack renders code
           # blocks as plain monospace, which would flatten the emoji-led
-          # layout. No *bold*/_italic_ markup is used here either: Slack
-          # Workflow Builder's "Send a message" step doesn't treat the
-          # webhook's "message" variable as an mrkdwn-typed text object, so
-          # that markup used to render as literal asterisks/underscores
-          # instead of actual formatting. Only <url|text> links (auto-parsed
-          # regardless of mrkdwn typing) and emoji render as intended.
+          # layout. No *bold*/_italic_ markup and no <url|label> link syntax
+          # either: per Slack's own docs, only text typed directly into a
+          # Workflow Builder step (through Slack's own composer) supports
+          # rich formatting - an inserted *variable*'s value is always
+          # substituted as a literal string, with no mrkdwn interpretation
+          # applied to its content. Confirmed live: both markup styles showed
+          # up as literal characters in the delivered message.
+          #
+          # So the changelog link is deliberately NOT built here at all - the
+          # URL never changes, so it's added ONCE as static, properly
+          # hyperlinked text directly in the Workflow Builder step itself
+          # (see README.md's "Slack-meldingen" section), where Slack's own
+          # link tool actually works. This "message" variable only ever
+          # carries the dynamic emoji + summary lines.
           PAYLOAD=$(jq -n \
             --arg count "$CHANGE_COUNT" \
             --arg summary "$CHANGE_SUMMARY" \
-            --arg url "https://novarwo.github.io/micar-registers/changelog.html" \
-            '{message: ("📋 MiCAR-register bijgewerkt — " + $count + " wijziging(en)\n\n" + $summary + "\n\nBekijk de volledige <" + $url + "|wijzigingsgeschiedenis>")}')
+            '{message: ("📋 MiCAR-register bijgewerkt — " + $count + " wijziging(en)\n\n" + $summary)}')
           curl -sf -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
