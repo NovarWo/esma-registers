@@ -96,11 +96,11 @@ jobs:
           # up as literal characters in the delivered message.
           #
           # So the changelog link is deliberately NOT built here at all - the
-          # URL never changes, so it's added ONCE as static, properly
-          # hyperlinked text directly in the Workflow Builder step itself
-          # (see README.md's "Slack-meldingen" section), where Slack's own
-          # link tool actually works. This "message" variable only ever
-          # carries the dynamic emoji + summary lines.
+          # URL never changes, so it's added ONCE as a button on the "Send a
+          # message" step itself (see README.md's "Slack-meldingen" section),
+          # Workflow Builder's native way to attach a link without needing
+          # mrkdwn interpretation. This "message" variable only ever carries
+          # the dynamic emoji + summary lines.
           PAYLOAD=$(jq -n \
             --arg count "$CHANGE_COUNT" \
             --arg summary "$CHANGE_SUMMARY" \
