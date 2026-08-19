@@ -105,16 +105,14 @@ Eenmalige setup:
 2. Kopieer de webhook-URL die Workflow Builder je geeft (`https://hooks.slack.com/triggers/...`).
 3. Zet die URL als GitHub-repository-secret: **Settings → Secrets and variables → Actions →
    New repository secret**, naam `SLACK_WEBHOOK_URL`.
-4. Voeg de link naar de changelog toe als **losse, statisch getypte tekst** in diezelfde "Send a
-   message"-stap — niet via de `message`-variabele, want Slack past mrkdwn (bold/italic/links)
-   alleen toe op tekst die je zelf rechtstreeks in Workflow Builder's tekstvak typt, nooit op de
-   inhoud van een ingevoegde variabele (die wordt altijd letterlijk, ongeïnterpreteerd geplakt —
-   vandaar dat `*bold*`, `_italic_` én `<url|label>`-links eerder allemaal als kale tekens
-   verschenen). Typ dus, ná het invoegen van de `message`-variabele, zelf een regel als "Bekijk
-   de volledige wijzigingsgeschiedenis", selecteer het woord "wijzigingsgeschiedenis" en gebruik
-   Slack's eigen link-knop (of Cmd/Ctrl+K) om daar de vaste URL
-   `https://novarwo.github.io/micar-registers/changelog.html` aan te hangen. Omdat die URL nooit
-   wijzigt, hoeft dit maar één keer.
+4. Voeg de link naar de changelog toe als een **knop** op diezelfde "Send a message"-stap
+   (**Add a button** → Button label "Wijzigingsgeschiedenis", Behaviour "Open link", URL
+   `https://novarwo.github.io/micar-registers/changelog.html`) — niet via de `message`-variabele.
+   Slack past mrkdwn (bold/italic/`<url|label>`-links) namelijk alleen toe op tekst die je zelf
+   rechtstreeks in Workflow Builder typt of instelt, nooit op de inhoud van een ingevoegde
+   variabele (die wordt altijd letterlijk, ongeïnterpreteerd geplakt — vandaar dat die opmaak
+   eerder als kale tekens verscheen). Een knop is de native, betrouwbare manier om dit op te
+   lossen zonder de volledige URL te tonen. Omdat die URL nooit wijzigt, hoeft dit maar één keer.
 
 Zonder het `SLACK_WEBHOOK_URL`-secret slaat de workflow de Slack-stap stilzwijgend over
 (`continue-on-error`) — de rest van de scrape/site-update blijft gewoon werken.
