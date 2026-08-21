@@ -138,31 +138,29 @@ h1, h2, h3 { color: var(--text); line-height: 1.25; margin: 0 0 8px; }
 .lang-toggle__btn:hover { color: var(--text); }
 .lang-toggle__btn.is-active { background: var(--color-primary); color: #fff; }
 
-/* ☀️/🌙 theme toggle, same segmented-pill pattern as the NL/EN lang-toggle
-   above (and .page-size-toggle further down) - kept as its own class rather
-   than reusing .lang-toggle so the two independent toggles in the topnav can
-   be told apart/targeted separately if either needs to change. */
+/* ☀️/🌙 theme toggle: a single round icon button (not a segmented pill like
+   .lang-toggle) - it always shows the current theme's icon, and a click just
+   flips to the other one. See renderThemeToggle() in app.js. */
 .theme-toggle {
-  display: inline-flex; align-items: center; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex: none; padding: 0;
+  font-family: inherit; font-size: 1rem; line-height: 1; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  border-radius: 50%;
+  transition: background .15s ease, opacity .15s ease, transform .1s ease;
 }
-.theme-toggle__btn {
-  font-family: inherit; font-size: .9375rem; line-height: 1; cursor: pointer;
-  border: none; background: none; color: var(--text-muted); border-radius: var(--radius-pill);
-  padding: 6px 9px; transition: background .15s ease, color .15s ease, opacity .15s ease;
-  opacity: .55; filter: grayscale(1);
-}
-.theme-toggle__btn:hover { opacity: .85; }
-.theme-toggle__btn.is-active { background: var(--color-primary-lighter); opacity: 1; filter: none; }
+.theme-toggle:hover { background: var(--color-primary-lighter); }
+.theme-toggle:active { transform: scale(.92); }
 
 /* Below the nav's own max-width (1180px - see .topnav__inner), the language
    and theme toggles no longer reliably fit on the same row as the nav links
-   without crowding/wrapping oddly - stack them instead, equal width, in the
-   same order (language above theme) rather than letting them wrap apart
-   unpredictably. */
+   without crowding/wrapping oddly - stack them instead, in the same order
+   (language above theme). The language pill stretches to the column's full
+   width; the theme button is a fixed-size circle, so it's just centered
+   instead - stretching it would turn the circle into an oval. */
 @media (max-width: 1180px) {
-  .header-controls { flex-direction: column; align-items: stretch; gap: 6px; width: 100%; max-width: 220px; }
-  .header-controls .lang-toggle, .header-controls .theme-toggle { display: flex; width: 100%; justify-content: center; }
+  .header-controls { flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 220px; }
+  .header-controls .lang-toggle { display: flex; width: 100%; justify-content: center; }
 }
 
 /* Page header */
