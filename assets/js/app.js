@@ -1337,28 +1337,28 @@ if (darkSchemeQuery) {
   else if (darkSchemeQuery.addListener) darkSchemeQuery.addListener(onSystemChange); // older Safari
 }
 
-// Compact sun/moon toggle, same segmented-pill visual pattern as the NL/EN
-// lang-toggle it sits next to. Unlike the language toggle, switching theme is
-// a pure CSS variable swap - no page reload needed, so this just re-renders
-// its own active-state highlighting in place. The active button always
-// reflects the current *resolved* theme (system-followed or overridden alike)
-// - clicking the other one makes this session's choice explicit.
+// Single round icon button, not a two-option toggle: it always shows the
+// *current* resolved theme's icon (☀️ while light, 🌙 while dark), and a
+// click just flips to the other theme - no segmented pill, no two buttons
+// sitting side by side. Switching theme is a pure CSS variable swap - no
+// page reload needed, so a click just re-paints this one button in place.
 function renderThemeToggle(container) {
-  const wrap = el("div", { class: "theme-toggle", role: "group", "aria-label": t("theme.toggleLabel") });
-  const modes = [
-    { value: "light", icon: "☀️", title: t("theme.light") },
-    { value: "dark", icon: "🌙", title: t("theme.dark") },
-  ];
+  const btn = el("button", { type: "button", class: "theme-toggle" });
   const paint = () => {
     const current = resolveTheme();
-    [...wrap.children].forEach((btn, i) => btn.classList.toggle("is-active", modes[i].value === current));
+    btn.textContent = current === "dark" ? "🌙" : "☀️";
+    // Label/title describe the action a click performs (switch to the OTHER
+    // theme), not the icon currently shown - the standard pattern for a
+    // single toggle button, so screen readers announce what will happen.
+    const label = current === "dark" ? t("theme.switchToLight") : t("theme.switchToDark");
+    btn.title = label;
+    btn.setAttribute("aria-label", label);
   };
-  for (const mode of modes) {
-    const btn = el("button", { type: "button", class: "theme-toggle__btn", title: mode.title, "aria-label": mode.title }, mode.icon);
-    btn.addEventListener("click", () => { setThemeOverride(mode.value); paint(); });
-    wrap.appendChild(btn);
-  }
+  btn.addEventListener("click", () => {
+    setThemeOverride(resolveTheme() === "dark" ? "light" : "dark");
+    paint();
+  });
   paint();
-  container.appendChild(wrap);
-  return wrap;
+  container.appendChild(btn);
+  return btn;
 }
