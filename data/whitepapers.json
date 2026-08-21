@@ -1,6 +1,6 @@
 {
   "register": "whitepapers",
-  "generated_at": "2026-08-21T13:33:43+00:00",
+  "generated_at": "2026-08-21T14:20:14+00:00",
   "records": [
     {
       "id": "dfea4f01709f83f8",
@@ -821,16 +821,6 @@
           "last_update": "12/05/2025"
         },
         {
-          "url": "https://crypto-risk-metrics.com/en/white-paper-ai16z-ffg-8sqn5vkwh",
-          "casp_name": null,
-          "casp_lei": null,
-          "offer_countries": [],
-          "dti": null,
-          "dti_ffg": null,
-          "comments": null,
-          "last_update": "10/06/2025"
-        },
-        {
           "url": "https://crypto-risk-metrics.com/en/white-paper-dogwifhat-ffg-10g31sk86/",
           "casp_name": null,
           "casp_lei": null,
@@ -839,47 +829,6 @@
           "dti_ffg": null,
           "comments": null,
           "last_update": "10/06/2025"
-        },
-        {
-          "url": "https://white-paper.crypto-risk-metrics.com/en/official-trump-ffg-ljdpgnxxk/index.html",
-          "casp_name": null,
-          "casp_lei": null,
-          "offer_countries": [
-            "AT",
-            "BE",
-            "BG",
-            "CY",
-            "CZ",
-            "DE",
-            "DK",
-            "EE",
-            "ES",
-            "FI",
-            "FR",
-            "GR",
-            "HR",
-            "HU",
-            "IE",
-            "IS",
-            "IT",
-            "LI",
-            "LT",
-            "LU",
-            "LV",
-            "MT",
-            "NL",
-            "NO",
-            "PL",
-            "PT",
-            "RO",
-            "SE",
-            "SI",
-            "SK"
-          ],
-          "dti": "13D4K4NW6| 3R313RR9C",
-          "dti_ffg": "LJDPGNXXK",
-          "comments": "Modification",
-          "last_update": "30/06/2026"
         },
         {
           "url": "https://crypto-risk-metrics.com/en/white-paper-ethereum-classic-ether-ffg-dgmqmfzd4/",
@@ -920,16 +869,6 @@
           "dti_ffg": null,
           "comments": null,
           "last_update": "16/06/2025"
-        },
-        {
-          "url": "https://crypto-risk-metrics.com/en/white-paper-peanut-the-squirrel-ffg-75d0kj7wn/",
-          "casp_name": null,
-          "casp_lei": null,
-          "offer_countries": [],
-          "dti": null,
-          "dti_ffg": null,
-          "comments": null,
-          "last_update": "26/06/2025"
         },
         {
           "url": "https://crypto-risk-metrics.com/en/white-paper-pudgy-penguins-ffg-13jbpt88t/",
@@ -1042,16 +981,6 @@
           "last_update": "22/07/2025"
         },
         {
-          "url": "https://crypto-risk-metrics.com/en/white-paper-pump.fun-ffg-c2f189jnl/",
-          "casp_name": null,
-          "casp_lei": null,
-          "offer_countries": [],
-          "dti": null,
-          "dti_ffg": null,
-          "comments": null,
-          "last_update": "22/07/2025"
-        },
-        {
           "url": "https://crypto-risk-metrics.com/en/white-paper-tokenbot-ffg-b9bf88zxp/",
           "casp_name": null,
           "casp_lei": null,
@@ -1123,16 +1052,6 @@
         },
         {
           "url": "https://crypto-risk-metrics.com/en/white-paper-cookie-dao-ffg-dbrtw3ff8/",
-          "casp_name": null,
-          "casp_lei": null,
-          "offer_countries": [],
-          "dti": null,
-          "dti_ffg": null,
-          "comments": null,
-          "last_update": "12/08/2025"
-        },
-        {
-          "url": "https://crypto-risk-metrics.com/en/white-paper-b3-ffg-bplsknpd9/",
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [],
@@ -4190,6 +4109,170 @@
           "dti_ffg": "P0SD47M0W",
           "comments": null,
           "last_update": "13/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/b3-ffg-bplsknpd9/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "KJVKZ3X3W",
+          "dti_ffg": "BPLSKNPD9",
+          "comments": "Modification",
+          "last_update": "13/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/ai16z-ffg-8sqn5vkwh/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "2PZTQFMK4",
+          "dti_ffg": "8SQN5VKWH",
+          "comments": "Modification",
+          "last_update": "17/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/pumpfun-ffg-c2f189jnl/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "ZDR1PTM67",
+          "dti_ffg": "C2F189JNL",
+          "comments": "Modification",
+          "last_update": "17/08/2026"
+        },
+        {
+          "url": "https://white-paper.crypto-risk-metrics.com/en/peanut-the-squirrel-ffg-75d0kj7wn/index.html",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [
+            "AT",
+            "BE",
+            "BG",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+          ],
+          "dti": "7FJ0P4TBH",
+          "dti_ffg": "75D0KJ7WN",
+          "comments": "Modification",
+          "last_update": "18/08/2026"
         }
       ]
     },
@@ -4717,7 +4800,7 @@
       "head_office_country": "DE",
       "whitepapers": [
         {
-          "url": "N/A",
+          "url": "https://www.heldfor.com/whitepaper",
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [
@@ -21168,7 +21251,7 @@
     },
     {
       "id": "e13a1c4088320411",
-      "competent_authority": "Norwegian Financial Supervisory Authority",
+      "competent_authority": "Norwegian Financial Supervisory Authority (Finanstilsynet)",
       "home_member_state": "NO",
       "name": "Dog Planet AS",
       "lei": "984500BB7F58F08AAE09",
@@ -21179,10 +21262,50 @@
           "casp_name": null,
           "casp_lei": null,
           "offer_countries": [],
-          "dti": null,
+          "dti": "Pending",
           "dti_ffg": null,
-          "comments": "DTI Pending",
-          "last_update": "13/05/2026"
+          "comments": null,
+          "last_update": null
+        }
+      ]
+    },
+    {
+      "id": "d86c562a47b66d1a",
+      "competent_authority": "Norwegian Financial Supervisory Authority (Finanstilsynet)",
+      "home_member_state": "NO",
+      "name": "PALM Token",
+      "lei": "984500DO9DFB6A524A59",
+      "head_office_country": "NO",
+      "whitepapers": [
+        {
+          "url": "http://www.palmeconomy.io",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "Pending",
+          "dti_ffg": null,
+          "comments": "Updated WP July 2026",
+          "last_update": null
+        }
+      ]
+    },
+    {
+      "id": "922a9bd572d4b464",
+      "competent_authority": "Norwegian Financial Supervisory Authority (Finanstilsynet)",
+      "home_member_state": "NO",
+      "name": "Aprikos Venture AS",
+      "lei": "254900214ET6113P0X94",
+      "head_office_country": "NO",
+      "whitepapers": [
+        {
+          "url": "https://venturetoken.io/",
+          "casp_name": null,
+          "casp_lei": null,
+          "offer_countries": [],
+          "dti": "Pending",
+          "dti_ffg": null,
+          "comments": null,
+          "last_update": null
         }
       ]
     }

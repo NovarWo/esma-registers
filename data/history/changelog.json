@@ -14734,5 +14734,322 @@
       "authorisation date: 15/07/2026 → 16/07/2026"
     ],
     "timestamp": "2026-08-18T10:12:04+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "f1d8927264ff54ce",
+    "name": "Crypto Risk Metrics GmbH",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "c3f4f043512c74d2",
+    "name": "Heldfor GmbH",
+    "detail": [
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "whitepapers",
+    "id": "e13a1c4088320411",
+    "name": "Dog Planet AS",
+    "detail": [
+      "competent authority: Norwegian Financial Supervisory Authority → Norwegian Financial Supervisory Authority (Finanstilsynet)",
+      {
+        "kind": "field_changed",
+        "field": "whitepapers"
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "d86c562a47b66d1a",
+    "name": "PALM Token",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "whitepapers",
+    "id": "922a9bd572d4b464",
+    "name": "Aprikos Venture AS",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "5310dd2f81712f8d",
+    "name": "360 Treasury Systems AG",
+    "detail": [
+      "commercial name: flatexDEGIRO Bank AG → 360 Treasury Systems AG"
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "929688abd77ea707",
+    "name": "Crypto Finance (Deutschland) GmbH",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "a",
+        "countries": [
+          "AT",
+          "HU",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "c",
+        "countries": [
+          "AT",
+          "HU",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "d",
+        "countries": [
+          "AT",
+          "HU",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "e",
+        "countries": [
+          "AT",
+          "HU",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "j",
+        "countries": [
+          "AT",
+          "HU",
+          "SK"
+        ]
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "82bff8a6ceb99671",
+    "name": "Tangany GmbH",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "a",
+        "countries": [
+          "IS",
+          "LI",
+          "NO"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "j",
+        "countries": [
+          "IS",
+          "LI",
+          "NO"
+        ]
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "4932c86b81632d3e",
+    "name": "Ihre Volksbank eG Neckar Odenwald Main Tauber",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "6668fa2356964f14",
+    "name": "VR-Bank Mittelfranken Mitte eG",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "87f2c31e140d66cf",
+    "name": "Volksbank Euskirchen eG",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "aca61e63105e6855",
+    "name": "VR Bank Ried-Überwald eG",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "added",
+    "register": "casps",
+    "id": "8812cdf833f8cb31",
+    "name": "Volksbank Backnang eG",
+    "timestamp": "2026-08-21T14:20:14+00:00"
+  },
+  {
+    "type": "changed",
+    "register": "casps",
+    "id": "12a4d23fda6353e8",
+    "name": "CRIPTAN TRADE S.L.",
+    "detail": [
+      {
+        "kind": "service_countries_added",
+        "code": "a",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GR",
+          "HR",
+          "HU",
+          "IE",
+          "IT",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "c",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GR",
+          "HR",
+          "HU",
+          "IE",
+          "IT",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "d",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GR",
+          "HR",
+          "HU",
+          "IE",
+          "IT",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      },
+      {
+        "kind": "service_countries_added",
+        "code": "j",
+        "countries": [
+          "AT",
+          "BE",
+          "BG",
+          "CY",
+          "CZ",
+          "DE",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GR",
+          "HR",
+          "HU",
+          "IE",
+          "IT",
+          "LT",
+          "LU",
+          "LV",
+          "MT",
+          "NL",
+          "PL",
+          "PT",
+          "RO",
+          "SE",
+          "SI",
+          "SK"
+        ]
+      }
+    ],
+    "timestamp": "2026-08-21T14:20:14+00:00"
   }
 ]

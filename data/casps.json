@@ -1,6 +1,6 @@
 {
   "register": "casps",
-  "generated_at": "2026-08-21T13:33:43+00:00",
+  "generated_at": "2026-08-21T14:20:14+00:00",
   "records": [
     {
       "id": "67737a1e35f92605",
@@ -7611,7 +7611,7 @@
       "name": "360 Treasury Systems AG",
       "lei": "529900P0204W9HA8JP36",
       "head_office_country": "DE",
-      "commercial_name": "flatexDEGIRO Bank AG",
+      "commercial_name": "360 Treasury Systems AG",
       "address": "Grüneburgweg 16-18 - 60322 Frankfurt am Main",
       "website": "www.360t.com",
       "platform_website": null,
@@ -8231,97 +8231,112 @@
         {
           "service": "a. providing custody and administration of crypto-assets on behalf of clients",
           "countries": [
+            "AT",
             "DE",
             "BE",
             "ES",
             "FR",
             "GR",
+            "HU",
             "IT",
             "LI",
             "LU",
             "MT",
             "NL",
             "PL",
-            "PT"
+            "PT",
+            "SK"
           ],
           "comments": null,
-          "last_update": "23/05/2025"
+          "last_update": "19/06/2026"
         },
         {
           "service": "c. exchange of crypto-assets for funds",
           "countries": [
+            "AT",
             "DE",
             "BE",
             "ES",
             "FR",
             "GR",
+            "HU",
             "IT",
             "LI",
             "LU",
             "MT",
             "NL",
             "PL",
-            "PT"
+            "PT",
+            "SK"
           ],
           "comments": null,
-          "last_update": "23/05/2025"
+          "last_update": "19/06/2026"
         },
         {
           "service": "d. exchange of crypto-assets for other crypto-assets",
           "countries": [
+            "AT",
             "DE",
             "BE",
             "ES",
             "FR",
             "GR",
+            "HU",
             "IT",
             "LI",
             "LU",
             "MT",
             "NL",
             "PL",
-            "PT"
+            "PT",
+            "SK"
           ],
           "comments": null,
-          "last_update": "23/05/2025"
+          "last_update": "19/06/2026"
         },
         {
           "service": "e. execution of orders for crypto-assets on behalf of clients",
           "countries": [
+            "AT",
             "DE",
             "BE",
             "ES",
             "FR",
             "GR",
+            "HU",
             "IT",
             "LI",
             "LU",
             "MT",
             "NL",
             "PL",
-            "PT"
+            "PT",
+            "SK"
           ],
           "comments": null,
-          "last_update": "23/05/2025"
+          "last_update": "19/06/2026"
         },
         {
           "service": "j. providing transfer services for crypto-assets on behalf of clients",
           "countries": [
+            "AT",
             "DE",
             "BE",
             "ES",
             "FR",
             "GR",
+            "HU",
             "IT",
             "LI",
             "LU",
             "MT",
             "NL",
             "PL",
-            "PT"
+            "PT",
+            "SK"
           ],
           "comments": null,
-          "last_update": "23/05/2025"
+          "last_update": "19/06/2026"
         }
       ],
       "source": "esma"
@@ -8396,10 +8411,13 @@
             "RO",
             "SE",
             "SI",
-            "SK"
+            "SK",
+            "NO",
+            "IS",
+            "LI"
           ],
           "comments": null,
-          "last_update": "08/08/2025"
+          "last_update": "22/06/2026"
         },
         {
           "service": "j. providing transfer services for crypto-assets on behalf of clients",
@@ -8430,10 +8448,13 @@
             "RO",
             "SE",
             "SI",
-            "SK"
+            "SK",
+            "NO",
+            "IS",
+            "LI"
           ],
           "comments": null,
-          "last_update": "08/08/2025"
+          "last_update": "22/06/2026"
         }
       ],
       "source": "esma"
@@ -10554,6 +10575,136 @@
       "source": "esma"
     },
     {
+      "id": "4932c86b81632d3e",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Ihre Volksbank eG Neckar Odenwald Main Tauber",
+      "lei": "529900XUBIXXFHP44185",
+      "head_office_country": "DE",
+      "commercial_name": "Ihre Volksbank eG Neckar Odenwald Main Tauber",
+      "address": "Rechte Tauberstraße 1, 97877 Wertheim a Main",
+      "website": "www.ihre-vb.de",
+      "platform_website": null,
+      "authorisation_date": "18/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "18/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
+      "id": "6668fa2356964f14",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "VR-Bank Mittelfranken Mitte eG",
+      "lei": "5299009RFJSJRM1FIW34",
+      "head_office_country": "DE",
+      "commercial_name": "VR-Bank Mittelfranken Mitte eG",
+      "address": "Promenade 19 -23, 91522 Ansbach",
+      "website": "www.vr-mfr.de",
+      "platform_website": null,
+      "authorisation_date": "18/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "18/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
+      "id": "87f2c31e140d66cf",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Volksbank Euskirchen eG",
+      "lei": "529900DLAJ534R7YPF91",
+      "head_office_country": "DE",
+      "commercial_name": "Volksbank Euskirchen eG",
+      "address": "Bahnhofstraße 7, 53879 Euskirchen",
+      "website": "www.eu-banking.de",
+      "platform_website": null,
+      "authorisation_date": "14/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "20/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
+      "id": "aca61e63105e6855",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "VR Bank Ried-Überwald eG",
+      "lei": "529900Z9LN7U0GBF2S53",
+      "head_office_country": "DE",
+      "commercial_name": "VR Bank Ried-Überwald eG",
+      "address": "Nibelungenstraße 57, 68642 Bürstadt",
+      "website": "www.raiba-ried.de",
+      "platform_website": null,
+      "authorisation_date": "20/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "20/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
+      "id": "8812cdf833f8cb31",
+      "competent_authority": "Federal Financial Supervisory Authority (BaFin)",
+      "home_member_state": "DE",
+      "name": "Volksbank Backnang eG",
+      "lei": "5299000CFIYPHBDCD952",
+      "head_office_country": "DE",
+      "commercial_name": "Volksbank Backnang eG",
+      "address": "Schillerstraße 18, 71522 Backnang",
+      "website": "www.volksbank-backnang.de",
+      "platform_website": null,
+      "authorisation_date": "20/08/2026",
+      "withdrawal_date": null,
+      "status": "active",
+      "services": [
+        {
+          "service": "e. execution of orders for crypto-assets on behalf of clients",
+          "countries": [
+            "DE"
+          ],
+          "comments": null,
+          "last_update": "20/08/2026"
+        }
+      ],
+      "source": "esma"
+    },
+    {
       "id": "5851ed02452fae27",
       "competent_authority": "Finanstilsynet",
       "home_member_state": "DK",
@@ -12444,34 +12595,138 @@
         {
           "service": "a. providing custody and administration of crypto-assets on behalf of clients.",
           "countries": [
-            "ES"
+            "ES",
+            "AT",
+            "BE",
+            "BG",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FI",
+            "FR",
+            "DE",
+            "GR",
+            "HU",
+            "IE",
+            "IT",
+            "LV",
+            "LT",
+            "LU",
+            "MT",
+            "NL",
+            "PL",
+            "PT",
+            "RO",
+            "SK",
+            "SI",
+            "SE"
           ],
           "comments": null,
-          "last_update": "26/06/2026"
+          "last_update": "09/07/2026"
         },
         {
           "service": "c. exchange of crypto-assets for funds",
           "countries": [
-            "ES"
+            "ES",
+            "AT",
+            "BE",
+            "BG",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FI",
+            "FR",
+            "DE",
+            "GR",
+            "HU",
+            "IE",
+            "IT",
+            "LV",
+            "LT",
+            "LU",
+            "MT",
+            "NL",
+            "PL",
+            "PT",
+            "RO",
+            "SK",
+            "SI",
+            "SE"
           ],
           "comments": null,
-          "last_update": "26/06/2026"
+          "last_update": "09/07/2026"
         },
         {
           "service": "d. exchange of crypto-assets for other crypto-assets",
           "countries": [
-            "ES"
+            "ES",
+            "AT",
+            "BE",
+            "BG",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FI",
+            "FR",
+            "DE",
+            "GR",
+            "HU",
+            "IE",
+            "IT",
+            "LV",
+            "LT",
+            "LU",
+            "MT",
+            "NL",
+            "PL",
+            "PT",
+            "RO",
+            "SK",
+            "SI",
+            "SE"
           ],
           "comments": null,
-          "last_update": "26/06/2026"
+          "last_update": "09/07/2026"
         },
         {
           "service": "j. providing transfer services for crypto-assets on behalf of clients.",
           "countries": [
-            "ES"
+            "ES",
+            "AT",
+            "BE",
+            "BG",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FI",
+            "FR",
+            "DE",
+            "GR",
+            "HU",
+            "IE",
+            "IT",
+            "LV",
+            "LT",
+            "LU",
+            "MT",
+            "NL",
+            "PL",
+            "PT",
+            "RO",
+            "SK",
+            "SI",
+            "SE"
           ],
           "comments": null,
-          "last_update": "26/06/2026"
+          "last_update": "09/07/2026"
         }
       ],
       "source": "esma"
